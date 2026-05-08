@@ -350,7 +350,7 @@ function initLoginForm() {
 
   const btn = document.getElementById('doLoginBtn');
 btnLoad(btn, '로그인 중...');
-
+console.log('로그인 API 호출 시작', { email });
 fetch('https://backend.di702934.workers.dev/api/auth/login', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
