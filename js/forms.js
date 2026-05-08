@@ -351,7 +351,7 @@ function initLoginForm() {
   const btn = document.getElementById('doLoginBtn');
 btnLoad(btn, '로그인 중...');
 
-fetch('http://localhost:8787/api/auth/login', {
+fetch('https://backend.di702934.workers.dev/api/auth/login', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
@@ -448,7 +448,7 @@ function initSignupForm() {
     const btn = document.getElementById('doSignupBtn');
 btnLoad(btn, '가입 중...');
 console.log('회원가입 API 호출 시작', { nick, email });
-fetch('http://localhost:8787/api/auth/signup', {
+fetch('https://backend.di702934.workers.dev/api/auth/signup', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
