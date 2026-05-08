@@ -1,5 +1,7 @@
 'use strict';
 
+console.log('forms.js 최신 파일 로드됨');
+
 /* ═══════════════════════════════════════════════════
    FORMS.JS — 완전한 폼 검증 & UX 시스템
    - 실시간 validation
