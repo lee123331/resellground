@@ -1,10 +1,20 @@
 import { Hono } from "hono";
+import { cors } from "hono/cors";
 
 type Bindings = {
   DB: D1Database;
 };
 
 const app = new Hono<{ Bindings: Bindings }>();
+
+app.use(
+  "*",
+  cors({
+    origin: "https://resellground.pages.dev",
+    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
 app.get("/", (c) => {
   return c.json({
@@ -71,20 +81,24 @@ app.post("/api/auth/login", async (c) => {
       return c.json({ message: "이메일과 비밀번호를 입력해주세요." }, 400);
     }
 
-    const user = await c.env.DB.prepare(
-      "SELECT * FROM users WHERE email = ?"
-    )
+    const user = await c.env.DB.prepare("SELECT * FROM users WHERE email = ?")
       .bind(email)
       .first<any>();
 
     if (!user) {
-      return c.json({ message: "이메일 또는 비밀번호가 올바르지 않습니다." }, 401);
+      return c.json(
+        { message: "이메일 또는 비밀번호가 올바르지 않습니다." },
+        401
+      );
     }
 
     const isValid = await verifyPassword(password, user.password_hash);
 
     if (!isValid) {
-      return c.json({ message: "이메일 또는 비밀번호가 올바르지 않습니다." }, 401);
+      return c.json(
+        { message: "이메일 또는 비밀번호가 올바르지 않습니다." },
+        401
+      );
     }
 
     const token = await createToken({
