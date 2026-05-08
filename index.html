@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="description" content="리셀그라운드 — 셀러를 팔로우하고 드롭을 발견하는 리셀그라운드"/>
+<title>리셀그라운드— 리셀그라운드</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="css/base.css"/>
+<link rel="stylesheet" href="css/layout.css"/>
+<link rel="stylesheet" href="css/components.css"/>
+<link rel="stylesheet" href="css/pages.css"/>
+<link rel="stylesheet" href="css/responsive.css"/>
+</head>
+<body>
+
+<!-- NAV — 리셀그라운드 2단 -->
+<nav class="nav" id="mainNav">
+  <div class="nav__top">
+    <a class="nav__logo" data-goto="home">리셀<em>그라운드</em><span class="nav__logo-fee">수수료 3%</span></a>
+    <div class="nav__searchbar hide-mobile">
+      <input class="nav__search-inp" id="searchInpTop" placeholder="상품명, 브랜드, 셀러 검색..." autocomplete="off"/>
+      <button class="nav__search-btn" id="searchBtn" aria-label="검색">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/></svg>
+      </button>
+    </div>
+    <div class="nav__actions">
+      <button class="icon-btn hide-mobile" id="notifBtn" style="position:relative;width:36px;height:36px;border-radius:8px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;color:rgba(255,255,255,.8);flex-shrink:0;transition:all .15s ease;" aria-label="알림">
+        <svg width="17" height="17" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="1.8" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span id="notifBadge" style="position:absolute;top:-4px;right:-4px;min-width:16px;height:16px;background:var(--red,#dc2626);color:#fff;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;border-radius:8px;padding:0 3px;border:2px solid #1e3a5f">2</span>
+      </button>
+      <button class="icon-btn hide-mobile" id="chatBtn" style="width:36px;height:36px;border-radius:8px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;color:rgba(255,255,255,.8);flex-shrink:0;" aria-label="채팅">
+        <svg width="17" height="17" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="1.8" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span style="position:absolute;top:5px;right:5px;width:7px;height:7px;border-radius:50%;background:var(--red,#dc2626);border:2px solid #1e3a5f"></span>
+      </button>
+      <button class="icon-btn hide-mobile" id="profileBtn" style="width:36px;height:36px;border-radius:8px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;color:rgba(255,255,255,.8);flex-shrink:0;" aria-label="마이페이지">
+        <svg width="17" height="17" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="1.8" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </button>
+      <button class="nav-btn-login hide-mobile" id="loginBtn">로그인</button>
+      <button class="nav-btn-join" id="preregBtn">파트너 신청</button>
+      <button class="nav__hbg" id="hbgBtn" aria-label="메뉴 열기" aria-expanded="false">
+        <span class="nav__bar"></span><span class="nav__bar"></span><span class="nav__bar"></span>
+      </button>
+    </div>
+  </div>
+  <div class="nav__bottom">
+    <ul class="nav__links">
+      <li class="nav__item"><a class="nav__link" data-goto="home">홈</a></li>
+      <li class="nav__item"><a class="nav__link" data-goto="popular-products">🔥 인기상품</a></li>
+      <li class="nav__item"><a class="nav__link" data-goto="drops">실시간 드롭</a></li>
+      <li class="nav__item"><a class="nav__link" data-goto="market-price">시세조회</a></li>
+      <li class="nav__item"><a class="nav__link" data-goto="community">커뮤니티</a></li>
+      <li class="nav__item"><a class="nav__link" data-goto="sellers">셀러</a></li>
+      <li class="nav__item">
+        <button class="nav__trigger" aria-haspopup="true">더보기 <span class="nav__arr">▾</span></button>
+        <ul class="nav__dropdown">
+          <li><a class="nav__dd-link" data-goto="ranking">주간 랭킹</a></li>
+          <li><a class="nav__dd-link" data-goto="fees">수수료 안내</a></li>
+          <li><a class="nav__dd-link" data-goto="guide">거래 가이드</a></li>
+          <li><a class="nav__dd-link" data-goto="verify">검수 안내</a></li>
+          <li><a class="nav__dd-link" data-goto="notice">공지사항</a></li>
+          <li><a class="nav__dd-link" data-goto="support">고객센터</a></li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+<!-- MOBILE DRAWER -->
+<nav class="drawer" id="drawer" aria-hidden="true">
+  <div class="drawer__link" data-goto="sellers">셀러 <em>→</em></div>
+  <div class="drawer__link" data-goto="drops">드롭스 <em>→</em></div>
+  <div class="drawer__link" data-goto="ranking">랭킹 <em>→</em></div>
+  <div class="drawer__link" data-goto="community">커뮤니티 <em>→</em></div>
+  <p class="drawer__sec">더보기</p>
+  <div class="drawer__sub" data-goto="fees">수수료</div>
+  <div class="drawer__sub" data-goto="market-price">시세조회</div>
+  <div class="drawer__sub" data-goto="popular-products">인기상품</div>
+  <div class="drawer__sub" data-goto="guide">거래가이드</div>
+  <div class="drawer__sub" data-goto="verify">검수안내</div>
+  <div class="drawer__sub" data-goto="notice">공지사항</div>
+  <div class="drawer__sub" data-goto="support">고객센터</div>
+  <div class="drawer__actions">
+    <button class="btn btn--g" id="loginBtnM">로그인</button>
+    <button class="btn btn--p" id="preregBtnM">파트너신청</button>
+  </div>
+</nav>
+
+<!-- SEARCH OVERLAY -->
+<div class="search-ov" id="searchOv">
+  <div class="search-inner">
+    <div class="search-row">
+      <input class="search-inp" id="searchInp" placeholder="검색어 입력..." autocomplete="off"/>
+      <button class="search-close" id="searchClose">✕</button>
+    </div>
+    <p class="search-label">최근 검색어</p>
+    <div class="search-chips">
+      <div class="search-chip">Jordan 1 Chicago</div>
+      <div class="search-chip">Rolex 서브마리너</div>
+      <div class="search-chip">Chanel 클래식플랩</div>
+      <div class="search-chip">New Balance 2002R</div>
+    </div>
+    <p class="search-label">인기 검색어</p>
+    <div class="search-chips">
+      <div class="search-chip">🔥 Nike Dunk Low</div>
+      <div class="search-chip">💎 Gucci Ophidia</div>
+      <div class="search-chip">⌚ AP Royal Oak</div>
+      <div class="search-chip">🧥 Stone Island</div>
+    </div>
+  </div>
+</div>
+
+<!-- HOME PAGE -->
+<main class="page active" id="page-home">
+  <!-- ════ HERO — 실시간 거래 데이터 + 셀러 네트워크 ════ -->
+  <section class="hero">
+    <div class="hero__content">
+      <p class="hero__eye">실시간 거래 데이터 · 셀러 네트워크 · 인플루언서 협업</p>
+      <h1 class="hero__title">
+        리셀 시장을<br>
+        <span class="text-three">새롭게 만든다</span>
+      </h1>
+      <p class="hero__sub">단순한 중고 거래가 아닙니다. 리셀러, 크리에이터, 인플루언서가 함께 성장하는 협업형 실시간 리셀 플랫폼입니다.</p>
+      <div class="hero__btns">
+        <button class="btn btn--p btn--lg" data-goto="popular-products">🔥 지금 핫한 상품 보기</button>
+        <button class="btn btn--outline-brand" data-goto="drops">실시간 드롭 →</button>
+      </div>
+      <!-- 거래 흐름 가이드 -->
+      <div class="trade-flow">
+        <div class="trade-flow__step">
+          <div class="trade-flow__icon">🔍</div>
+          <p class="trade-flow__label">상품 탐색</p>
+          <p class="trade-flow__desc">실시간 시세·드롭</p>
+        </div>
+        <div class="trade-flow__step">
+          <div class="trade-flow__icon">✓</div>
+          <p class="trade-flow__label">신뢰 확인</p>
+          <p class="trade-flow__desc">인증 셀러 검증</p>
+        </div>
+        <div class="trade-flow__step">
+          <div class="trade-flow__icon">💬</div>
+          <p class="trade-flow__label">거래 채팅</p>
+          <p class="trade-flow__desc">안전 결제 연동</p>
+        </div>
+        <div class="trade-flow__step">
+          <div class="trade-flow__icon">💰</div>
+          <p class="trade-flow__label">수익 창출</p>
+          <p class="trade-flow__desc">수수료 3% 고정</p>
+        </div>
+      </div>
+      <!-- KPI 카드 -->
+      <div class="hero__kpi">
+        <div class="kpi-card kpi-card--three">
+          <p class="kpi-card__label">수수료 고정</p>
+          <p class="kpi-card__value">3%</p>
+          <p class="kpi-card__change fixed">업계 최저 수준</p>
+        </div>
+        <div class="kpi-card">
+          <p class="kpi-card__label">오늘 거래량</p>
+          <p class="kpi-card__value">1,248</p>
+          <p class="kpi-card__change up">↑ 12% 어제 대비</p>
+        </div>
+        <div class="kpi-card">
+          <p class="kpi-card__label">인증 셀러</p>
+          <p class="kpi-card__value">247명</p>
+          <p class="kpi-card__change up">↑ 온라인 중</p>
+        </div>
+        <div class="kpi-card">
+          <p class="kpi-card__label">평균 거래가</p>
+          <p class="kpi-card__value">₩684K</p>
+          <p class="kpi-card__change up">↑ 3.2% 이번 주</p>
+        </div>
+      </div>
+    </div>
+    <aside class="hero__feed">
+      <div class="feed-hd">
+        <span class="feed-hd__t">실시간 거래 피드</span>
+        <span class="feed-hd__live"><span></span> LIVE</span>
+      </div>
+      <div class="feed-fol">
+        <p class="feed-fol__label">팔로우 중인 셀러</p>
+        <div class="feed-chips">
+          <div class="feed-chip"><span class="feed-chip__dot"></span>@sneaker.kang</div>
+          <div class="feed-chip"><span class="feed-chip__dot"></span>@luxe.j</div>
+          <div class="feed-chip"><span class="feed-chip__dot"></span>@techwear.s</div>
+        </div>
+      </div>
+      <div class="feed-list" id="feedList"></div>
+      <div class="feed-foot">
+        <p class="feed-foot__s">오늘 <strong>1,248건</strong> 거래 완료</p>
+        <button class="btn btn--p btn--sm" data-goto="drops">전체 피드 →</button>
+      </div>
+    </aside>
+  </section>
+
+  <!-- 마퀴 -->
+  <!-- 마퀴 -->
+  <div class="mq"><div class="mq__track">
+    <span class="mq__item hi">🔥 수수료 3% 고정</span><span class="mq__item">✦</span>
+    <span class="mq__item">실시간 시세조회</span><span class="mq__item">✦</span>
+    <span class="mq__item hi">인증 셀러 네트워크</span><span class="mq__item">✦</span>
+    <span class="mq__item">전국 안전결제 + 근거리 직거래</span><span class="mq__item">✦</span>
+    <span class="mq__item hi">셀러·크리에이터·인플루언서 협업</span><span class="mq__item">✦</span>
+    <span class="mq__item">리셀그라운드 — 협업형 리셀 플랫폼</span><span class="mq__item">✦</span>
+    <span class="mq__item hi">🔥 수수료 3% 고정</span><span class="mq__item">✦</span>
+    <span class="mq__item">실시간 시세조회</span><span class="mq__item">✦</span>
+    <span class="mq__item hi">인증 셀러 네트워크</span><span class="mq__item">✦</span>
+    <span class="mq__item">전국 안전결제 + 근거리 직거래</span><span class="mq__item">✦</span>
+    <span class="mq__item hi">셀러·크리에이터·인플루언서 협업</span><span class="mq__item">✦</span>
+    <span class="mq__item">리셀그라운드 — 협업형 리셀 플랫폼</span><span class="mq__item">✦</span>
+  </div></div>
+
+  <!-- ① 인기상품 + 실시간 거래 로그 -->
+  <section class="sp-y" style="background:#fff;border-bottom:1px solid var(--border)">
+    <div class="container reveal">
+      <div class="sec-hd">
+        <div>
+          <p class="section-tag">지금 가장 많이 팔리는</p>
+          <h2 class="section-h">🔥 인기상품 <span class="text-three">TOP</span></h2>
+        </div>
+        <button class="btn btn--outline-three btn--sm" data-goto="popular-products">전체 보기 →</button>
+      </div>
+      <!-- 거래 현황 바 -->
+      <div class="trade-bar">
+        <div class="live-tag"><span></span> LIVE</div>
+        <div class="trade-bar__item">오늘 거래 <span class="trade-bar__num">1,248건</span></div>
+        <div class="trade-bar__div"></div>
+        <div class="trade-bar__item">실시간 등록 <span class="trade-bar__num">37개</span></div>
+        <div class="trade-bar__div"></div>
+        <div class="trade-bar__item">활동 셀러 <span class="trade-bar__num">247명</span></div>
+        <div class="trade-bar__div"></div>
+        <div class="trade-bar__item">수수료 <span class="trade-bar__num brand">3%</span></div>
+      </div>
+      <!-- 인기상품 그리드 + 실시간 로그 -->
+      <div style="display:grid;grid-template-columns:1fr 280px;gap:var(--s5)">
+        <div class="g-popular" id="homePopularGrid"></div>
+        <div class="trade-log-section">
+          <div class="trade-log-header">
+            <h3>📡 실시간 거래 로그</h3>
+            <span class="live-tag" style="font-size:10px;padding:2px 6px"><span></span> LIVE</span>
+          </div>
+          <div class="trade-log-list" id="tradeLogList"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ② 실시간 드롭 -->
+  <section class="sp-y" style="background:var(--bg)">
+    <div class="container reveal">
+      <div class="sec-hd">
+        <div>
+          <p class="section-tag">방금 올라온</p>
+          <h2 class="section-h">⚡ 실시간 드롭</h2>
+        </div>
+        <button class="btn btn--outline-three btn--sm" data-goto="drops">전체 보기 →</button>
+      </div>
+      <div class="g-drops" id="homeDropsGrid"></div>
+    </div>
+  </section>
+
+  <!-- ③ 스폰서 + TOP 셀러 -->
+  <section class="sp-y" style="background:#fff;border-top:1px solid var(--border)">
+    <div class="container reveal">
+      <!-- 스폰서 배너 (광고 슬롯) -->
+      <div class="sponsor-banner">
+        <div class="sponsor-banner__avatar">🏆</div>
+        <div>
+          <p class="sponsor-banner__name">sneaker.kang</p>
+          <p class="sponsor-banner__desc">847건 거래 완료 · 거래 성공률 99.2% · 당일 발송</p>
+          <span class="sponsor-banner__badge">🥇 이달의 인증 셀러</span>
+        </div>
+        <button class="sponsor-banner__btn" onclick="requireLogin()">팔로우 · 거래하기</button>
+      </div>
+      <!-- 주간 TOP 셀러 -->
+      <div class="weekly-top-section">
+        <p class="weekly-top-title">🏆 주간 TOP 셀러 <span style="font-size:11px;font-weight:500;opacity:.7;margin-left:6px">매주 월요일 초기화</span></p>
+        <div class="weekly-top-grid" id="weeklyTopGrid"></div>
+      </div>
+      <div class="sec-hd">
+        <div>
+          <p class="section-tag">검증된 판매자</p>
+          <h2 class="section-h">이달의 <span class="text-brand">TOP 셀러</span></h2>
+        </div>
+        <button class="btn btn--outline-brand btn--sm" data-goto="sellers">전체 셀러 →</button>
+      </div>
+      <div class="g-sellers" id="homeSellerGrid"></div>
+    </div>
+  </section>
+
+  <!-- ④ 수수료 비교 + 수익 구조 -->
+  <section style="background:linear-gradient(135deg,var(--brand) 0%,#1d4ed8 60%,#7c3aed 100%);padding:var(--s12) var(--s8);position:relative;overflow:hidden">
+    <div style="max-width:var(--max-w);margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:var(--s8);align-items:center" class="reveal">
+      <div>
+        <p class="section-tag" style="color:#6ee7b7">수익 구조 비교</p>
+        <h2 class="section-h" style="color:#fff;font-size:clamp(22px,3vw,38px)">더 팔수록<br>더 많이 남는 구조</h2>
+        <p style="font-size:14px;color:rgba(255,255,255,.75);line-height:1.8;margin-bottom:var(--s5);word-break:keep-all">타 플랫폼은 팔면 팔수록 수수료가 쌓입니다. 리셀그라운드는 3% 고정. 커뮤니티가 성장할수록 셀러가 이깁니다.</p>
+        <div style="display:flex;gap:var(--s3);flex-wrap:wrap">
+          <button class="btn btn--p" data-goto="fees">수수료 자세히 보기 →</button>
+          <button class="btn" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3)" data-goto="sellers">셀러 되기 →</button>
+        </div>
+      </div>
+      <div>
+        <table class="fee-compare-table" style="width:100%;margin-bottom:var(--s4)">
+          <thead><tr><th>플랫폼</th><th>수수료</th><th>100만원 판매 시</th></tr></thead>
+          <tbody>
+            <tr><td>번개장터</td><td>3.5%+</td><td>965,000원</td></tr>
+            <tr><td>크림 (KREAM)</td><td>5~8%</td><td>920,000원</td></tr>
+            <tr><td>솔드아웃</td><td>6~10%</td><td>900,000원</td></tr>
+            <tr class="rslx-row"><td>✅ 리셀그라운드</td><td>3% 고정</td><td>970,000원</td></tr>
+          </tbody>
+        </table>
+        <div class="profit-calc">
+          <p class="profit-calc__title">💰 100만원 판매 시 실수령액 비교</p>
+          <div class="profit-calc__row"><p class="profit-calc__label">타 플랫폼 평균 (8%)</p><p class="profit-calc__value red">920,000원</p></div>
+          <div class="profit-calc__row"><p class="profit-calc__label">리셀그라운드 (3% 고정)</p><p class="profit-calc__value three">970,000원</p></div>
+          <div class="profit-calc__row"><p class="profit-calc__label">차이</p><p class="profit-calc__value three">+50,000원 더 남음</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ⑤ 랭킹 (간략) -->
+  <section class="sp-y" style="background:#fff">
+    <div class="container reveal">
+      <div class="sec-hd">
+        <div>
+          <p class="section-tag">이번 주 거래 순위</p>
+          <h2 class="section-h">주간 <span class="text-three">랭킹</span></h2>
+        </div>
+        <button class="btn btn--outline-three btn--sm" data-goto="ranking">전체 랭킹 →</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 300px;gap:var(--s5)">
+        <div style="border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;background:#fff" id="homeRankList"></div>
+        <div>
+          <div class="side-card">
+            <p class="side-card__t">카테고리별 거래량</p>
+            <div class="side-card__row"><div><p class="side-card__rn">스니커즈</p><div class="pbar"><div class="pbar__fill" style="width:92%"></div></div></div><p class="side-card__rv">1,284건</p></div>
+            <div class="side-card__row"><div><p class="side-card__rn">명품 백</p><div class="pbar"><div class="pbar__fill" style="width:68%"></div></div></div><p class="side-card__rv">948건</p></div>
+            <div class="side-card__row"><div><p class="side-card__rn">시계</p><div class="pbar"><div class="pbar__fill" style="width:55%"></div></div></div><p class="side-card__rv">762건</p></div>
+            <div class="side-card__row"><div><p class="side-card__rn">아우터/의류</p><div class="pbar"><div class="pbar__fill" style="width:38%"></div></div></div><p class="side-card__rv">521건</p></div>
+          </div>
+          <div class="side-card">
+            <p class="side-card__t">플랫폼 현황</p>
+            <div class="side-card__row"><p class="side-card__rn">전체 셀러</p><p class="side-card__rv">4,821명</p></div>
+            <div class="side-card__row"><p class="side-card__rn">인증 셀러</p><p class="side-card__rv" style="color:var(--three)">247명</p></div>
+            <div class="side-card__row"><p class="side-card__rn">평균 평점</p><p class="side-card__rv">4.94 ★</p></div>
+            <div class="side-card__row"><p class="side-card__rn">수수료</p><p class="side-card__rv" style="color:var(--three);font-weight:900">3% 고정 🔒</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ⑥ CTA — 파트너 모집 -->
+  <section style="background:var(--bg-soft);border-top:1px solid var(--border);padding:var(--s12) var(--s8);text-align:center">
+    <div style="max-width:580px;margin:0 auto" class="reveal">
+      <p class="section-tag" style="justify-content:center">함께 성장하세요</p>
+      <h2 style="font-size:clamp(24px,4vw,40px);font-weight:900;color:var(--text);margin-bottom:var(--s4);line-height:1.25;word-break:keep-all">리셀 시장을 새롭게 만들어갈<br><span class="text-three">리셀러 · 크리에이터 · 인플루언서</span>를<br>기다리고 있습니다</h2>
+      <p style="font-size:14px;color:var(--text-sub);margin-bottom:var(--s6);line-height:1.8;word-break:keep-all">함께 성장할 리셀 파트너를 찾습니다. 파트너 신청하고 초기 셀러 혜택, 우선 노출, 수수료 할인 기회를 받아보세요.</p>
+      <div style="display:flex;gap:var(--s3);justify-content:center;flex-wrap:wrap">
+        <button class="btn btn--p btn--lg" id="ctaBtn">파트너 신청하기 →</button>
+        <button class="btn btn--outline-brand" data-goto="guide">거래 가이드 보기</button>
+      </div>
+      <p style="font-size:11px;color:var(--text-mute);margin-top:var(--s4)">선착순 혜택 · 수수료 3% 고정 · SNS 팔로워 1,000명 이상 환영</p>
+    </div>
+  </section>
+
+  <footer class="site-foot">
+    <a class="site-foot__logo" data-goto="home">리셀그라운드</a>
+    <p class="site-foot__copy">© 2025 리셀 그라운드 · 실시간 리셀 거래 · 셀러 네트워크</p>
+    <ul class="site-foot__links"><li><a data-goto="guide">거래가이드</a></li><li><a data-goto="verify">검수안내</a></li><li><a data-goto="support">고객센터</a></li></ul>
+  </footer>
+</main>
+
+<!-- SELLERS PAGE -->
+<main class="page" id="page-sellers">
+  <div class="page-hd"><div class="page-hd__inner"><p class="section-tag">셀러</p><h1 class="page-hd__title">SELLERS</h1></div></div>
+  <div class="sellers-layout">
+    <aside class="sellers-side">
+      <p class="sellers-side__title">셀러 등급</p>
+      <button class="filter-btn act" data-tier="전체">전체 셀러</button>
+      <button class="filter-btn" data-tier="주간TOP">🏆 주간 TOP 10</button>
+      <button class="filter-btn" data-tier="verified">✓ 인증 셀러</button>
+      <button class="filter-btn" data-tier="trusted">★ 신뢰 셀러</button>
+      <button class="filter-btn" data-tier="">일반 셀러</button>
+      <p class="sellers-side__title" style="margin-top:var(--s5)">카테고리</p>
+      <button class="filter-btn" data-cat="전체">전체</button>
+      <button class="filter-btn" data-cat="스니커즈">스니커즈</button>
+      <button class="filter-btn" data-cat="명품/럭셔리">명품 / 럭셔리</button>
+      <button class="filter-btn" data-cat="시계">시계</button>
+      <button class="filter-btn" data-cat="아우터/의류">아우터 / 의류</button>
+    </aside>
+    <div class="sellers-main"><div class="g-sellers-pg" id="fullSellerGrid"></div></div>
+  </div>
+</main>
+
+<!-- DROPS PAGE -->
+<main class="page" id="page-drops">
+  <div class="page-hd"><div class="page-hd__inner"><p class="section-tag">드롭스</p><h1 class="page-hd__title">DROPS</h1></div></div>
+  <div class="drops-pg">
+    <div class="drops-toolbar">
+      <div class="drops-filters">
+        <button class="drops-flt-btn act" data-df="전체">전체</button>
+        <button class="drops-flt-btn" data-df="스니커즈">스니커즈</button>
+        <button class="drops-flt-btn" data-df="명품">명품</button>
+        <button class="drops-flt-btn" data-df="시계">시계</button>
+        <button class="drops-flt-btn" data-df="의류">의류</button>
+      </div>
+      <button class="btn btn--p" id="addDropBtn">+ 상품 등록</button>
+    </div>
+    <div class="g-drops-pg" id="dropsPageGrid"></div>
+  </div>
+</main>
+
+<!-- RANKING PAGE -->
+<main class="page" id="page-ranking">
+  <div class="page-hd"><div class="page-hd__inner"><p class="section-tag">랭킹</p><h1 class="page-hd__title">RANKING</h1></div></div>
+  <div class="sp-y container">
+    <div class="g-rank">
+      <div><p class="section-tag" style="margin-bottom:var(--sp-4)">이번 달 거래 랭킹</p><div style="border:1px solid var(--c-border)" id="fullRankList"></div></div>
+      <div class="side-card"><p class="side-card__t">카테고리별 거래량</p>
+        <div class="side-card__row"><div><p class="side-card__rn">스니커즈</p><div class="pbar"><div class="pbar__fill" style="width:92%"></div></div></div><p class="side-card__rv">1,284</p></div>
+        <div class="side-card__row"><div><p class="side-card__rn">명품 백</p><div class="pbar"><div class="pbar__fill" style="width:68%"></div></div></div><p class="side-card__rv">948</p></div>
+        <div class="side-card__row"><div><p class="side-card__rn">시계</p><div class="pbar"><div class="pbar__fill" style="width:55%"></div></div></div><p class="side-card__rv">762</p></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- COMMUNITY PAGE -->
+<main class="page" id="page-community">
+  <div class="comm-layout">
+    <aside class="comm-side">
+      <p class="comm-side__title" style="margin-top:var(--sp-2)">게시판</p>
+      <div class="comm-side__link act" data-board="자유게시판"><span class="comm-side__dot"></span>자유게시판</div>
+      <div class="comm-side__link" data-board="인증게시판"><span class="comm-side__dot"></span>인증게시판</div>
+      <div class="comm-side__link" data-board="질문게시판"><span class="comm-side__dot"></span>질문게시판</div>
+      <div class="comm-side__link" data-board="시세토론"><span class="comm-side__dot"></span>시세토론</div>
+      <div class="comm-side__link" data-board="리셀정보"><span class="comm-side__dot"></span>리셀정보</div>
+      <div class="comm-side__link" data-board="거래후기"><span class="comm-side__dot"></span>거래후기</div>
+      <p class="comm-side__title" style="margin-top:var(--sp-5)">HOT</p>
+      <div class="comm-side__link"><span class="comm-side__dot" style="background:#ff4d4d"></span>인기글</div>
+      <div class="comm-side__link"><span class="comm-side__dot" style="background:var(--c-accent)"></span>실시간 댓글</div>
+    </aside>
+    <div class="comm-main">
+      <button class="btn btn--p btn--full" id="writePostBtn" style="margin-bottom:var(--sp-4)">✏ 글쓰기</button>
+      <div id="postList"></div>
+    </div>
+    <aside class="comm-right">
+      <p class="hot-title">🔥 인기글 TOP 5</p>
+      <div class="hot-item"><p class="hot-item__t">조던1 시카고 시세 폭등 이유 아시나요?</p><p class="hot-item__m">추천 84 · 댓글 31</p></div>
+      <div class="hot-item"><p class="hot-item__t">명품 직거래 노쇼 당했을 때 대처법</p><p class="hot-item__m">추천 61 · 댓글 22</p></div>
+      <div class="hot-item"><p class="hot-item__t">뉴발란스 2002R 리셀 타이밍 공유</p><p class="hot-item__m">추천 57 · 댓글 18</p></div>
+      <div class="hot-item"><p class="hot-item__t">롤렉스 서브마리너 위조품 구분법</p><p class="hot-item__m">추천 49 · 댓글 15</p></div>
+      <div class="hot-item"><p class="hot-item__t">리셀그라운드 셀러 등급 올리는 가장 빠른 방법</p><p class="hot-item__m">추천 44 · 댓글 12</p></div>
+      <p class="rt-title">💬 실시간 댓글</p>
+      <div class="rt-item"><div class="rt-av av-a">🔥</div><span><strong style="color:var(--c-text)">sneaker.kang</strong>: 조던 시카고 정품 확실합니다</span></div>
+      <div class="rt-item"><div class="rt-av av-b">💎</div><span><strong style="color:var(--c-text)">luxe.j</strong>: 구찌 정품 여부 DM 주세요</span></div>
+      <div class="rt-item"><div class="rt-av av-c">⌚</div><span><strong style="color:var(--c-text)">watch.yk</strong>: 롤렉스 박스+보증서 포함</span></div>
+    </aside>
+  </div>
+</main>
+
+<!-- FEES PAGE -->
+<main class="page" id="page-fees">
+  <div class="page-hd"><div class="page-hd__inner"><p class="section-tag">수수료 안내</p><h1 class="page-hd__title">수수료 안내</h1></div></div>
+  <div style="max-width:var(--max-w);margin:0 auto;padding:var(--s8) var(--s5)">
+    <!-- 핵심 강조 -->
+    <div style="background:linear-gradient(135deg,var(--brand),#1d4ed8);border-radius:var(--radius-lg);padding:var(--s8) var(--s8);text-align:center;margin-bottom:var(--s8);position:relative;overflow:hidden;box-shadow:var(--shadow-lg)">
+      <div style="position:absolute;font-size:180px;font-weight:900;color:rgba(255,255,255,.04);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;letter-spacing:-8px">3%</div>
+      <p style="font-size:11px;font-weight:700;color:rgba(255,255,255,.6);letter-spacing:2px;margin-bottom:var(--s2)">리셀그라운드 수수료 · 고정</p>
+      <p style="font-size:clamp(60px,12vw,120px);font-weight:900;color:#fff;line-height:.9;letter-spacing:-4px">3%</p>
+      <p style="font-size:15px;color:rgba(255,255,255,.8);margin-top:var(--s3);font-weight:500">더 팔수록 더 많이 남는 구조. 커뮤니티가 커질수록 셀러가 이깁니다.</p>
+    </div>
+    <!-- 수익 비교 -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--s6);margin-bottom:var(--s8)">
+      <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:var(--s5);box-shadow:var(--shadow-sm)">
+        <p class="section-tag">타 플랫폼 vs 리셀그라운드</p>
+        <h3 style="font-size:18px;font-weight:800;margin-bottom:var(--s4);color:var(--text)">수수료 비교</h3>
+        <table class="fee-table">
+          <thead><tr><th>플랫폼</th><th>수수료</th><th>직거래</th><th>셀러 브랜딩</th></tr></thead>
+          <tbody>
+            <tr><td>번개장터</td><td>3.5%+</td><td>✓</td><td>제한적</td></tr>
+            <tr><td>당근마켓</td><td>없음</td><td>✓</td><td>없음</td></tr>
+            <tr><td>크림 (KREAM)</td><td>5~8%</td><td>✗</td><td>없음</td></tr>
+            <tr><td>솔드아웃</td><td>6~10%</td><td>✗</td><td>없음</td></tr>
+            <tr><td class="ac" style="font-weight:800">✅ 리셀그라운드</td><td class="ac">3% 고정</td><td style="color:var(--three);font-weight:700">✓ 전국+직거래</td><td style="color:var(--three);font-weight:700">✓ 등급 시스템</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:var(--s5);box-shadow:var(--shadow-sm)">
+        <p class="section-tag">실수령액 계산기</p>
+        <h3 style="font-size:18px;font-weight:800;margin-bottom:var(--s4);color:var(--text)">100만원 판매 시</h3>
+        <div style="background:var(--bg-soft);border-radius:var(--radius);padding:var(--s4);margin-bottom:var(--s3)">
+          <div style="display:flex;justify-content:space-between;padding:var(--s2) 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--text-sub)">번개장터 (3.5%)</span><span style="font-size:14px;font-weight:700">965,000원</span></div>
+          <div style="display:flex;justify-content:space-between;padding:var(--s2) 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--text-sub)">크림 (8%)</span><span style="font-size:14px;font-weight:700">920,000원</span></div>
+          <div style="display:flex;justify-content:space-between;padding:var(--s2) 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--text-sub)">솔드아웃 (10%)</span><span style="font-size:14px;font-weight:700">900,000원</span></div>
+          <div style="display:flex;justify-content:space-between;padding:var(--s3) 0;background:var(--three-l);margin:-2px -4px 0;padding:var(--s3) var(--s3);border-radius:var(--radius)"><span style="font-size:14px;font-weight:800;color:var(--three)">✅ 리셀그라운드 (3%)</span><span style="font-size:18px;font-weight:900;color:var(--three)">970,000원</span></div>
+        </div>
+        <p style="font-size:12px;color:var(--text-mute);text-align:center">월 10건 거래 시: 타 플랫폼 대비 <strong style="color:var(--three)">+500,000원</strong> 더 남음</p>
+      </div>
+    </div>
+    <!-- 셀러 혜택 -->
+    <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:var(--s6);box-shadow:var(--shadow-sm)">
+      <p class="section-tag">셀러 혜택</p>
+      <h3 style="font-size:18px;font-weight:800;margin-bottom:var(--s5);color:var(--text)">리셀그라운드 셀러가 얻는 이점</h3>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s4)">
+        <div style="background:var(--three-l);border-radius:var(--radius);padding:var(--s4);text-align:center"><div style="font-size:32px;margin-bottom:var(--s2)">💰</div><p style="font-size:14px;font-weight:800;color:var(--three);margin-bottom:var(--s1)">3% 고정 수수료</p><p style="font-size:12px;color:var(--text-sub)">더 많이 팔수록 유리한 구조</p></div>
+        <div style="background:var(--brand-l);border-radius:var(--radius);padding:var(--s4);text-align:center"><div style="font-size:32px;margin-bottom:var(--s2)">🌟</div><p style="font-size:14px;font-weight:800;color:var(--brand);margin-bottom:var(--s1)">셀러 브랜딩</p><p style="font-size:12px;color:var(--text-sub)">등급·배지·팔로워 시스템</p></div>
+        <div style="background:#fef9c3;border-radius:var(--radius);padding:var(--s4);text-align:center"><div style="font-size:32px;margin-bottom:var(--s2)">📢</div><p style="font-size:14px;font-weight:800;color:var(--amber);margin-bottom:var(--s1)">우선 노출</p><p style="font-size:12px;color:var(--text-sub)">인증 셀러 홈 상단 노출</p></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- MARKET PRICE PAGE -->
+<main class="page" id="page-market-price">
+  <div class="page-hd"><div class="page-hd__inner"><p class="section-tag">시세조회</p><h1 class="page-hd__title">MARKET PRICE</h1></div></div>
+  <div class="sp-y container"><div class="g-market" id="marketGrid"></div></div>
+</main>
+
+<!-- POPULAR PRODUCTS PAGE -->
+<main class="page" id="page-popular-products">
+  <div class="page-hd"><div class="page-hd__inner"><p class="section-tag">인기상품</p><h1 class="page-hd__title">POPULAR</h1></div></div>
+  <div class="sp-y container"><div class="g-popular" id="popularGrid"></div></div>
+</main>
+
+<!-- INFO PAGES -->
+<main class="page" id="page-guide">
+  <div class="page-hd"><div class="page-hd__inner"><p class="section-tag">거래 가이드</p><h1 class="page-hd__title">거래 가이드</h1></div></div>
+  <div class="info-pg">
+    <h3>🛡 전국 안전결제 프로세스</h3>
+    <div style="background:var(--three-l);border-radius:var(--radius);padding:var(--s4);margin:var(--s3) 0;border-left:3px solid var(--three)">
+      <p style="font-size:13px;font-weight:600;color:var(--text)">① 구매자 결제 → ② 리셀그라운드 에스크로 예치 → ③ 판매자 발송 → ④ 구매자 수령 확인 → ⑤ 판매자 정산 (수수료 3%)</p>
+    </div>
+    <h3>🤝 근거리 직거래</h3>
+    <p>앱 내 위치 기반 매칭 → 예치금 시스템으로 노쇼 방지 → 직거래 완료 후 거래 기록 자동 등록</p>
+    <h3>✓ 인증 셀러 시스템</h3>
+    <p>SNS 팔로워 1,000명 이상 또는 거래 실적 기준 충족 셀러에게 인증 배지 발급. 인증 셀러는 홈 상단 우선 노출 혜택을 받습니다.</p>
+    <h3>⚠️ 사기 예방 가이드</h3>
+    <p>플랫폼 외부 결제 절대 금지 / 정품 확인서 요청 가능 / 거래 전 판매자 온도·거래 성공률 반드시 확인 / 의심 거래는 즉시 신고</p>
+    <h3>📦 발송 및 검수</h3>
+    <p>고가 상품 (50만원 이상) 검수 서비스 신청 가능. 파트너 검수 기관을 통해 정품 여부 확인 후 인증 배지 부여.</p>
+  </div>
+</main>
+<main class="page" id="page-verify">
+  <div class="page-hd"><div class="page-hd__inner"><p class="section-tag">검수 안내</p><h1 class="page-hd__title">검수 안내</h1></div></div>
+  <div class="info-pg">
+    <h3>🔍 검수 대상 상품</h3>
+    <p>명품 가방, 시계, 스니커즈 한정판, 고가 의류 등 위조 위험이 높은 상품은 검수를 권장합니다. 50만원 이상 상품은 자동 안내.</p>
+    <h3>📋 검수 절차</h3>
+    <div style="background:var(--brand-l);border-radius:var(--radius);padding:var(--s4);margin:var(--s3) 0;border-left:3px solid var(--brand)">
+      <p style="font-size:13px;font-weight:600;color:var(--text)">① 상품 등록 → ② 검수 신청 → ③ 파트너 검수 기관 발송 → ④ 진품 확인 → ⑤ 인증 배지 부여 → ⑥ 홈 상단 노출</p>
+    </div>
+    <h3>✅ 인증 배지 혜택</h3>
+    <p>검수 완료 상품에는 "인증" 배지가 표시됩니다. 인증 배지 상품은 검색 결과 상단 노출, 구매자 신뢰도 대폭 향상.</p>
+    <h3>⏱ 검수 소요 시간</h3>
+    <p>일반 검수: 1~2 영업일 / 빠른 검수: 당일 (추가 비용 발생) / 온라인 사진 검수: 4시간 이내</p>
+  </div>
+</main>
+<main class="page" id="page-notice"><div class="page-hd"><div class="page-hd__inner"><p class="section-tag">공지사항</p><h1 class="page-hd__title">NOTICE</h1></div></div><div class="info-pg"><div class="notice-item"><p class="notice-item__date">2025.06.01 · 공지</p><p class="notice-item__title">리셀그라운드 베타 서비스 오픈 안내</p></div><div class="notice-item"><p class="notice-item__date">2025.05.20 · 업데이트</p><p class="notice-item__title">셀러 브랜딩 등급 시스템 업데이트</p></div></div></main>
+<main class="page" id="page-support">
+  <div class="page-hd">
+    <div class="page-hd__inner">
+      <p class="section-tag">고객센터</p>
+      <h1 class="page-hd__title">SUPPORT</h1>
+    </div>
+  </div>
+
+  <div class="info-pg">
+    <div class="side-card" style="margin-bottom:var(--sp-5)">
+      <p class="side-card__t">이메일 문의</p>
+      <p style="font-size:22px;font-weight:500;color:var(--c-accent)">di702934@gmail.com</p>
+    </div>
+
+    <div class="side-card">
+      <p class="side-card__t">문의하기</p>
+
+      <div class="form-group">
+        <label class="form-label" for="supportCategory">문의 유형</label>
+        <select class="form-select" id="supportCategory">
+          <option value="">문의 유형 선택</option>
+          <option>계정 / 로그인</option>
+          <option>거래 / 결제</option>
+          <option>상품 등록 / 수정</option>
+          <option>정가품 검수</option>
+          <option>신고 / 제재</option>
+          <option>버그 / 오류</option>
+          <option>광고 / 제휴</option>
+          <option>기타 문의</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">제목</label>
+        <input class="form-input" placeholder="제목"/>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">문의 내용</label>
+        <textarea class="form-textarea" rows="4" placeholder="문의 내용을 입력해주세요"></textarea>
+      </div>
+
+      <button class="btn btn--p" id="supportBtn">문의 보내기</button>
+    </div>
+  </div>
+</main>
+
+<!-- MYPAGE -->
+<main class="page" id="page-mypage">
+  <div class="mp-layout">
+    <aside class="mp-side">
+      <div class="mp-profile"><div class="mp-av av-a">🔥</div><p class="mp-name">sneaker.kang</p><p class="mp-tier">큐레이션 셀러</p></div>
+      <div class="mp-nav-link act">프로필 관리</div>
+      <div class="mp-nav-link">내 상품</div>
+      <div class="mp-nav-link">내 게시글</div>
+      <div class="mp-nav-link">거래 내역</div>
+      <div class="mp-nav-link">리뷰 관리</div>
+    </aside>
+    <div class="mp-main">
+      <div class="mp-stats"><div class="mp-stat"><p class="mp-stat__val">847</p><p class="mp-stat__label">판매 완료</p></div><div class="mp-stat"><p class="mp-stat__val">4.98</p><p class="mp-stat__label">평점</p></div><div class="mp-stat"><p class="mp-stat__val">3.2K</p><p class="mp-stat__label">팔로워</p></div><div class="mp-stat"><p class="mp-stat__val">₩1.2B</p><p class="mp-stat__label">총 거래액</p></div></div>
+      <p class="mp-sec-title">프로필 정보</p>
+      <div class="form-row" style="margin-bottom:var(--sp-4)">
+        <div class="form-group"><label class="form-label">닉네임</label><input class="form-input" value="sneaker.kang"/></div>
+        <div class="form-group"><label class="form-label">이메일</label><input class="form-input" type="email" value="kang@example.com"/></div>
+        <div class="form-group"><label class="form-label">연락처</label><input class="form-input" id="mpTel" type="tel" value="010-****-****" autocomplete="tel" inputmode="numeric"/></div>
+        <div class="form-group"><label class="form-label">지역</label><input class="form-input" value="서울"/></div>
+        <div class="form-group" style="grid-column:1/-1"><label class="form-label">소개글</label><textarea class="form-textarea" id="mpBio" maxlength="200">스니커즈 전문 셀러입니다. Jordan 브랜드 중심으로 거래합니다.</textarea>
+      <p class="form-char"><span class="char-count-cur" id="mpBioCount">0</span>/200</p></div>
+        <div class="form-group"><label class="form-label">인스타그램</label><input class="form-input" id="prInstagram" placeholder="@아이디"/></div>
+        <div class="form-group"><label class="form-label">틱톡</label><input class="form-input" placeholder="@아이디"/></div>
+      </div>
+      <p class="mp-sec-title">관심 카테고리</p>
+      <div class="tag-select" style="margin-bottom:var(--sp-6)"><div class="tag-opt sel">스니커즈</div><div class="tag-opt sel">Jordan</div><div class="tag-opt sel">Nike SB</div><div class="tag-opt">명품</div><div class="tag-opt">시계</div><div class="tag-opt">아우터</div></div>
+      <button class="btn btn--p" id="mpSaveBtn">저장하기</button>
+
+      <p class="mp-sec-title" style="margin-top:var(--s6)">최근 본 상품</p>
+      <div class="recent-viewed" id="recentViewed">
+        <div class="recent-item"><div class="recent-item__img">👟</div><p class="recent-item__name">Air Jordan 1</p><p class="recent-item__price">₩680,000</p></div>
+        <div class="recent-item"><div class="recent-item__img">⌚</div><p class="recent-item__name">Rolex Sub 41mm</p><p class="recent-item__price">₩12,800,000</p></div>
+        <div class="recent-item"><div class="recent-item__img">👜</div><p class="recent-item__name">Gucci Ophidia</p><p class="recent-item__price">₩1,240,000</p></div>
+      </div>
+
+      <p class="mp-sec-title" style="margin-top:var(--s5)">알림 설정</p>
+      <div style="background:var(--bg-soft);border-radius:var(--radius);padding:var(--s4)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--s3)"><span style="font-size:13px;font-weight:600">시세 변동 알림</span><input type="checkbox" checked style="accent-color:var(--three);width:16px;height:16px"/></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--s3)"><span style="font-size:13px;font-weight:600">새 드롭 알림</span><input type="checkbox" checked style="accent-color:var(--three);width:16px;height:16px"/></div>
+        <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;font-weight:600">채팅 알림</span><input type="checkbox" checked style="accent-color:var(--three);width:16px;height:16px"/></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- LOGIN MODAL -->
+<div class="modal-ov" id="modal-login">
+  <div class="modal">
+    <div class="modal__hd"><h2 class="modal__title">리셀 그라운드 로그인</h2><button class="modal__close" data-close="login" aria-label="닫기">✕</button></div>
+    <div class="modal__body">
+      <div class="modal-tabs"><button class="modal-tab act" data-tab="login-pane">로그인</button><button class="modal-tab" data-tab="signup-pane">회원가입</button></div>
+
+      <!-- 로그인 -->
+      <div id="login-pane">
+        <div class="form-group">
+          <label class="form-label" for="loginEmail">이메일 <span class="required">*</span></label>
+          <input class="form-input" id="loginEmail" type="email" placeholder="example@email.com" autocomplete="email" inputmode="email"/>
+          <p class="form-error" id="loginEmailErr"></p>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="loginPw">비밀번호 <span class="required">*</span></label>
+          <div class="input-pw-wrap">
+            <input class="form-input" id="loginPw" type="password" placeholder="비밀번호" autocomplete="current-password"/>
+            <button class="pw-toggle" type="button" id="loginPwToggle" aria-label="비밀번호 보기">
+              <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <p class="form-error" id="loginPwErr"></p>
+        </div>
+        <button class="btn btn--p btn--full" id="doLoginBtn">로그인</button>
+        <div class="form-divider"><span>또는</span></div>
+        <div class="social-grid"><button class="social-btn" type="button">카카오 로그인</button><button class="social-btn" type="button">구글 로그인</button></div>
+      </div>
+
+      <!-- 회원가입 -->
+      <div id="signup-pane" style="display:none">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="signupNick">닉네임 <span class="required">*</span></label>
+            <input class="form-input" id="signupNick" type="text" placeholder="닉네임" autocomplete="nickname"/>
+            <p class="form-error" id="signupNickErr"></p>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="signupEmail">이메일 <span class="required">*</span></label>
+            <input class="form-input" id="signupEmail" type="email" placeholder="example@email.com" autocomplete="email" inputmode="email"/>
+            <p class="form-error" id="signupEmailErr"></p>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="signupPw">비밀번호 <span class="required">*</span></label>
+            <div class="input-pw-wrap">
+              <input class="form-input" id="signupPw" type="password" placeholder="8자 이상" autocomplete="new-password"/>
+              <button class="pw-toggle" type="button" id="signupPwToggle" aria-label="비밀번호 보기">
+                <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+            
+            
+            <p class="form-error" id="signupPwErr"></p>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="signupPw2">비밀번호 확인 <span class="required">*</span></label>
+            <div class="input-pw-wrap">
+              <input class="form-input" id="signupPw2" type="password" placeholder="비밀번호 재입력" autocomplete="new-password"/>
+              <button class="pw-toggle" type="button" id="signupPw2Toggle" aria-label="비밀번호 보기">
+                <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+            <p class="form-error" id="signupPw2Err"></p>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="signupTel">연락처 <span class="optional">(선택)</span></label>
+          <input class="form-input" id="signupTel" type="tel" placeholder="010-0000-0000" autocomplete="tel" inputmode="numeric"/>
+        </div>
+        <div class="form-check"><input type="checkbox" id="agreeTerms"/><label for="agreeTerms">이용약관 및 개인정보처리방침에 동의합니다. <span class="required">(필수)</span></label></div>
+        <div class="form-check"><input type="checkbox" id="agreeMarketing"/><label for="agreeMarketing">마케팅 정보 수신에 동의합니다. <span class="optional">(선택)</span></label></div>
+        <button class="btn btn--p btn--full" id="doSignupBtn">회원가입</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PREREG MODAL -->
+<div class="modal-ov" id="modal-prereg">
+  <div class="modal wide">
+    <div class="modal__hd"><h2 class="modal__title">파트너 신청</h2><button class="modal__close" data-close="prereg">✕</button></div>
+    <div class="modal__body" id="preregBody">
+      <div class="prereg-hint"><strong>인플루언서 기준</strong> · 팔로워 1,000명 이상 · 리셀/패션/스니커즈 관련 콘텐츠 · 최근 3개월 내 업로드 이력</div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">이름/닉네임 *</label><input class="form-input" id="prName" placeholder="닉네임"/><p class="form-error" id="prNameErr">이름을 입력해주세요.</p></div>
+        <div class="form-group"><label class="form-label">이메일 *</label><input class="form-input" id="prEmail" type="email" placeholder="이메일" autocomplete="email"/><p class="form-error" id="prEmailErr">올바른 이메일을 입력해주세요.</p></div>
+        <div class="form-group"><label class="form-label">연락처 *</label><input class="form-input" id="prTel" type="tel" placeholder="010-0000-0000" autocomplete="tel" inputmode="numeric"/></div>
+        <div class="form-group"><label class="form-label">팔로워 수</label><select class="form-select"><option value="">선택</option><option>1,000~5,000명</option><option>5,000~1만명</option><option>1만~5만명</option><option>5만명 이상</option></select></div>
+        <div class="form-group"><label class="form-label">인스타그램 *</label><input class="form-input" placeholder="@아이디"/></div>
+        <div class="form-group"><label class="form-label">틱톡</label><input class="form-input" placeholder="@아이디"/></div>
+        <div class="form-group"><label class="form-label">유튜브</label><input class="form-input" placeholder="채널명 또는 URL"/></div>
+        <div class="form-group"><label class="form-label">기타 SNS</label><input class="form-input" placeholder="플랫폼명 + 아이디"/></div>
+      </div>
+      <div class="form-group"><label class="form-label">활동 분야</label>
+        <div class="tag-select" style="margin-top:var(--sp-2)" id="actTags"><div class="tag-opt">스니커즈</div><div class="tag-opt">명품/럭셔리</div><div class="tag-opt">스트릿패션</div><div class="tag-opt">시계</div><div class="tag-opt">테크/가전</div><div class="tag-opt">아웃도어</div><div class="tag-opt">빈티지</div><div class="tag-opt">기타</div></div>
+      </div>
+      <div class="form-group"><label class="form-label">리셀 관련 활동 여부</label><select class="form-select"><option value="">선택</option><option>현재 활발히 거래 중</option><option>가끔 거래함</option><option>관심만 있음</option><option>콘텐츠 제작 중심</option></select></div>
+      <div class="form-group"><label class="form-label">인플루언서 증명 링크</label><input class="form-input" placeholder="대표 콘텐츠 URL"/></div>
+      <div class="form-group"><label class="form-label">협업 제안 / 소개글 *</label><textarea class="form-textarea" id="prIntro" placeholder="간단한 소개나 협업 아이디어를 적어주세요." rows="3" maxlength="500"></textarea><p class="form-char"><span id="introCount">0</span>/500</p></div>
+      <div class="form-check"><input type="checkbox" id="preregAgree"/><label for="preregAgree">개인정보 수집 및 이용에 동의합니다. (필수)</label></div>
+      <p class="form-error" id="preregAgreeErr" style="margin-bottom:var(--sp-3)">개인정보 수집 동의가 필요합니다.</p>
+      <button class="btn btn--p btn--full" id="preregSubmitBtn">사전신청 제출하기</button>
+    </div>
+    <div class="modal__body" id="preregSuccess" style="display:none">
+      <div class="success-box"><p class="success-box__icon">🎉</p><h3 class="success-box__title">신청 완료!</h3><p class="success-box__desc">사전신청이 성공적으로 접수되었습니다.<br>검토 후 이메일로 안내드리겠습니다.<br><br><span style="color:var(--c-accent)">리셀그라운드와 함께 리셀 문화를 만들어가요!</span></p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ADD DROP MODAL -->
+<div class="modal-ov" id="modal-addDrop">
+  <div class="modal wide">
+    <div class="modal__hd"><h2 class="modal__title">상품 등록</h2><button class="modal__close" data-close="addDrop" aria-label="닫기">✕</button></div>
+    <div class="modal__body" id="dropFormInner">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="dropName">상품명 <span class="required">*</span></label>
+          <input class="form-input" id="dropName" type="text" placeholder="상품명을 입력해주세요"/>
+          <p class="form-error" id="dropNameErr"></p>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="dropBrand">브랜드 <span class="required">*</span></label>
+          <input class="form-input" id="dropBrand" type="text" placeholder="브랜드명"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="dropCat">카테고리 <span class="required">*</span></label>
+          <select class="form-select" id="dropCat"><option value="">선택해주세요</option><option>스니커즈</option><option>명품 백</option><option>시계</option><option>의류/아우터</option><option>테크/가전</option><option>기타</option></select>
+          <p class="form-error" id="dropCatErr"></p>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="dropSize">사이즈 <span class="optional">(선택)</span></label>
+          <input class="form-input" id="dropSize" type="text" placeholder="예: 270, FREE, 44"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="dropPrice">가격 <span class="required">*</span></label>
+          <input class="form-input" id="dropPrice" type="number" placeholder="숫자만 입력" inputmode="numeric" min="0"/>
+          <p class="form-price-display" id="dropPriceDisplay"></p>
+          <p class="form-error" id="dropPriceErr"></p>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="dropCond">상태 <span class="required">*</span></label>
+          <select class="form-select" id="dropCond"><option value="">선택해주세요</option><option>미사용 (새상품)</option><option>새상품급</option><option>상태 좋음</option><option>사용감 있음</option></select>
+          <p class="form-error" id="dropCondErr"></p>
+        </div>
+      </div>
+
+      <!-- 파일 업로드 -->
+      <div class="form-group">
+        <label class="form-label">상품 이미지 <span class="optional">(선택, 최대 10장)</span></label>
+        <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp" multiple style="display:none" aria-label="이미지 파일 선택"/>
+        <div class="upload-area" id="uploadArea" role="button" tabindex="0" aria-label="이미지 업로드 — 클릭하거나 드래그">
+          <p class="upload-area__icon">📷</p>
+          <p class="upload-area__text">클릭하거나 드래그하여 이미지 업로드</p>
+          <p class="upload-area__hint">JPG / PNG / WebP · 장당 5MB 이하 · <span class="upload-count">0/10장 선택됨</span></p>
+        </div>
+        <div class="upload-preview" id="imagePreview"></div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="dropDesc">상품 설명 <span class="optional">(선택)</span></label>
+        <textarea class="form-textarea" id="dropDesc" placeholder="상품 상태, 구매 경로, 특이사항 등을 입력해주세요." rows="4"></textarea>
+        <p class="form-char"><span class="char-count-cur" id="dropDescCount">0</span>/1000</p>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="dropTrade">거래 방식</label>
+          <select class="form-select" id="dropTrade"><option>전국 안전결제</option><option>근거리 직거래</option><option>전국+직거래 모두</option></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="dropVerify">검수 희망</label>
+          <select class="form-select" id="dropVerify"><option>검수 없이 등록</option><option>검수 후 인증배지 희망</option></select>
+        </div>
+      </div>
+      <button class="btn btn--p btn--full" id="dropSubmitBtn">상품 등록하기</button>
+    </div>
+  </div>
+</div>
+
+<!-- WRITE POST MODAL -->
+<div class="modal-ov" id="modal-writePost">
+  <div class="modal wide">
+    <div class="modal__hd"><h2 class="modal__title">글쓰기</h2><button class="modal__close" data-close="writePost">✕</button></div>
+    <div class="modal__body" id="postFormInner">
+      <div class="form-group"><label class="form-label">게시판</label><select class="form-select"><option>자유게시판</option><option>인증게시판</option><option>질문게시판</option><option>시세토론</option><option>리셀정보</option><option>거래후기</option></select></div>
+      <div class="form-group"><label class="form-label">제목 *</label><input class="form-input" id="postTitle" placeholder="제목을 입력해주세요"/><p class="form-error" id="postTitleErr">제목을 입력해주세요.</p></div>
+      <div class="form-group"><label class="form-label">내용 *</label>
+        <div class="post-tools"><button class="post-tool" type="button">이미지</button><button class="post-tool" type="button">링크</button><button class="post-tool" type="button">굵게</button></div>
+        <textarea class="form-textarea" id="postContent" placeholder="내용을 입력해주세요." rows="8" maxlength="5000"></textarea>
+        <p class="form-char"><span id="postCount">0</span>/5000</p>
+      </div>
+      <div class="post-submit-row">
+  <button class="btn btn--g" type="button" id="postDraftBtn">임시저장</button>
+  <button class="btn btn--p" type="button" id="postSubmitBtn">게시글 등록</button>
+</div>
+    </div>
+  </div>
+</div>
+
+<!-- CHAT PANEL -->
+<aside class="chat-panel" id="chatPanel" aria-hidden="true">
+  <div class="chat-panel__hd">
+    <div class="chat-panel__hd-left">
+      <svg width="14" height="14" viewBox="0 0 24 24" stroke="var(--c-accent)" fill="none" stroke-width="1.6" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <div><p class="chat-panel__title" id="chatTitle">채팅</p><p class="chat-panel__sub" id="chatSub">3개의 대화</p></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:var(--sp-1)">
+      <button class="chat-back-btn" id="chatBackBtn" style="display:none">← 목록</button>
+      <button class="chat-close-btn" id="chatCloseBtn">✕</button>
+    </div>
+  </div>
+  <div class="chat-conv-list" id="chatConvList">
+    <div class="chat-conv" data-user="sneaker.kang"><div class="chat-conv__av av-a">🔥</div><div><p class="chat-conv__name">sneaker.kang</p><p class="chat-conv__prev">사이즈 265도 있나요?</p></div><div class="chat-conv__meta"><span class="chat-conv__time">2분 전</span><span class="chat-conv__unread">2</span></div></div>
+    <div class="chat-conv" data-user="luxe.j"><div class="chat-conv__av av-b">💎</div><div><p class="chat-conv__name">luxe.j</p><p class="chat-conv__prev">정품 확인서 있습니다</p></div><div class="chat-conv__meta"><span class="chat-conv__time">15분 전</span><span class="chat-conv__unread">1</span></div></div>
+    <div class="chat-conv" data-user="watch.yk"><div class="chat-conv__av av-c">⌚</div><div><p class="chat-conv__name">watch.yk</p><p class="chat-conv__prev">직거래 가능합니다</p></div><div class="chat-conv__meta"><span class="chat-conv__time">1시간 전</span></div></div>
+  </div>
+  <div class="chat-msgs" id="chatMsgs" style="display:none"></div>
+  <div class="chat-tools" id="chatTools" style="display:none">
+    <button class="chat-tool-btn" id="chatSendDrop" title="상품 카드 전송">📦 상품</button>
+    <button class="chat-tool-btn" onclick="requireLogin()" title="거래 제안">💰 거래 제안</button>
+    <button class="chat-tool-btn" onclick="requireLogin()" title="안전결제 요청">🔒 안전결제</button>
+  </div>
+  <div class="chat-input-row" id="chatInputRow" style="display:none">
+    <input class="chat-inp" id="chatInp" placeholder="메시지 입력..." autocomplete="off"/>
+    <button class="chat-send" id="chatSendBtn">전송</button>
+  </div>
+</aside>
+
+<!-- 알림 모달 -->
+<div class="modal-ov" id="modal-notifications">
+  <div class="modal">
+    <div class="modal__hd"><h2 class="modal__title">🔔 알림</h2><button class="modal__close" data-close="notifications">✕</button></div>
+    <div class="modal__body" style="padding:0">
+      <div id="notifList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-con" id="toastCon"></div>
+
+<script src="js/data.js"></script>
+<script src="js/render.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/forms.js"></script>
+<script src="js/app.js"></script>
+
+<!-- 모바일 하단 네비게이션 -->
+<nav class="bottom-nav" id="bottomNav">
+  <button class="bottom-nav__item" data-goto="home">
+    <span class="bottom-nav__icon">🏠</span>
+    <span class="bottom-nav__label">홈</span>
+  </button>
+  <button class="bottom-nav__item" data-goto="popular-products">
+    <span class="bottom-nav__icon">🔥</span>
+    <span class="bottom-nav__label">인기</span>
+  </button>
+  <button class="bottom-nav__item" data-goto="drops">
+    <span class="bottom-nav__icon">⚡</span>
+    <span class="bottom-nav__label">드롭</span>
+  </button>
+  <button class="bottom-nav__item" data-goto="community">
+    <span class="bottom-nav__icon">💬</span>
+    <span class="bottom-nav__label">커뮤니티</span>
+  </button>
+  <button class="bottom-nav__item" data-goto="mypage">
+    <span class="bottom-nav__icon">👤</span>
+    <span class="bottom-nav__label">MY</span>
+  </button>
+</nav>
+
+<!-- 모바일 플로팅 버튼 -->
+<button class="fab-btn" id="fabBtn" aria-label="글쓰기/상품등록">✏</button>
+
+</body>
+</html>

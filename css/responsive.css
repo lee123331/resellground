@@ -1,0 +1,85 @@
+@media(max-width:1024px){
+  .nav__links{display:none}
+  .nav__hbg{display:flex}
+  .hide-mobile{display:none!important}
+  .nav__top{padding:0 var(--s4)}
+  .hero{grid-template-columns:1fr}
+  .hero__feed{display:none}
+  .hero__content{padding:var(--s8) var(--s5)}
+  .hero__kpi{grid-template-columns:repeat(2,1fr)}
+  .g-sellers,.g-sellers-pg{grid-template-columns:repeat(2,1fr)}
+  .g-drops{grid-template-columns:1fr}
+  .g-drops-side{background:none;gap:0}
+  .g-rank{grid-template-columns:1fr}
+  .g-market{grid-template-columns:repeat(2,1fr)}
+  .g-popular{grid-template-columns:repeat(2,1fr)}
+  .g-drops-pg{grid-template-columns:repeat(2,1fr)}
+  .comm-layout{grid-template-columns:1fr}
+  .comm-side,.comm-right{display:none}
+  .comm-main{padding:var(--s4)}
+  .sellers-layout{grid-template-columns:1fr}
+  .sellers-side{display:none}
+  .sellers-main{padding:var(--s4)}
+  .mp-layout{grid-template-columns:1fr}
+  .mp-side{display:none}
+  .mp-main{padding:var(--s4)}
+  .mp-stats{grid-template-columns:repeat(2,1fr)}
+  .container{padding:0 var(--s4)}
+  .sp-y{padding:var(--s8) var(--s4)}
+  .fee-compare-inner{grid-template-columns:1fr}
+  .fee-compare-section::before{display:none}
+  .drops-pg{padding:var(--s4)}
+  .site-foot{padding:var(--s4)}
+}
+@media(max-width:768px){
+  .g-sellers,.g-sellers-pg{grid-template-columns:1fr}
+  .g-market{grid-template-columns:1fr}
+  .g-popular{grid-template-columns:repeat(2,1fr)}
+  .g-drops-pg{grid-template-columns:1fr}
+  .form-row{grid-template-columns:1fr}
+  .social-grid{grid-template-columns:1fr}
+  .hero__kpi{grid-template-columns:repeat(2,1fr)}
+  .trade-bar{gap:var(--s3)}
+  .sec-hd{flex-direction:column;align-items:flex-start}
+  .chat-panel{width:100%;right:0!important;left:0!important;top:auto!important;bottom:0!important;border-radius:var(--radius-lg) var(--radius-lg) 0 0}
+  .modal{border-radius:var(--radius-lg)}
+  .modal__body{padding:var(--s4)}
+  .site-foot{flex-direction:column;text-align:center}
+  .site-foot__links{justify-content:center}
+}
+@media(max-width:480px){
+  .hero__content{padding:var(--s6) var(--s4)}
+  .hero__btns{flex-direction:column}
+  .hero__btns .btn{width:100%}
+  .hero__kpi{grid-template-columns:repeat(2,1fr)}
+  .g-popular{grid-template-columns:repeat(2,1fr)}
+  .nav__top{padding:0 var(--s3)}
+  .nav__logo{font-size:17px;letter-spacing:3px}
+  .nav__logo-fee{display:none}
+  .nav-btn-join{font-size:11px;padding:6px 12px}
+  .mp-stats{grid-template-columns:1fr 1fr}
+  .drops-toolbar{flex-direction:column;align-items:flex-start}
+  .modal-ov{padding:var(--s2)}
+  .kpi-card__value{font-size:18px}
+  .kpi-card--three .kpi-card__value{font-size:22px}
+}
+
+/* 모바일 하단 네비 공간 확보 */
+@media(max-width:768px){
+  .page{padding-bottom:70px}
+  body{padding-bottom:0}
+  .chat-panel{bottom:58px;border-radius:12px 12px 0 0}
+  .toast-con{bottom:72px}
+  .fee-compare-inner{grid-template-columns:1fr!important}
+  /* 홈 인기상품+로그 레이아웃 */
+  #homePopularGrid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:480px){
+  .weekly-top-grid{grid-template-columns:1fr!important}
+  .trade-flow{gap:0}
+  .hero__kpi{grid-template-columns:repeat(2,1fr)}
+}
+/* 인기상품+거래로그 2컬럼 레이아웃 반응형 */
+@media(max-width:1024px){
+  .home-popular-with-log{grid-template-columns:1fr!important}
+}
