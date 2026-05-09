@@ -99,10 +99,11 @@ function applyLoginState() {
  if (loginBtn) {
   loginBtn.style.display = 'none';
 }
-  if (loginBtnM) {
-    loginBtnM.textContent = user.nickname || '마이페이지';
-    loginBtnM.onclick = () => navigateTo('mypage');
-  }
+if (loginBtnM) {
+  loginBtnM.style.display = '';
+  loginBtnM.textContent = '로그인';
+  loginBtnM.onclick = () => openModal('login');
+}
 }
 
 function logout() {
