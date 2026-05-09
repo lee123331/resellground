@@ -104,8 +104,12 @@ if (loginBtn) {
 }
 if (loginBtnM) {
   loginBtnM.style.display = '';
-  loginBtnM.textContent = '로그인';
-  loginBtnM.onclick = () => openModal('login');
+  loginBtnM.textContent = '마이페이지';
+  loginBtnM.onclick = () => {
+    loginBtnM.blur();
+    closeMobileDrawer();
+    navigateTo('mypage');
+  };
 }
 }
 
@@ -128,10 +132,11 @@ if (loginBtn) {
 
 if (loginBtnM) {
   loginBtnM.style.display = '';
-  loginBtnM.textContent = '마이페이지';
+  loginBtnM.textContent = '로그인';
   loginBtnM.onclick = () => {
+    loginBtnM.blur();
     closeMobileDrawer();
-    navigateTo('mypage');
+    openModal('login');
   };
 }
   showToast('로그아웃되었습니다.', 'success');
