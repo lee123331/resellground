@@ -165,7 +165,51 @@ function renderPostCard(post) {
   `;
   return div;
 }
+function loadPosts() {
+  const pl = document.getElementById('postList');
+  if (!pl) return;
 
+  fetch('https://backend.di702934.workers.dev/api/posts')
+    .then(res => res.json())
+    .then(data => {
+      pl.innerHTML = '';
+
+      if (!data.posts || data.posts.length === 0) {
+        pl.innerHTML = `
+          <div class="empty-state">
+            <p class="empty-state__icon">✍️</p>
+            <p class="empty-state__title">아직 게시글이 없습니다</p>
+            <p class="empty-state__desc">첫 번째 게시글을 작성해보세요.</p>
+          </div>
+        `;
+        return;
+      }
+
+      data.posts.forEach(post => {
+        pl.appendChild(renderPostCard({
+          av: 'av-a',
+          em: '🔥',
+          author: post.nickname || '익명 셀러',
+          time: post.created_at || '방금 전',
+          badge: post.board || '자유',
+          title: post.title,
+          preview: post.content,
+          likes: 0,
+          comments: 0,
+          views: 0
+        }));
+      });
+    })
+    .catch(() => {
+      pl.innerHTML = `
+        <div class="empty-state">
+          <p class="empty-state__icon">⚠️</p>
+          <p class="empty-state__title">게시글을 불러오지 못했습니다</p>
+          <p class="empty-state__desc">잠시 후 다시 시도해주세요.</p>
+        </div>
+      `;
+    });
+}
 /* ── MARKET CARD ── */
 function renderMarketCard(item) {
   const maxB = Math.max(...item.bars);
@@ -284,15 +328,18 @@ function initGrids() {
   const dpg = document.getElementById('dropsPageGrid');
   if (dpg) { dpg.innerHTML=''; DATA.drops.forEach(d=>dpg.appendChild(renderDropCard(d))); }
 
-  ['homeRankList','fullRankList'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el){el.innerHTML=''; DATA.rankings.forEach(r=>el.appendChild(renderRankItem(r)));}
-  });
+['homeRankList','fullRankList'].forEach(id=>{
+  const el=document.getElementById(id);
+  if(el){el.innerHTML=''; DATA.rankings.forEach(r=>el.appendChild(renderRankItem(r)));}
+});
 
-  const pl=document.getElementById('postList');
-  if(pl){pl.innerHTML=''; DATA.posts.forEach(p=>pl.appendChild(renderPostCard(p)));}
+const pl = document.getElementById('postList');
+if (pl) {
+  pl.innerHTML = '';
+  loadPosts();
+}
 
-  const mg=document.getElementById('marketGrid');
+const mg=document.getElementById('marketGrid');
   if(mg){mg.innerHTML=''; DATA.markets.forEach(m=>mg.appendChild(renderMarketCard(m)));}
 
   const pg=document.getElementById('popularGrid');
