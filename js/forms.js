@@ -96,11 +96,9 @@ function applyLoginState() {
   const loginBtn = document.getElementById('loginBtn');
   const loginBtnM = document.getElementById('loginBtnM');
 
-  if (loginBtn) {
-    loginBtn.textContent = user.nickname || '마이페이지';
-    loginBtn.onclick = () => navigateTo('mypage');
-  }
-
+ if (loginBtn) {
+  loginBtn.style.display = 'none';
+}
   if (loginBtnM) {
     loginBtnM.textContent = user.nickname || '마이페이지';
     loginBtnM.onclick = () => navigateTo('mypage');
@@ -118,10 +116,11 @@ function logout() {
   const loginBtn = document.getElementById('loginBtn');
   const loginBtnM = document.getElementById('loginBtnM');
 
-  if (loginBtn) {
-    loginBtn.textContent = '로그인';
-    loginBtn.onclick = () => openModal('login');
-  }
+if (loginBtn) {
+  loginBtn.style.display = '';
+  loginBtn.textContent = '로그인';
+  loginBtn.onclick = () => openModal('login');
+}
 
   if (loginBtnM) {
     loginBtnM.textContent = '로그인';
