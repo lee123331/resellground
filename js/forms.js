@@ -75,6 +75,62 @@ function safeText(el, text) {
   if (el) el.textContent = text;
 }
 
+function getAuthUser() {
+  try {
+    return JSON.parse(localStorage.getItem('rg_user') || 'null');
+  } catch (e) {
+    return null;
+  }
+}
+
+function applyLoginState() {
+  const token = localStorage.getItem('rg_token');
+  const user = getAuthUser();
+
+  if (!token || !user) return;
+
+  if (typeof S !== 'undefined') {
+    S.loggedIn = true;
+  }
+
+  const loginBtn = document.getElementById('loginBtn');
+  const loginBtnM = document.getElementById('loginBtnM');
+
+  if (loginBtn) {
+    loginBtn.textContent = user.nickname || '마이페이지';
+    loginBtn.onclick = () => navigateTo('mypage');
+  }
+
+  if (loginBtnM) {
+    loginBtnM.textContent = user.nickname || '마이페이지';
+    loginBtnM.onclick = () => navigateTo('mypage');
+  }
+}
+
+function logout() {
+  localStorage.removeItem('rg_token');
+  localStorage.removeItem('rg_user');
+
+  if (typeof S !== 'undefined') {
+    S.loggedIn = false;
+  }
+
+  const loginBtn = document.getElementById('loginBtn');
+  const loginBtnM = document.getElementById('loginBtnM');
+
+  if (loginBtn) {
+    loginBtn.textContent = '로그인';
+    loginBtn.onclick = () => openModal('login');
+  }
+
+  if (loginBtnM) {
+    loginBtnM.textContent = '로그인';
+    loginBtnM.onclick = () => openModal('login');
+  }
+
+  showToast('로그아웃되었습니다.', 'success');
+  navigateTo('home');
+}
 /* ─── CHAR COUNTER ─── */
 function initCharCounter(textareaId, counterId, max) {
   const ta = document.getElementById(textareaId);
@@ -332,6 +388,14 @@ function initCloseGuard(modalId, formId, draftKey) {
    LOGIN FORM
 ═══════════════════════════════════════════════════ */
 function initLoginForm() {
+  function initSocialLoginButtons() {
+  document.querySelectorAll('.social-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const provider = btn.textContent.includes('카카오') ? '카카오' : '구글';
+      showToast(`${provider} 로그인은 준비 중입니다.`, 'error');
+    });
+  });
+}
   // 비밀번호 토글
   initPwToggle('loginPw', 'loginPwToggle');
 
@@ -365,16 +429,13 @@ fetch('https://backend.di702934.workers.dev/api/auth/login', {
     return data;
   })
   .then(data => {
-    localStorage.setItem('rg_token', data.token);
-    localStorage.setItem('rg_user', JSON.stringify(data.user));
+localStorage.setItem('rg_token', data.token);
+localStorage.setItem('rg_user', JSON.stringify(data.user));
 
-    S.loggedIn = true;
-    closeModal('login');
-    showToast('로그인되었습니다! 환영합니다. 🎉', 'success');
+applyLoginState();
 
-    const lBtn = document.getElementById('loginBtn');
-    lBtn.textContent = '마이페이지';
-    lBtn.onclick = () => navigateTo('mypage');
+closeModal('login');
+showToast('로그인되었습니다! 환영합니다. 🎉', 'success');
   })
   .catch(err => {
     showToast(err.message, 'error');
@@ -707,4 +768,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initPostForm();
   initSupportForm();
   initMypageForm();
+  initSocialLoginButtons();
+  applyLoginState();
 });

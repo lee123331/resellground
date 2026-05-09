@@ -81,9 +81,18 @@ app.post("/api/auth/login", async (c) => {
       return c.json({ message: "이메일과 비밀번호를 입력해주세요." }, 400);
     }
 
-    const user = await c.env.DB.prepare("SELECT * FROM users WHERE email = ?")
-      .bind(email)
-      .first<any>();
+ const user = await c.env.DB.prepare("SELECT * FROM users WHERE email = ?")
+  .bind(email)
+  .first();
+
+if (!user) {
+  return c.json(
+    { message: "이메일 또는 비밀번호가 올바르지 않습니다." },
+    401
+  );
+}
+
+const savedHash = String(user.password_hash || "");
 
     if (!user) {
       return c.json(
@@ -92,7 +101,7 @@ app.post("/api/auth/login", async (c) => {
       );
     }
 
-    const isValid = await verifyPassword(password, user.password_hash);
+const isValid = await verifyPassword(password, savedHash);
 
     if (!isValid) {
       return c.json(
@@ -163,7 +172,14 @@ async function createToken(payload: Record<string, unknown>) {
     exp: Date.now() + 1000 * 60 * 60 * 24 * 7,
   };
 
-  return btoa(JSON.stringify(tokenPayload));
-}
+  const json = JSON.stringify(tokenPayload);
+  const bytes = new TextEncoder().encode(json);
 
+  let binary = "";
+  for (const byte of bytes) {
+    binary += String.fromCharCode(byte);
+  }
+
+  return btoa(binary);
+}
 export default app;
