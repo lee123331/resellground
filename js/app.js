@@ -6,8 +6,23 @@
 function openLoginModal() { openModal('login'); }
 
 /* NAV 버튼 */
-document.getElementById('loginBtn').addEventListener('click', openLoginModal);
-document.getElementById('loginBtnM').addEventListener('click', () => { closeMobileDrawer(); openModal('login'); });
+document.getElementById('loginBtn').addEventListener('click', () => {
+  if (S.loggedIn) {
+    navigateTo('mypage');
+  } else {
+    openModal('login');
+  }
+});
+
+document.getElementById('loginBtnM').addEventListener('click', () => {
+  closeMobileDrawer();
+
+  if (S.loggedIn) {
+    navigateTo('mypage');
+  } else {
+    openModal('login');
+  }
+});
 document.getElementById('preregBtn').addEventListener('click', () => openModal('prereg'));
 document.getElementById('preregBtnM').addEventListener('click', () => { closeMobileDrawer(); openModal('prereg'); });
 
