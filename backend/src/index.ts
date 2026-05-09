@@ -182,4 +182,60 @@ async function createToken(payload: Record<string, unknown>) {
 
   return btoa(binary);
 }
+app.post("/api/posts", async (c) => {
+  try {
+    const body = await c.req.json();
+
+    const title = String(body.title || "").trim();
+    const content = String(body.content || "").trim();
+    const board = String(body.board || "자유게시판").trim();
+    const userId = body.userId ? Number(body.userId) : null;
+
+    if (!title || !content) {
+      return c.json({ message: "제목과 내용을 입력해주세요." }, 400);
+    }
+
+    await c.env.DB.prepare(
+      `INSERT INTO posts (user_id, board, title, content)
+       VALUES (?, ?, ?, ?)`
+    )
+      .bind(userId, board, title, content)
+      .run();
+
+    return c.json(
+      {
+        message: "게시글이 등록되었습니다.",
+      },
+      201
+    );
+  } catch (err) {
+    console.error(err);
+    return c.json({ message: "게시글 등록 중 서버 오류가 발생했습니다." }, 500);
+  }
+});
+
+app.get("/api/posts", async (c) => {
+  try {
+    const result = await c.env.DB.prepare(
+      `SELECT 
+        posts.id,
+        posts.user_id,
+        posts.board,
+        posts.title,
+        posts.content,
+        posts.created_at,
+        users.nickname
+       FROM posts
+       LEFT JOIN users ON posts.user_id = users.id
+       ORDER BY posts.id DESC`
+    ).all();
+
+    return c.json({
+      posts: result.results || [],
+    });
+  } catch (err) {
+    console.error(err);
+    return c.json({ message: "게시글 목록을 불러오지 못했습니다." }, 500);
+  }
+});
 export default app;

@@ -722,14 +722,40 @@ if (!content) {
 if (!ok) return;
 
 const btn = document.getElementById('postSubmitBtn');
-    btnLoad(btn, '등록 중...');
-    setTimeout(() => {
-      btnReset(btn);
-      clearDraft('post');
-      resetForm(document.getElementById('postFormInner'));
-      closeModal('writePost');
-      showToast('게시글이 등록되었습니다! 🎉', 'success');
-    }, 1000);
+btnLoad(btn, '등록 중...');
+
+let user = null;
+try {
+  user = JSON.parse(localStorage.getItem('rg_user') || 'null');
+} catch (e) {}
+
+fetch('https://backend.di702934.workers.dev/api/posts', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    userId: user?.id || null,
+    board: document.querySelector('.comm-side__link.act')?.dataset.board || '자유게시판',
+    title,
+    content
+  })
+})
+  .then(async res => {
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || '게시글 등록에 실패했습니다.');
+    return data;
+  })
+  .then(() => {
+    clearDraft('post');
+    resetForm(document.getElementById('postFormInner'));
+    closeModal('writePost');
+    showToast('게시글이 등록되었습니다! 🎉', 'success');
+  })
+  .catch(err => {
+    showToast(err.message, 'error');
+  })
+  .finally(() => {
+    btnReset(btn);
+  });
   });
 }
 
