@@ -388,14 +388,7 @@ function initCloseGuard(modalId, formId, draftKey) {
    LOGIN FORM
 ═══════════════════════════════════════════════════ */
 function initLoginForm() {
-  function initSocialLoginButtons() {
-  document.querySelectorAll('.social-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const provider = btn.textContent.includes('카카오') ? '카카오' : '구글';
-      showToast(`${provider} 로그인은 준비 중입니다.`, 'error');
-    });
-  });
-}
+  
   // 비밀번호 토글
   initPwToggle('loginPw', 'loginPwToggle');
 
@@ -445,7 +438,14 @@ showToast('로그인되었습니다! 환영합니다. 🎉', 'success');
   });
   });
 }
-
+function initSocialLoginButtons() {
+  document.querySelectorAll('.social-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const provider = btn.textContent.includes('카카오') ? '카카오' : '구글';
+      showToast(`${provider} 로그인은 준비 중입니다.`, 'error');
+    });
+  });
+}
 /* ═══════════════════════════════════════════════════
    SIGNUP FORM
 ═══════════════════════════════════════════════════ */
