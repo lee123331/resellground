@@ -96,8 +96,11 @@ function applyLoginState() {
   const loginBtn = document.getElementById('loginBtn');
   const loginBtnM = document.getElementById('loginBtnM');
 
- if (loginBtn) {
-  loginBtn.style.display = 'none';
+if (loginBtn) {
+  loginBtn.style.display = '';
+  loginBtn.textContent = '마이페이지';
+  loginBtn.onclick = () => navigateTo('mypage');
+
 }
 if (loginBtnM) {
   loginBtnM.style.display = '';
@@ -123,11 +126,14 @@ if (loginBtn) {
   loginBtn.onclick = () => openModal('login');
 }
 
-  if (loginBtnM) {
-    loginBtnM.textContent = '로그인';
-    loginBtnM.onclick = () => openModal('login');
-  }
-
+if (loginBtnM) {
+  loginBtnM.style.display = '';
+  loginBtnM.textContent = '마이페이지';
+  loginBtnM.onclick = () => {
+    closeMobileDrawer();
+    navigateTo('mypage');
+  };
+}
   showToast('로그아웃되었습니다.', 'success');
   navigateTo('home');
 }
