@@ -93,33 +93,22 @@ function applyLoginState() {
     S.loggedIn = true;
   }
 
-const loginBtn = document.getElementById('loginBtn');
-const loginBtnM = document.getElementById('loginBtnM');
-const logoutBtn = document.getElementById('logoutBtn');
-const logoutBtnM = document.getElementById('logoutBtnM');
+  const loginBtn = document.getElementById('loginBtn');
+  const loginBtnM = document.getElementById('loginBtnM');
 
-  if (loginBtn) {
-    loginBtn.style.display = '';
-    loginBtn.textContent = '마이페이지';
-    loginBtn.onclick = () => navigateTo('mypage');
-  }
+if (loginBtn) {
+  loginBtn.style.display = '';
+  loginBtn.textContent = '마이페이지';
+  loginBtn.onclick = () => navigateTo('mypage');
 
-  if (loginBtnM) {
-    loginBtnM.style.display = '';
-    loginBtnM.textContent = '마이페이지';
-    loginBtnM.onclick = () => {
-      loginBtnM.blur();
-      closeMobileDrawer();
-      navigateTo('mypage');
-    };
-  }
-
- if (logoutBtnM) {
-  logoutBtnM.style.display = 'inline-flex';
-  logoutBtnM.onclick = () => {
-    logoutBtnM.blur();
+}
+if (loginBtnM) {
+  loginBtnM.style.display = '';
+  loginBtnM.textContent = '마이페이지';
+  loginBtnM.onclick = () => {
+    loginBtnM.blur();
     closeMobileDrawer();
-    logout();
+    navigateTo('mypage');
   };
 }
 }
@@ -132,34 +121,24 @@ function logout() {
     S.loggedIn = false;
   }
 
-  if (logoutBtn) {
-  logoutBtn.style.display = 'none';
-}
   const loginBtn = document.getElementById('loginBtn');
-const loginBtnM = document.getElementById('loginBtnM');
-const logoutBtn = document.getElementById('logoutBtn');
-const logoutBtnM = document.getElementById('logoutBtnM');
+  const loginBtnM = document.getElementById('loginBtnM');
 
-  if (loginBtn) {
-    loginBtn.style.display = '';
-    loginBtn.textContent = '로그인';
-    loginBtn.onclick = () => openModal('login');
-  }
+if (loginBtn) {
+  loginBtn.style.display = '';
+  loginBtn.textContent = '로그인';
+  loginBtn.onclick = () => openModal('login');
+}
 
-  if (loginBtnM) {
-    loginBtnM.style.display = '';
-    loginBtnM.textContent = '로그인';
-    loginBtnM.onclick = () => {
-      loginBtnM.blur();
-      closeMobileDrawer();
-      openModal('login');
-    };
-  }
-
-  if (logoutBtnM) {
-    logoutBtnM.style.display = 'none';
-  }
-
+if (loginBtnM) {
+  loginBtnM.style.display = '';
+  loginBtnM.textContent = '로그인';
+  loginBtnM.onclick = () => {
+    loginBtnM.blur();
+    closeMobileDrawer();
+    openModal('login');
+  };
+}
   showToast('로그아웃되었습니다.', 'success');
   navigateTo('home');
 }
