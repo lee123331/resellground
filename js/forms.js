@@ -84,43 +84,41 @@ function applyLoginState() {
   const token = localStorage.getItem('rg_token');
   const user = getAuthUser();
 
-  if (!token || !user) {
-    if (typeof S !== 'undefined') {
-      S.loggedIn = false;
+  const isLoggedIn = !!(token && user);
+
+  if (typeof S !== 'undefined') {
+    S.loggedIn = isLoggedIn;
+  }
+
+  const loginBtn = document.getElementById('loginBtn');
+  const profileBtn = document.getElementById('profileBtn');
+
+  if (isLoggedIn) {
+    if (loginBtn) {
+      loginBtn.style.display = '';
+      loginBtn.textContent = '마이페이지';
+      loginBtn.onclick = () => navigateTo('mypage');
     }
 
-    const loginBtn = document.getElementById('loginBtn');
-
+    if (profileBtn) {
+      profileBtn.onclick = () => navigateTo('mypage');
+    }
+  } else {
     if (loginBtn) {
       loginBtn.style.display = '';
       loginBtn.textContent = '로그인';
       loginBtn.onclick = () => openModal('login');
     }
 
-    if (typeof updateDrawerState === 'function') {
-      updateDrawerState();
+    if (profileBtn) {
+      profileBtn.onclick = () => openModal('login');
     }
-
-    return;
-  }
-
-  if (typeof S !== 'undefined') {
-    S.loggedIn = true;
-  }
-
-  const loginBtn = document.getElementById('loginBtn');
-
-  if (loginBtn) {
-    loginBtn.style.display = '';
-    loginBtn.textContent = '마이페이지';
-    loginBtn.onclick = () => navigateTo('mypage');
   }
 
   if (typeof updateDrawerState === 'function') {
     updateDrawerState();
   }
 }
-
 function logout() {
   localStorage.removeItem('rg_token');
   localStorage.removeItem('rg_user');
@@ -129,17 +127,7 @@ function logout() {
     S.loggedIn = false;
   }
 
-  const loginBtn = document.getElementById('loginBtn');
-
-  if (loginBtn) {
-    loginBtn.style.display = '';
-    loginBtn.textContent = '로그인';
-    loginBtn.onclick = () => openModal('login');
-  }
-
-  if (typeof updateDrawerState === 'function') {
-    updateDrawerState();
-  }
+  applyLoginState();
 
   showToast('로그아웃되었습니다.', 'success');
   navigateTo('home');
@@ -437,15 +425,15 @@ fetch('https://backend.di702934.workers.dev/api/auth/login', {
 
     return data;
   })
-  .then(data => {
-    localStorage.setItem('rg_token', data.token);
-    localStorage.setItem('rg_user', JSON.stringify(data.user));
+ .then(data => {
+  localStorage.setItem('rg_token', data.token);
+  localStorage.setItem('rg_user', JSON.stringify(data.user));
 
-    applyLoginState();
+  applyLoginState();
 
-    closeModal('login');
-    showToast('로그인되었습니다! 환영합니다. 🎉', 'success');
-  })
+  closeModal('login');
+  showToast('로그인되었습니다! 환영합니다. 🎉', 'success');
+})
   .catch(err => {
     showToast(err.message, 'error');
   })
@@ -755,6 +743,17 @@ document.addEventListener('DOMContentLoaded', () => {
   initPostForm();
   initSupportForm();
   initMypageForm();
+
+  document.addEventListener('click', (e) => {
+    const logoutTarget = e.target.closest('#logoutBtnPc, #logoutBtnM, [data-logout]');
+
+    if (!logoutTarget) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    logout();
+  });
 
   applyLoginState();
 });

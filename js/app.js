@@ -189,14 +189,7 @@ initMarketSearch();
 initScrollTopBtn();
 initEnterSubmit();
 
-const logoutBtnPc = document.getElementById('logoutBtnPc');
 
-if (logoutBtnPc) {
-  logoutBtnPc.addEventListener('click', () => {
-    logout();
-    if (typeof updateDrawerState === 'function') updateDrawerState();
-  });
-}
 
 /* 주간 TOP 셀러 그리드 */
 function renderWeeklyTop() {
