@@ -56,7 +56,17 @@ function updateDrawerState() {
 }
 
 /* NAV 버튼 */
-document.getElementById('loginBtn').addEventListener('click', openLoginModal);
+const loginBtn = document.getElementById('loginBtn');
+
+if (loginBtn) {
+  loginBtn.addEventListener('click', () => {
+    if (S.loggedIn) {
+      navigateTo('mypage');
+    } else {
+      openModal('login');
+    }
+  });
+}
 document.getElementById('loginBtnM').addEventListener('click', () => { closeMobileDrawer(); openModal('login'); });
 document.getElementById('preregBtn').addEventListener('click', () => openModal('prereg'));
 document.getElementById('preregBtnM').addEventListener('click', () => { closeMobileDrawer(); openModal('prereg'); });
@@ -66,7 +76,17 @@ const ctaBtn = document.getElementById('ctaBtn');
 if (ctaBtn) ctaBtn.addEventListener('click', () => openModal('prereg'));
 
 /* 로그인 필요 버튼들 */
-document.getElementById('profileBtn').addEventListener('click', () => S.loggedIn ? navigateTo('mypage') : openModal('login'));
+const profileBtn = document.getElementById('profileBtn');
+
+if (profileBtn) {
+  profileBtn.addEventListener('click', () => {
+    if (S.loggedIn) {
+      navigateTo('mypage');
+    } else {
+      openModal('login');
+    }
+  });
+}
 document.getElementById('writePostBtn').addEventListener('click', () => requireLogin() && openModal('writePost'));
 document.getElementById('addDropBtn').addEventListener('click', () => requireLogin() && openModal('addDrop'));
 

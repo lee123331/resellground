@@ -90,33 +90,23 @@ function applyLoginState() {
     S.loggedIn = isLoggedIn;
   }
 
-  const loginBtn = document.getElementById('loginBtn');
-  const profileBtn = document.getElementById('profileBtn');
-
-  if (isLoggedIn) {
-    if (loginBtn) {
-      loginBtn.style.display = '';
-      loginBtn.textContent = '마이페이지';
-      loginBtn.onclick = () => navigateTo('mypage');
-    }
-
-    if (profileBtn) {
-      profileBtn.onclick = () => navigateTo('mypage');
-    }
-  } else {
-    if (loginBtn) {
-      loginBtn.style.display = '';
-      loginBtn.textContent = '로그인';
-      loginBtn.onclick = () => openModal('login');
-    }
-
-    if (profileBtn) {
-      profileBtn.onclick = () => openModal('login');
-    }
+ if (isLoggedIn) {
+  if (loginBtn) {
+    loginBtn.style.display = '';
+    loginBtn.textContent = '마이페이지';
   }
 
-  if (typeof updateDrawerState === 'function') {
-    updateDrawerState();
+  if (profileBtn) {
+    profileBtn.setAttribute('aria-label', '마이페이지');
+  }
+} else {
+  if (loginBtn) {
+    loginBtn.style.display = '';
+    loginBtn.textContent = '로그인';
+  }
+
+  if (profileBtn) {
+    profileBtn.setAttribute('aria-label', '로그인');
   }
 }
 function logout() {
