@@ -10,45 +10,46 @@ function updateDrawerState() {
   const actions = document.querySelector('.drawer__actions');
   if (!actions) return;
 
- if (S.loggedIn) {
-  // 로그인 상태: 마이페이지 + 로그아웃
-  const userName = document.querySelector('.mp-name')?.textContent || '내 계정';
+  if (S.loggedIn) {
+    // 로그인 상태: 마이페이지 + 로그아웃
+    const userName = document.querySelector('.mp-name')?.textContent || '내 계정';
 
-  actions.innerHTML = `
-    <button class="btn btn--g btn--full" id="loginBtnM" style="text-align:left;justify-content:flex-start;gap:8px">
-      <span style="font-size:20px">👤</span>
-      <span>
-        <span style="display:block;font-size:13px;font-weight:800;color:var(--text)">${userName}</span>
-        <span style="display:block;font-size:11px;color:var(--text-mute)">마이페이지 →</span>
-      </span>
-    </button>
+    actions.innerHTML = `
+      <button class="btn btn--g btn--full" id="loginBtnM" style="text-align:left;justify-content:flex-start;gap:8px">
+        <span style="font-size:20px">👤</span>
+        <span>
+          <span style="display:block;font-size:13px;font-weight:800;color:var(--text)">${userName}</span>
+          <span style="display:block;font-size:11px;color:var(--text-mute)">마이페이지 →</span>
+        </span>
+      </button>
 
-    <button class="btn btn--outline-brand btn--full" id="logoutBtnM">
-      로그아웃
-    </button>
-  `;
+      <button class="btn btn--outline-brand btn--full" id="logoutBtnM">
+        로그아웃
+      </button>
+    `;
 
-  document.getElementById('loginBtnM')?.addEventListener('click', () => {
-    closeMobileDrawer();
-    navigateTo('mypage');
-  });
+    document.getElementById('loginBtnM')?.addEventListener('click', () => {
+      closeMobileDrawer();
+      navigateTo('mypage');
+    });
 
-  document.getElementById('logoutBtnM')?.addEventListener('click', () => {
-    closeMobileDrawer();
-    logout();
-    if (typeof updateDrawerState === 'function') updateDrawerState();
-  });
-} else {
+    document.getElementById('logoutBtnM')?.addEventListener('click', () => {
+      closeMobileDrawer();
+      logout();
+    });
+  } else {
     // 비로그인 상태: 로그인 + 파트너 신청
     actions.innerHTML = `
       <button class="btn btn--g" id="loginBtnM">로그인</button>
       <button class="btn btn--p" id="preregBtnM">파트너 신청</button>
     `;
-    document.getElementById('loginBtnM').addEventListener('click', () => {
+
+    document.getElementById('loginBtnM')?.addEventListener('click', () => {
       closeMobileDrawer();
       openModal('login');
     });
-    document.getElementById('preregBtnM').addEventListener('click', () => {
+
+    document.getElementById('preregBtnM')?.addEventListener('click', () => {
       closeMobileDrawer();
       openModal('prereg');
     });
@@ -67,9 +68,30 @@ if (loginBtn) {
     }
   });
 }
-document.getElementById('loginBtnM').addEventListener('click', () => { closeMobileDrawer(); openModal('login'); });
-document.getElementById('preregBtn').addEventListener('click', () => openModal('prereg'));
-document.getElementById('preregBtnM').addEventListener('click', () => { closeMobileDrawer(); openModal('prereg'); });
+
+const loginBtnM = document.getElementById('loginBtnM');
+
+if (loginBtnM) {
+  loginBtnM.addEventListener('click', () => {
+    closeMobileDrawer();
+    openModal('login');
+  });
+}
+
+const preregBtn = document.getElementById('preregBtn');
+
+if (preregBtn) {
+  preregBtn.addEventListener('click', () => openModal('prereg'));
+}
+
+const preregBtnM = document.getElementById('preregBtnM');
+
+if (preregBtnM) {
+  preregBtnM.addEventListener('click', () => {
+    closeMobileDrawer();
+    openModal('prereg');
+  });
+}
 
 /* 홈 CTA */
 const ctaBtn = document.getElementById('ctaBtn');
@@ -87,8 +109,22 @@ if (profileBtn) {
     }
   });
 }
-document.getElementById('writePostBtn').addEventListener('click', () => requireLogin() && openModal('writePost'));
-document.getElementById('addDropBtn').addEventListener('click', () => requireLogin() && openModal('addDrop'));
+
+const writePostBtn = document.getElementById('writePostBtn');
+
+if (writePostBtn) {
+  writePostBtn.addEventListener('click', () => {
+    if (requireLogin()) openModal('writePost');
+  });
+}
+
+const addDropBtn = document.getElementById('addDropBtn');
+
+if (addDropBtn) {
+  addDropBtn.addEventListener('click', () => {
+    if (requireLogin()) openModal('addDrop');
+  });
+}
 
 /* 마이페이지 저장 */
 const mpSaveBtn = document.getElementById('mpSaveBtn');
