@@ -451,10 +451,11 @@
     <aside class="comm-side">
       <p class="comm-side__title" style="margin-top:var(--sp-2)">게시판</p>
       <div class="comm-side__link act" data-board="RESELL TALK"><span class="comm-side__dot"></span>RESELL TALK</div>
-      <div class="comm-side__link" data-board="셀러에게 묻다"><span class="comm-side__dot"></span>셀러에게 묻다</div>
-      <div class="comm-side__link" data-board="시세 분석"><span class="comm-side__dot"></span>시세 분석</div>
-      <div class="comm-side__link" data-board="드롭 정보"><span class="comm-side__dot"></span>드롭 정보</div>
-      <div class="comm-side__link" data-board="거래 후기 🏷"><span class="comm-side__dot"></span>거래 후기 🏷</div>
+<div class="comm-side__link" data-board="자유게시판"><span class="comm-side__dot"></span>자유게시판</div>
+<div class="comm-side__link" data-board="셀러에게 묻다"><span class="comm-side__dot"></span>셀러에게 묻다</div>
+<div class="comm-side__link" data-board="시세 분석"><span class="comm-side__dot"></span>시세 분석</div>
+<div class="comm-side__link" data-board="드롭 정보"><span class="comm-side__dot"></span>드롭 정보</div>
+<div class="comm-side__link" data-board="거래 후기 🏷"><span class="comm-side__dot"></span>거래 후기 🏷</div>
       <p class="comm-side__title" style="margin-top:var(--sp-5)">HOT</p>
       <div class="comm-side__link"><span class="comm-side__dot" style="background:#ff4d4d"></span>인기글</div>
       <div class="comm-side__link"><span class="comm-side__dot" style="background:var(--c-accent)"></span>실시간 댓글</div>
@@ -946,7 +947,17 @@
   <div class="modal wide">
     <div class="modal__hd"><h2 class="modal__title">글쓰기</h2><button class="modal__close" data-close="writePost">✕</button></div>
     <div class="modal__body" id="postFormInner">
-      <div class="form-group"><label class="form-label">게시판</label><select class="form-select"><option>RESELL TALK</option><option>셀러에게 묻다</option><option>시세 분석</option><option>드롭 정보</option><option>거래 후기 🏷</option></select></div>
+      <div class="form-group">
+  <label class="form-label">게시판</label>
+  <select class="form-select">
+    <option>RESELL TALK</option>
+    <option>자유게시판</option>
+    <option>셀러에게 묻다</option>
+    <option>시세 분석</option>
+    <option>드롭 정보</option>
+    <option>거래 후기 🏷</option>
+  </select>
+</div>
       <div class="form-group"><label class="form-label">제목 *</label><input class="form-input" id="postTitle" placeholder="제목을 입력해주세요"/><p class="form-error" id="postTitleErr">제목을 입력해주세요.</p></div>
       <div class="form-group"><label class="form-label">내용 *</label>
         <div class="post-tools"><button class="post-tool" type="button">이미지</button><button class="post-tool" type="button">링크</button><button class="post-tool" type="button">굵게</button></div>
