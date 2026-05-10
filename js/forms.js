@@ -90,25 +90,34 @@ function applyLoginState() {
     S.loggedIn = isLoggedIn;
   }
 
- if (isLoggedIn) {
-  if (loginBtn) {
-    loginBtn.style.display = '';
-    loginBtn.textContent = '마이페이지';
+  const loginBtn = document.getElementById('loginBtn');
+  const profileBtn = document.getElementById('profileBtn');
+
+  if (isLoggedIn) {
+    if (loginBtn) {
+      loginBtn.style.display = '';
+      loginBtn.textContent = '마이페이지';
+    }
+
+    if (profileBtn) {
+      profileBtn.setAttribute('aria-label', '마이페이지');
+    }
+  } else {
+    if (loginBtn) {
+      loginBtn.style.display = '';
+      loginBtn.textContent = '로그인';
+    }
+
+    if (profileBtn) {
+      profileBtn.setAttribute('aria-label', '로그인');
+    }
   }
 
-  if (profileBtn) {
-    profileBtn.setAttribute('aria-label', '마이페이지');
-  }
-} else {
-  if (loginBtn) {
-    loginBtn.style.display = '';
-    loginBtn.textContent = '로그인';
-  }
-
-  if (profileBtn) {
-    profileBtn.setAttribute('aria-label', '로그인');
+  if (typeof updateDrawerState === 'function') {
+    updateDrawerState();
   }
 }
+
 function logout() {
   localStorage.removeItem('rg_token');
   localStorage.removeItem('rg_user');
