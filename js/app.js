@@ -13,7 +13,6 @@ document.getElementById('loginBtn').addEventListener('click', () => {
     openModal('login');
   }
 });
-
 document.getElementById('loginBtnM').addEventListener('click', () => {
   closeMobileDrawer();
 
@@ -22,7 +21,7 @@ document.getElementById('loginBtnM').addEventListener('click', () => {
   } else {
     openModal('login');
   }
-});
+}); 
 document.getElementById('preregBtn').addEventListener('click', () => openModal('prereg'));
 document.getElementById('preregBtnM').addEventListener('click', () => { closeMobileDrawer(); openModal('prereg'); });
 
