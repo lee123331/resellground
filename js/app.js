@@ -10,23 +10,35 @@ function updateDrawerState() {
   const actions = document.querySelector('.drawer__actions');
   if (!actions) return;
 
-  if (S.loggedIn) {
-    // 로그인 상태: 유저 이름 + 마이페이지 버튼
-    const userName = document.querySelector('.mp-name')?.textContent || '내 계정';
-    actions.innerHTML = `
-      <button class="btn btn--g btn--full" id="loginBtnM" style="text-align:left;justify-content:flex-start;gap:8px">
-        <span style="font-size:20px">👤</span>
-        <span>
-          <span style="display:block;font-size:13px;font-weight:800;color:var(--text)">${userName}</span>
-          <span style="display:block;font-size:11px;color:var(--text-mute)">마이페이지 →</span>
-        </span>
-      </button>
-    `;
-    document.getElementById('loginBtnM').addEventListener('click', () => {
-      closeMobileDrawer();
-      navigateTo('mypage');
-    });
-  } else {
+ if (S.loggedIn) {
+  // 로그인 상태: 마이페이지 + 로그아웃
+  const userName = document.querySelector('.mp-name')?.textContent || '내 계정';
+
+  actions.innerHTML = `
+    <button class="btn btn--g btn--full" id="loginBtnM" style="text-align:left;justify-content:flex-start;gap:8px">
+      <span style="font-size:20px">👤</span>
+      <span>
+        <span style="display:block;font-size:13px;font-weight:800;color:var(--text)">${userName}</span>
+        <span style="display:block;font-size:11px;color:var(--text-mute)">마이페이지 →</span>
+      </span>
+    </button>
+
+    <button class="btn btn--outline-brand btn--full" id="logoutBtnM">
+      로그아웃
+    </button>
+  `;
+
+  document.getElementById('loginBtnM')?.addEventListener('click', () => {
+    closeMobileDrawer();
+    navigateTo('mypage');
+  });
+
+  document.getElementById('logoutBtnM')?.addEventListener('click', () => {
+    closeMobileDrawer();
+    logout();
+    if (typeof updateDrawerState === 'function') updateDrawerState();
+  });
+} else {
     // 비로그인 상태: 로그인 + 파트너 신청
     actions.innerHTML = `
       <button class="btn btn--g" id="loginBtnM">로그인</button>
@@ -176,6 +188,15 @@ initTradeBarAnimation();
 initMarketSearch();
 initScrollTopBtn();
 initEnterSubmit();
+
+const logoutBtnPc = document.getElementById('logoutBtnPc');
+
+if (logoutBtnPc) {
+  logoutBtnPc.addEventListener('click', () => {
+    logout();
+    if (typeof updateDrawerState === 'function') updateDrawerState();
+  });
+}
 
 /* 주간 TOP 셀러 그리드 */
 function renderWeeklyTop() {

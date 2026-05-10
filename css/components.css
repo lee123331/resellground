@@ -430,3 +430,14 @@
   color: var(--three);
   font-weight: 800;
 }
+.mp-logout-link {
+  color: var(--danger, #dc2626);
+  margin-top: var(--s4);
+  border-top: 1px solid var(--border);
+  padding-top: var(--s3);
+}
+
+.mp-logout-link:hover {
+  background: #fee2e2;
+  color: var(--danger, #dc2626);
+}
