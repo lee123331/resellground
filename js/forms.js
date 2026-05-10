@@ -93,27 +93,30 @@ function applyLoginState() {
     S.loggedIn = true;
   }
 
-  const loginBtn = document.getElementById('loginBtn');
-  const loginBtnM = document.getElementById('loginBtnM');
-  const logoutBtnM = document.getElementById('logoutBtnM');
+const loginBtn = document.getElementById('loginBtn');
+const loginBtnM = document.getElementById('loginBtnM');
+const logoutBtn = document.getElementById('logoutBtn');
+const logoutBtnM = document.getElementById('logoutBtnM');
 
-  if (loginBtn) {
-    loginBtn.style.display = '';
-    loginBtn.textContent = '마이페이지';
-    loginBtn.onclick = () => navigateTo('mypage');
-  }
+if (loginBtnM) {
+  loginBtnM.style.display = '';
+  loginBtnM.textContent = '마이페이지';
+  loginBtnM.onclick = () => {
+    loginBtnM.blur();
+    closeMobileDrawer();
+    navigateTo('mypage');
+  };
+}
 
-  if (loginBtnM) {
-    loginBtnM.style.display = '';
-    loginBtnM.textContent = '마이페이지';
-    loginBtnM.onclick = () => {
-      loginBtnM.blur();
-      closeMobileDrawer();
-      navigateTo('mypage');
-    };
-  }
+if (logoutBtn) {
+  logoutBtn.style.display = 'inline-flex';
+  logoutBtn.onclick = () => {
+    logoutBtn.blur();
+    logout();
+  };
+}
 
- if (logoutBtnM) {
+if (logoutBtnM) {
   logoutBtnM.style.display = 'inline-flex';
   logoutBtnM.onclick = () => {
     logoutBtnM.blur();
@@ -131,9 +134,13 @@ function logout() {
     S.loggedIn = false;
   }
 
+  if (logoutBtn) {
+  logoutBtn.style.display = 'none';
+}
   const loginBtn = document.getElementById('loginBtn');
-  const loginBtnM = document.getElementById('loginBtnM');
-  const logoutBtnM = document.getElementById('logoutBtnM');
+const loginBtnM = document.getElementById('loginBtnM');
+const logoutBtn = document.getElementById('logoutBtn');
+const logoutBtnM = document.getElementById('logoutBtnM');
 
   if (loginBtn) {
     loginBtn.style.display = '';
