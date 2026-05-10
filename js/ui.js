@@ -30,6 +30,9 @@ function requireLogin() {
 function showToast(msg, type='info') {
   const icons = {info:'ℹ️',success:'✅',error:'❌',warn:'⚠️'};
   const container = document.getElementById('toastCon');
+
+  if (!container) return;
+
   const toast = document.createElement('div');
   toast.className = `toast ${type}`;
   toast.innerHTML = `<span>${icons[type]||'ℹ️'}</span> ${msg}`;
@@ -58,7 +61,13 @@ function closeModal(id) {
 /* ESC 닫기 */
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
-    if (document.getElementById('searchOv').classList.contains('open')) { closeSearch(); return; }
+    const searchOv = document.getElementById('searchOv');
+
+    if (searchOv && searchOv.classList.contains('open')) {
+      closeSearch();
+      return;
+    }
+
     const last = [...S.openModals].pop();
     if (last) closeModal(last);
     if (S.drawerOpen) closeMobileDrawer();
@@ -88,23 +97,56 @@ document.querySelectorAll('.modal-tab').forEach(tab => {
 
 /* ── SEARCH ── */
 function openSearch() {
-  document.getElementById('searchOv').classList.add('open');
+  const searchOv = document.getElementById('searchOv');
+  const searchInp = document.getElementById('searchInp');
+
+  if (!searchOv) return;
+
+  searchOv.classList.add('open');
   document.body.style.overflow = 'hidden';
-  setTimeout(()=>document.getElementById('searchInp').focus(),100);
+
+  if (searchInp) {
+    setTimeout(() => searchInp.focus(), 100);
+  }
 }
+
 function closeSearch() {
-  document.getElementById('searchOv').classList.remove('open');
+  const searchOv = document.getElementById('searchOv');
+
+  if (!searchOv) return;
+
+  searchOv.classList.remove('open');
   document.body.style.overflow = '';
 }
-document.getElementById('searchBtn').addEventListener('click', openSearch);
-document.getElementById('searchClose').addEventListener('click', closeSearch);
-document.getElementById('searchOv').addEventListener('click', e => { if(e.target===document.getElementById('searchOv')) closeSearch(); });
-document.getElementById('searchInp').addEventListener('keydown', e => {
-  if (e.key==='Enter') {
-    const q = e.target.value.trim();
-    if (q) { closeSearch(); showToast(`"${q}" 검색 중...`, 'info'); }
-  }
-});
+const searchBtn = document.getElementById('searchBtn');
+if (searchBtn) {
+  searchBtn.addEventListener('click', openSearch);
+}
+
+const searchClose = document.getElementById('searchClose');
+if (searchClose) {
+  searchClose.addEventListener('click', closeSearch);
+}
+
+const searchOv = document.getElementById('searchOv');
+if (searchOv) {
+  searchOv.addEventListener('click', e => {
+    if (e.target === searchOv) closeSearch();
+  });
+}
+
+const searchInp = document.getElementById('searchInp');
+if (searchInp) {
+  searchInp.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      const q = e.target.value.trim();
+      if (q) {
+        closeSearch();
+        showToast(`"${q}" 검색 중...`, 'info');
+      }
+    }
+  });
+}
 document.querySelectorAll('.search-chip').forEach(chip => {
   chip.addEventListener('click', () => {
     document.getElementById('searchInp').value = chip.textContent.replace(/^[^\w가-힣]+/,'');
@@ -121,31 +163,57 @@ if (navSearchTop) {
 
 /* ── HAMBURGER / DRAWER ── */
 function openMobileDrawer() {
+  const drawer = document.getElementById('drawer');
+  const hbg = document.getElementById('hbgBtn');
+
+  if (!drawer) return;
+
   S.drawerOpen = true;
-  document.getElementById('drawer').classList.add('open');
-  document.getElementById('drawer').setAttribute('aria-hidden','false');
-  const hbg = document.getElementById('hbgBtn');
-  hbg.classList.add('open');
-  hbg.setAttribute('aria-expanded','true');
+  drawer.classList.add('open');
+  drawer.setAttribute('aria-hidden', 'false');
+
+  if (hbg) {
+    hbg.classList.add('open');
+    hbg.setAttribute('aria-expanded', 'true');
+  }
 }
+
 function closeMobileDrawer() {
-  S.drawerOpen = false;
-  document.getElementById('drawer').classList.remove('open');
-  document.getElementById('drawer').setAttribute('aria-hidden','true');
+  const drawer = document.getElementById('drawer');
   const hbg = document.getElementById('hbgBtn');
-  if (hbg) { hbg.classList.remove('open'); hbg.setAttribute('aria-expanded','false'); }
+
+  S.drawerOpen = false;
+
+  if (drawer) {
+    drawer.classList.remove('open');
+    drawer.setAttribute('aria-hidden', 'true');
+  }
+
+  if (hbg) {
+    hbg.classList.remove('open');
+    hbg.setAttribute('aria-expanded', 'false');
+  }
 }
 const hbgBtn = document.getElementById('hbgBtn');
 if (hbgBtn) hbgBtn.addEventListener('click', () => S.drawerOpen ? closeMobileDrawer() : openMobileDrawer());
 
 /* ── CHAT (거래용 강화) ── */
 function toggleChat() {
-  if (!S.loggedIn) { openModal('login'); return; }
+  const chatPanel = document.getElementById('chatPanel');
+
+  if (!S.loggedIn) {
+    openModal('login');
+    return;
+  }
+
+  if (!chatPanel) return;
+
   S.chatOpen = !S.chatOpen;
-  document.getElementById('chatPanel').classList.toggle('open', S.chatOpen);
-  // FAB 버튼 — 채팅 열리면 숨기고, 닫히면 다시 보임
+  chatPanel.classList.toggle('open', S.chatOpen);
+
   const fab = document.getElementById('fabBtn');
   if (fab) fab.style.display = S.chatOpen ? 'none' : 'flex';
+
   if (!S.chatOpen) closeChatConv();
 }
 function openChatWith(userName) {
@@ -180,27 +248,51 @@ function closeChatConv() {
 }
 function sendChatMsg() {
   const inp = document.getElementById('chatInp');
-  const text = inp.value.trim();
-  if (!text || !S.chatUser) return;
   const area = document.getElementById('chatMsgs');
+
+  if (!inp || !area) return;
+
+  const text = inp.value.trim();
+
+  if (!text || !S.chatUser) return;
+
   const msg = document.createElement('div');
   msg.className = 'chat-msg me';
   msg.innerHTML = `${text}<span class="chat-msg-read">전송됨</span>`;
   area.appendChild(msg);
+
   inp.value = '';
   area.scrollTop = area.scrollHeight;
+
   if (!DATA.chatMessages[S.chatUser]) DATA.chatMessages[S.chatUser] = [];
   DATA.chatMessages[S.chatUser].push({me:true,t:text,read:false});
 }
+const chatBtn = document.getElementById('chatBtn');
+if (chatBtn) {
+  chatBtn.addEventListener('click', toggleChat);
+}
 
-document.getElementById('chatBtn').addEventListener('click', toggleChat);
-document.getElementById('chatCloseBtn').addEventListener('click', toggleChat);
-document.getElementById('chatBackBtn').addEventListener('click', closeChatConv);
-document.getElementById('chatSendBtn').addEventListener('click', sendChatMsg);
-document.getElementById('chatInp').addEventListener('keydown', e => { if(e.key==='Enter') sendChatMsg(); });
-document.querySelectorAll('.chat-conv').forEach(conv => {
-  conv.addEventListener('click', () => openChatWith(conv.dataset.user));
-});
+const chatCloseBtn = document.getElementById('chatCloseBtn');
+if (chatCloseBtn) {
+  chatCloseBtn.addEventListener('click', toggleChat);
+}
+
+const chatBackBtn = document.getElementById('chatBackBtn');
+if (chatBackBtn) {
+  chatBackBtn.addEventListener('click', closeChatConv);
+}
+
+const chatSendBtn = document.getElementById('chatSendBtn');
+if (chatSendBtn) {
+  chatSendBtn.addEventListener('click', sendChatMsg);
+}
+
+const chatInp = document.getElementById('chatInp');
+if (chatInp) {
+  chatInp.addEventListener('keydown', e => {
+    if (e.key === 'Enter') sendChatMsg();
+  });
+}
 
 /* 거래 카드 전송 버튼 */
 const chatSendDrop = document.getElementById('chatSendDrop');
