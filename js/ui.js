@@ -143,6 +143,9 @@ function toggleChat() {
   if (!S.loggedIn) { openModal('login'); return; }
   S.chatOpen = !S.chatOpen;
   document.getElementById('chatPanel').classList.toggle('open', S.chatOpen);
+  // FAB 버튼 — 채팅 열리면 숨기고, 닫히면 다시 보임
+  const fab = document.getElementById('fabBtn');
+  if (fab) fab.style.display = S.chatOpen ? 'none' : 'flex';
   if (!S.chatOpen) closeChatConv();
 }
 function openChatWith(userName) {
@@ -347,4 +350,95 @@ if (fabBtn) {
     if (!requireLogin()) return;
     openModal('writePost');
   });
+}
+
+/* ═══ [6] 시세조회 검색 기능 ═══ */
+function initMarketSearch() {
+  const inp = document.getElementById('marketSearchInp');
+  const btn = document.getElementById('marketSearchBtn');
+  const noResult = document.getElementById('marketNoResult');
+  if (!inp || !btn) return;
+
+  function doSearch() {
+    const q = inp.value.trim().toLowerCase();
+    const grid = document.getElementById('marketGrid');
+    const cards = grid ? grid.querySelectorAll('.mkc') : [];
+    let found = 0;
+    cards.forEach(card => {
+      const name = card.querySelector('.mkc__name')?.textContent.toLowerCase() || '';
+      const cat  = card.querySelector('.mkc__cat')?.textContent.toLowerCase() || '';
+      const match = !q || name.includes(q) || cat.includes(q);
+      card.style.display = match ? '' : 'none';
+      if (match) found++;
+    });
+    if (noResult) noResult.style.display = (q && found === 0) ? 'block' : 'none';
+    if (q) showToast(`"${inp.value.trim()}" 검색 결과 ${found}건`, found > 0 ? 'info' : 'error');
+  }
+
+  btn.addEventListener('click', doSearch);
+  inp.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+
+  // 카테고리 필터 연동
+  document.querySelectorAll('[data-market]').forEach(btn => {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('[data-market]').forEach(b => b.classList.remove('act'));
+      this.classList.add('act');
+      inp.value = '';
+      if (noResult) noResult.style.display = 'none';
+      const val = this.dataset.market;
+      const grid = document.getElementById('marketGrid');
+      if (!grid) return;
+      grid.querySelectorAll('.mkc').forEach(card => {
+        const cat = card.querySelector('.mkc__cat')?.textContent || '';
+        card.style.display = (val === '전체' || cat.includes(val)) ? '' : 'none';
+      });
+    });
+  });
+}
+
+/* ═══ [7] 스크롤 상단 버튼 ═══ */
+function initScrollTopBtn() {
+  const btn = document.getElementById('scrollTopBtn');
+  if (!btn) return;
+  window.addEventListener('scroll', () => {
+    const show = window.scrollY > 400;
+    btn.style.display = show ? 'flex' : 'none';
+  }, { passive: true });
+  btn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+}
+
+/* ═══ [8] 엔터키 폼 제출 ═══ */
+function initEnterSubmit() {
+  // 로그인 폼
+  const loginPw = document.getElementById('loginPw');
+  const doLoginBtn = document.getElementById('doLoginBtn');
+  if (loginPw && doLoginBtn) {
+    loginPw.addEventListener('keydown', e => { if (e.key === 'Enter') doLoginBtn.click(); });
+    const loginEmail = document.getElementById('loginEmail');
+    if (loginEmail) loginEmail.addEventListener('keydown', e => { if (e.key === 'Enter') loginPw.focus(); });
+  }
+
+  // 회원가입 폼 — 마지막 입력 필드에서 엔터
+  const doSignupBtn = document.getElementById('doSignupBtn');
+  if (doSignupBtn) {
+    ['signupPw2'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('keydown', e => { if (e.key === 'Enter') doSignupBtn.click(); });
+    });
+  }
+
+  // 사전신청 폼
+  const doPreregBtn = document.getElementById('doPreregBtn');
+  if (doPreregBtn) {
+    ['prName','prEmail','prTel','prIntro'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('keydown', e => {
+        if (e.key === 'Enter' && el.tagName !== 'TEXTAREA') doPreregBtn.click();
+      });
+    });
+  }
+
+  // 채팅창은 ui.js에서 이미 처리됨
 }

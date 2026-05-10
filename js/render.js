@@ -54,8 +54,15 @@ function renderSellerCard(seller, index) {
     <span class="sc__rank">${String(index+1).padStart(2,'0')}</span>
     <div class="sc__av ${seller.av}">${seller.em}</div>
     <div class="sc__tier-row">${tierBadge(seller)}</div>
-    <p class="sc__name">${seller.name}</p>
+    <p class="sc__name">
+      ${seller.name}
+      ${seller.onlineNow ? '<span class="sc__online"><span class="sc__online-dot"></span>온라인</span>' : ''}
+    </p>
     <p class="sc__handle">${seller.handle} · ${seller.loc}</p>
+    <div class="sc__live-signals">
+      <span class="sc__signal">⏱ ${seller.lastTrade} 응답</span>
+      <span class="sc__signal sc__signal--hot">🔥 이번 주 ${seller.weekTrades}건</span>
+    </div>
     <div class="sc__tags">${seller.tags.map(t=>`<span class="sc__tag">${t}</span>`).join('')}</div>
     <div class="sc__stats">
       <div><p class="sc__sn">${seller.sales}</p><p class="sc__sl">판매</p></div>
@@ -114,7 +121,10 @@ function renderDropCard(drop) {
     <div class="dc__body">
       <p class="dc__cat">${drop.cat}</p>
       <p class="dc__name">${drop.name}</p>
-      <p class="dc__seller">by <strong>${drop.seller}</strong></p>
+      <p class="dc__seller">
+        by <strong>${drop.seller}</strong>
+        ${drop.postedAt ? `<span class="dc__posted-at">· ${drop.postedAt}</span>` : ''}
+      </p>
       <div class="dc__foot">
         <p class="dc__price">${drop.price}</p>
         <p class="dc__int">관심 <strong>${drop.interest}</strong>명</p>
@@ -165,51 +175,7 @@ function renderPostCard(post) {
   `;
   return div;
 }
-function loadPosts() {
-  const pl = document.getElementById('postList');
-  if (!pl) return;
 
-  fetch('https://backend.di702934.workers.dev/api/posts')
-    .then(res => res.json())
-    .then(data => {
-      pl.innerHTML = '';
-
-      if (!data.posts || data.posts.length === 0) {
-        pl.innerHTML = `
-          <div class="empty-state">
-            <p class="empty-state__icon">✍️</p>
-            <p class="empty-state__title">아직 게시글이 없습니다</p>
-            <p class="empty-state__desc">첫 번째 게시글을 작성해보세요.</p>
-          </div>
-        `;
-        return;
-      }
-
-      data.posts.forEach(post => {
-        pl.appendChild(renderPostCard({
-          av: 'av-a',
-          em: '🔥',
-          author: post.nickname || '익명 셀러',
-          time: post.created_at || '방금 전',
-          badge: post.board || '자유',
-          title: post.title,
-          preview: post.content,
-          likes: 0,
-          comments: 0,
-          views: 0
-        }));
-      });
-    })
-    .catch(() => {
-      pl.innerHTML = `
-        <div class="empty-state">
-          <p class="empty-state__icon">⚠️</p>
-          <p class="empty-state__title">게시글을 불러오지 못했습니다</p>
-          <p class="empty-state__desc">잠시 후 다시 시도해주세요.</p>
-        </div>
-      `;
-    });
-}
 /* ── MARKET CARD ── */
 function renderMarketCard(item) {
   const maxB = Math.max(...item.bars);
@@ -328,18 +294,15 @@ function initGrids() {
   const dpg = document.getElementById('dropsPageGrid');
   if (dpg) { dpg.innerHTML=''; DATA.drops.forEach(d=>dpg.appendChild(renderDropCard(d))); }
 
-['homeRankList','fullRankList'].forEach(id=>{
-  const el=document.getElementById(id);
-  if(el){el.innerHTML=''; DATA.rankings.forEach(r=>el.appendChild(renderRankItem(r)));}
-});
+  ['homeRankList','fullRankList'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){el.innerHTML=''; DATA.rankings.forEach(r=>el.appendChild(renderRankItem(r)));}
+  });
 
-const pl = document.getElementById('postList');
-if (pl) {
-  pl.innerHTML = '';
-  loadPosts();
-}
+  const pl=document.getElementById('postList');
+  if(pl){pl.innerHTML=''; DATA.posts.forEach(p=>pl.appendChild(renderPostCard(p)));}
 
-const mg=document.getElementById('marketGrid');
+  const mg=document.getElementById('marketGrid');
   if(mg){mg.innerHTML=''; DATA.markets.forEach(m=>mg.appendChild(renderMarketCard(m)));}
 
   const pg=document.getElementById('popularGrid');

@@ -83,3 +83,22 @@
 @media(max-width:1024px){
   .home-popular-with-log{grid-template-columns:1fr!important}
 }
+
+/* [5] 드롭 카드 — 모바일에서 오버레이 항상 표시 */
+@media(max-width:768px) {
+  .dc__overlay {
+    opacity: 1;
+    transform: translateY(0);
+    background: linear-gradient(transparent 0%, rgba(0,0,0,.65) 100%);
+  }
+  .dc__overlay-btn {
+    padding: 6px;
+    font-size: 11px;
+  }
+  .dc__overlay-bm {
+    display: none; /* 모바일에서 북마크 버튼 숨김 — 공간 부족 */
+  }
+  .pop__sold-overlay {
+    font-size: 12px;
+  }
+}

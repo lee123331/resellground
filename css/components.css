@@ -355,3 +355,78 @@
 #modal-prereg .form-error {
   display: none !important;
 }
+/* ═══ 감성 강화 추가 스타일 ═══ */
+
+/* ③ 셀러 카드 — 온라인 신호 */
+.sc__online {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--three);
+  background: var(--three-l);
+  padding: 2px 7px;
+  border-radius: 10px;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+.sc__online-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--three);
+  animation: ldPulse 1.4s infinite;
+  flex-shrink: 0;
+}
+.sc__live-signals {
+  display: flex;
+  gap: var(--s2);
+  flex-wrap: wrap;
+  margin: 5px 0 var(--s2);
+}
+.sc__signal {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-mute);
+  background: var(--bg-soft);
+  padding: 2px 8px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+.sc__signal--hot {
+  color: var(--red);
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
+/* ④ 드롭 카드 — 타임스탬프 */
+.dc__posted-at {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--three);
+  background: var(--three-l);
+  padding: 1px 6px;
+  border-radius: 8px;
+  margin-left: 4px;
+  white-space: nowrap;
+}
+
+/* ⑤ KPI 카운트업 애니메이션 */
+.kpi-card__value {
+  transition: color 0.3s ease;
+}
+.kpi-card__value.counting {
+  color: var(--three);
+}
+
+/* 커뮤니티 게시판 — 리셀 감성 강화 */
+.comm-side__link[data-board="board-resell-talk"] .comm-side__dot { background: var(--red); }
+.comm-side__link[data-board="board-cert"] .comm-side__dot { background: var(--three); }
+.comm-side__link[data-board="board-price"] .comm-side__dot { background: var(--amber); }
+
+/* 히어로 서브카피 강조 */
+.hero__sub strong {
+  color: var(--three);
+  font-weight: 800;
+}

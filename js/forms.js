@@ -1,7 +1,5 @@
 'use strict';
 
-console.log('forms.js 최신 파일 로드됨');
-
 /* ═══════════════════════════════════════════════════
    FORMS.JS — 완전한 폼 검증 & UX 시스템
    - 실시간 validation
@@ -75,73 +73,6 @@ function safeText(el, text) {
   if (el) el.textContent = text;
 }
 
-function getAuthUser() {
-  try {
-    return JSON.parse(localStorage.getItem('rg_user') || 'null');
-  } catch (e) {
-    return null;
-  }
-}
-
-function applyLoginState() {
-  const token = localStorage.getItem('rg_token');
-  const user = getAuthUser();
-
-  if (!token || !user) return;
-
-  if (typeof S !== 'undefined') {
-    S.loggedIn = true;
-  }
-
-  const loginBtn = document.getElementById('loginBtn');
-  const loginBtnM = document.getElementById('loginBtnM');
-
-if (loginBtn) {
-  loginBtn.style.display = '';
-  loginBtn.textContent = '마이페이지';
-  loginBtn.onclick = () => navigateTo('mypage');
-
-}
-if (loginBtnM) {
-  loginBtnM.style.display = '';
-  loginBtnM.textContent = '마이페이지';
-  loginBtnM.onclick = () => {
-    loginBtnM.blur();
-    closeMobileDrawer();
-    navigateTo('mypage');
-  };
-}
-}
-
-function logout() {
-  localStorage.removeItem('rg_token');
-  localStorage.removeItem('rg_user');
-
-  if (typeof S !== 'undefined') {
-    S.loggedIn = false;
-  }
-
-  const loginBtn = document.getElementById('loginBtn');
-  const loginBtnM = document.getElementById('loginBtnM');
-
-if (loginBtn) {
-  loginBtn.style.display = '';
-  loginBtn.textContent = '로그인';
-  loginBtn.onclick = () => openModal('login');
-}
-
-if (loginBtnM) {
-  loginBtnM.style.display = '';
-  loginBtnM.textContent = '로그인';
-  loginBtnM.onclick = () => {
-    loginBtnM.blur();
-    closeMobileDrawer();
-    openModal('login');
-  };
-}
-  showToast('로그아웃되었습니다.', 'success');
-  navigateTo('home');
-}
 /* ─── CHAR COUNTER ─── */
 function initCharCounter(textareaId, counterId, max) {
   const ta = document.getElementById(textareaId);
@@ -399,7 +330,6 @@ function initCloseGuard(modalId, formId, draftKey) {
    LOGIN FORM
 ═══════════════════════════════════════════════════ */
 function initLoginForm() {
-  
   // 비밀번호 토글
   initPwToggle('loginPw', 'loginPwToggle');
 
@@ -416,47 +346,21 @@ function initLoginForm() {
     if (!pw) { setErr('loginPw','loginPwErr','비밀번호를 입력해주세요.'); ok=false; }
     if (!ok) return;
 
-  const btn = document.getElementById('doLoginBtn');
-btnLoad(btn, '로그인 중...');
-console.log('로그인 API 호출 시작', { email });
-fetch('https://backend.di702934.workers.dev/api/auth/login', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    email,
-    password: pw
-  })
-})
-  .then(async res => {
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || '로그인에 실패했습니다.');
-    return data;
-  })
-  .then(data => {
-localStorage.setItem('rg_token', data.token);
-localStorage.setItem('rg_user', JSON.stringify(data.user));
-
-applyLoginState();
-
-closeModal('login');
-showToast('로그인되었습니다! 환영합니다. 🎉', 'success');
-  })
-  .catch(err => {
-    showToast(err.message, 'error');
-  })
-  .finally(() => {
-    btnReset(btn);
-  });
+    const btn = document.getElementById('doLoginBtn');
+    btnLoad(btn, '로그인 중...');
+    setTimeout(() => {
+      btnReset(btn);
+      S.loggedIn = true;
+      closeModal('login');
+      showToast('로그인되었습니다! 환영합니다. 🎉', 'success');
+      const lBtn = document.getElementById('loginBtn');
+      lBtn.textContent = '마이페이지';
+      lBtn.onclick = () => navigateTo('mypage');
+      if (typeof updateDrawerState === 'function') updateDrawerState();
+    }, 1200);
   });
 }
-function initSocialLoginButtons() {
-  document.querySelectorAll('.social-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const provider = btn.textContent.includes('카카오') ? '카카오' : '구글';
-      showToast(`${provider} 로그인은 준비 중입니다.`, 'error');
-    });
-  });
-}
+
 /* ═══════════════════════════════════════════════════
    SIGNUP FORM
 ═══════════════════════════════════════════════════ */
@@ -518,35 +422,13 @@ function initSignupForm() {
     if (!ok) return;
 
     const btn = document.getElementById('doSignupBtn');
-btnLoad(btn, '가입 중...');
-console.log('회원가입 API 호출 시작', { nick, email });
-fetch('https://backend.di702934.workers.dev/api/auth/signup', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    nickname: nick,
-    email,
-    password: pw,
-    phone: document.getElementById('signupTel')?.value.trim() || null
-  })
-})
-  .then(async res => {
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || '회원가입에 실패했습니다.');
-    return data;
-  })
-  .then(() => {
-    resetForm(document.getElementById('signup-pane'));
-    showToast('회원가입이 완료되었습니다! 로그인해주세요 🎉', 'success');
-
-    document.querySelector('[data-tab="login-pane"]')?.click();
-  })
-  .catch(err => {
-    showToast(err.message, 'error');
-  })
-  .finally(() => {
-    btnReset(btn);
-  });
+    btnLoad(btn, '가입 중...');
+    setTimeout(() => {
+      btnReset(btn);
+      resetForm(document.getElementById('signup-pane'));
+      closeModal('login');
+      showToast('회원가입이 완료되었습니다! 환영해요 🎉', 'success');
+    }, 1500);
   });
 }
 
@@ -734,40 +616,14 @@ if (!content) {
 if (!ok) return;
 
 const btn = document.getElementById('postSubmitBtn');
-btnLoad(btn, '등록 중...');
-
-let user = null;
-try {
-  user = JSON.parse(localStorage.getItem('rg_user') || 'null');
-} catch (e) {}
-
-fetch('https://backend.di702934.workers.dev/api/posts', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    userId: user?.id || null,
-    board: document.querySelector('.comm-side__link.act')?.dataset.board || '자유게시판',
-    title,
-    content
-  })
-})
-  .then(async res => {
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || '게시글 등록에 실패했습니다.');
-    return data;
-  })
-  .then(() => {
-    clearDraft('post');
-    resetForm(document.getElementById('postFormInner'));
-    closeModal('writePost');
-    showToast('게시글이 등록되었습니다! 🎉', 'success');
-  })
-  .catch(err => {
-    showToast(err.message, 'error');
-  })
-  .finally(() => {
-    btnReset(btn);
-  });
+    btnLoad(btn, '등록 중...');
+    setTimeout(() => {
+      btnReset(btn);
+      clearDraft('post');
+      resetForm(document.getElementById('postFormInner'));
+      closeModal('writePost');
+      showToast('게시글이 등록되었습니다! 🎉', 'success');
+    }, 1000);
   });
 }
 
@@ -805,6 +661,4 @@ document.addEventListener('DOMContentLoaded', () => {
   initPostForm();
   initSupportForm();
   initMypageForm();
-  initSocialLoginButtons();
-  applyLoginState();
 });

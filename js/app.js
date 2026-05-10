@@ -5,23 +5,47 @@
 
 function openLoginModal() { openModal('login'); }
 
-/* NAV 버튼 */
-document.getElementById('loginBtn').addEventListener('click', () => {
-  if (S.loggedIn) {
-    navigateTo('mypage');
-  } else {
-    openModal('login');
-  }
-});
-document.getElementById('loginBtnM').addEventListener('click', () => {
-  closeMobileDrawer();
+/* 드로어 상태 업데이트 — 로그인/비로그인에 따라 하단 버튼 변경 */
+function updateDrawerState() {
+  const actions = document.querySelector('.drawer__actions');
+  if (!actions) return;
 
   if (S.loggedIn) {
-    navigateTo('mypage');
+    // 로그인 상태: 유저 이름 + 마이페이지 버튼
+    const userName = document.querySelector('.mp-name')?.textContent || '내 계정';
+    actions.innerHTML = `
+      <button class="btn btn--g btn--full" id="loginBtnM" style="text-align:left;justify-content:flex-start;gap:8px">
+        <span style="font-size:20px">👤</span>
+        <span>
+          <span style="display:block;font-size:13px;font-weight:800;color:var(--text)">${userName}</span>
+          <span style="display:block;font-size:11px;color:var(--text-mute)">마이페이지 →</span>
+        </span>
+      </button>
+    `;
+    document.getElementById('loginBtnM').addEventListener('click', () => {
+      closeMobileDrawer();
+      navigateTo('mypage');
+    });
   } else {
-    openModal('login');
+    // 비로그인 상태: 로그인 + 파트너 신청
+    actions.innerHTML = `
+      <button class="btn btn--g" id="loginBtnM">로그인</button>
+      <button class="btn btn--p" id="preregBtnM">파트너 신청</button>
+    `;
+    document.getElementById('loginBtnM').addEventListener('click', () => {
+      closeMobileDrawer();
+      openModal('login');
+    });
+    document.getElementById('preregBtnM').addEventListener('click', () => {
+      closeMobileDrawer();
+      openModal('prereg');
+    });
   }
-}); 
+}
+
+/* NAV 버튼 */
+document.getElementById('loginBtn').addEventListener('click', openLoginModal);
+document.getElementById('loginBtnM').addEventListener('click', () => { closeMobileDrawer(); openModal('login'); });
 document.getElementById('preregBtn').addEventListener('click', () => openModal('prereg'));
 document.getElementById('preregBtnM').addEventListener('click', () => { closeMobileDrawer(); openModal('prereg'); });
 
@@ -72,11 +96,86 @@ function updateNotifBadge() {
   }
 }
 
+
+/* ⑤ KPI 카운트업 애니메이션 */
+function animateCountUp(el, target, duration=1200, suffix='') {
+  const start = 0;
+  const startTime = performance.now();
+  const isFloat = String(target).includes('.');
+  const update = (currentTime) => {
+    const elapsed = currentTime - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    // easeOutQuart
+    const eased = 1 - Math.pow(1 - progress, 4);
+    const current = Math.round(start + (target - start) * eased);
+    if (isFloat) {
+      el.textContent = (start + (target - start) * eased).toFixed(1) + suffix;
+    } else {
+      el.textContent = current.toLocaleString('ko-KR') + suffix;
+    }
+    if (progress < 1) requestAnimationFrame(update);
+    else el.textContent = isFloat ? target.toFixed(1) + suffix : target.toLocaleString('ko-KR') + suffix;
+  };
+  requestAnimationFrame(update);
+}
+
+function initKpiAnimation() {
+  const kpiMap = [
+    { selector: '.kpi-card:nth-child(2) .kpi-card__value', target: 1248, suffix: '' },
+    { selector: '.kpi-card:nth-child(3) .kpi-card__value', target: 247,  suffix: '명' },
+  ];
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        kpiMap.forEach(({ selector, target, suffix }) => {
+          const el = document.querySelector(selector);
+          if (el && !el.dataset.animated) {
+            el.dataset.animated = '1';
+            el.classList.add('counting');
+            animateCountUp(el, target, 1400, suffix);
+            setTimeout(() => el.classList.remove('counting'), 1500);
+          }
+        });
+        observer.disconnect();
+      }
+    });
+  }, { threshold: 0.3 });
+
+  const kpiSection = document.querySelector('.hero__kpi');
+  if (kpiSection) observer.observe(kpiSection);
+}
+
+/* 실시간 거래 현황 숫자 카운트업 (trade-bar) */
+function initTradeBarAnimation() {
+  const bars = document.querySelectorAll('.trade-bar__num');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      bars.forEach(el => {
+        if (el.dataset.animated) return;
+        el.dataset.animated = '1';
+        const raw = el.textContent.replace(/[^0-9]/g, '');
+        const num = parseInt(raw);
+        if (!isNaN(num) && num > 1) animateCountUp(el, num, 1000);
+      });
+      observer.disconnect();
+    });
+  }, { threshold: 0.5 });
+  const bar = document.querySelector('.trade-bar');
+  if (bar) observer.observe(bar);
+}
+
 /* BOOT */
 initGrids();
 startFeed();
 startTradeLogRotation();
 updateNotifBadge();
+updateDrawerState();
+initKpiAnimation();
+initTradeBarAnimation();
+initMarketSearch();
+initScrollTopBtn();
+initEnterSubmit();
 
 /* 주간 TOP 셀러 그리드 */
 function renderWeeklyTop() {
