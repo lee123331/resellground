@@ -113,14 +113,14 @@ function applyLoginState() {
     };
   }
 
-  if (logoutBtnM) {
-    logoutBtnM.style.display = '';
-    logoutBtnM.onclick = () => {
-      logoutBtnM.blur();
-      closeMobileDrawer();
-      logout();
-    };
-  }
+ if (logoutBtnM) {
+  logoutBtnM.style.display = 'inline-flex';
+  logoutBtnM.onclick = () => {
+    logoutBtnM.blur();
+    closeMobileDrawer();
+    logout();
+  };
+}
 }
 
 function logout() {
