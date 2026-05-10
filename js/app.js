@@ -217,16 +217,29 @@ function initTradeBarAnimation() {
   const observer = new IntersectionObserver(entries => {
     entries.forEach(entry => {
       if (!entry.isIntersecting) return;
+
       bars.forEach(el => {
         if (el.dataset.animated) return;
         el.dataset.animated = '1';
+
+        // 수수료 2.5%는 카운트업하지 않고 그대로 유지
+        if (el.classList.contains('brand')) {
+          el.textContent = '2.5%';
+          return;
+        }
+
         const raw = el.textContent.replace(/[^0-9]/g, '');
-        const num = parseInt(raw);
-        if (!isNaN(num) && num > 1) animateCountUp(el, num, 1000);
+        const num = parseInt(raw, 10);
+
+        if (!isNaN(num) && num > 1) {
+          animateCountUp(el, num, 1000);
+        }
       });
+
       observer.disconnect();
     });
   }, { threshold: 0.5 });
+
   const bar = document.querySelector('.trade-bar');
   if (bar) observer.observe(bar);
 }
