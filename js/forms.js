@@ -95,22 +95,32 @@ function applyLoginState() {
 
   const loginBtn = document.getElementById('loginBtn');
   const loginBtnM = document.getElementById('loginBtnM');
+  const logoutBtnM = document.getElementById('logoutBtnM');
 
-if (loginBtn) {
-  loginBtn.style.display = '';
-  loginBtn.textContent = '마이페이지';
-  loginBtn.onclick = () => navigateTo('mypage');
+  if (loginBtn) {
+    loginBtn.style.display = '';
+    loginBtn.textContent = '마이페이지';
+    loginBtn.onclick = () => navigateTo('mypage');
+  }
 
-}
-if (loginBtnM) {
-  loginBtnM.style.display = '';
-  loginBtnM.textContent = '마이페이지';
-  loginBtnM.onclick = () => {
-    loginBtnM.blur();
-    closeMobileDrawer();
-    navigateTo('mypage');
-  };
-}
+  if (loginBtnM) {
+    loginBtnM.style.display = '';
+    loginBtnM.textContent = '마이페이지';
+    loginBtnM.onclick = () => {
+      loginBtnM.blur();
+      closeMobileDrawer();
+      navigateTo('mypage');
+    };
+  }
+
+  if (logoutBtnM) {
+    logoutBtnM.style.display = '';
+    logoutBtnM.onclick = () => {
+      logoutBtnM.blur();
+      closeMobileDrawer();
+      logout();
+    };
+  }
 }
 
 function logout() {
@@ -123,22 +133,28 @@ function logout() {
 
   const loginBtn = document.getElementById('loginBtn');
   const loginBtnM = document.getElementById('loginBtnM');
+  const logoutBtnM = document.getElementById('logoutBtnM');
 
-if (loginBtn) {
-  loginBtn.style.display = '';
-  loginBtn.textContent = '로그인';
-  loginBtn.onclick = () => openModal('login');
-}
+  if (loginBtn) {
+    loginBtn.style.display = '';
+    loginBtn.textContent = '로그인';
+    loginBtn.onclick = () => openModal('login');
+  }
 
-if (loginBtnM) {
-  loginBtnM.style.display = '';
-  loginBtnM.textContent = '로그인';
-  loginBtnM.onclick = () => {
-    loginBtnM.blur();
-    closeMobileDrawer();
-    openModal('login');
-  };
-}
+  if (loginBtnM) {
+    loginBtnM.style.display = '';
+    loginBtnM.textContent = '로그인';
+    loginBtnM.onclick = () => {
+      loginBtnM.blur();
+      closeMobileDrawer();
+      openModal('login');
+    };
+  }
+
+  if (logoutBtnM) {
+    logoutBtnM.style.display = 'none';
+  }
+
   showToast('로그아웃되었습니다.', 'success');
   navigateTo('home');
 }
