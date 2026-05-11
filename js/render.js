@@ -14,11 +14,11 @@ function tierBadge(seller) {
   return (map[seller.tierCls] || '') + weekly;
 }
 
-/* 판매자 온도 */
-function sellerTemp(rate) {
-  const temp = Math.round(rate * 0.98 + 1);
-  const color = temp >= 99 ? '#059669' : temp >= 95 ? '#d97706' : '#dc2626';
-  return `<span style="color:${color};font-weight:800">${temp}°C</span>`;
+/* RG 셀러지수 */
+function sellerScore(rate) {
+  const score = Math.round(rate * 9);
+  const color = score >= 850 ? '#059669' : score >= 750 ? '#d97706' : '#dc2626';
+  return `<span style="color:${color};font-weight:800">${score}점</span>`;
 }
 
 /* 상품 태그 */
@@ -84,10 +84,10 @@ function renderSellerCard(seller, index) {
       </div>
     </div>
     <div class="sc__temp-row">
-      <span class="sc__temp-label">판매자 온도</span>
-      ${sellerTemp(seller.successRate)}
-      <div class="sc__temp-bar"><div class="sc__temp-fill" style="width:${seller.successRate}%"></div></div>
-    </div>
+  <span class="sc__temp-label">RG 셀러지수</span>
+  ${sellerScore(seller.successRate)}
+  <div class="sc__temp-bar"><div class="sc__temp-fill" style="width:${seller.successRate}%"></div></div>
+</div>
     <button class="sc__follow" data-follow="${seller.name}">팔로우</button>
   `;
   div.querySelector('.sc__follow').addEventListener('click', (e) => {
