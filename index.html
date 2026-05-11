@@ -635,20 +635,153 @@
 
 <!-- INFO PAGES -->
 <main class="page" id="page-guide">
-  <div class="page-hd"><div class="page-hd__inner"><p class="section-tag">거래 가이드</p><h1 class="page-hd__title">거래 가이드</h1></div></div>
-  <div class="info-pg">
-    <h3>🛡 전국 안전결제 프로세스</h3>
-    <div style="background:var(--three-l);border-radius:var(--radius);padding:var(--s4);margin:var(--s3) 0;border-left:3px solid var(--three)">
-      <p style="font-size:13px;font-weight:600;color:var(--text)">① 구매자 결제 → ② 리셀그라운드 에스크로 예치 → ③ 판매자 발송 → ④ 구매자 수령 확인 → ⑤ 판매자 정산 (수수료 2.5%)</p>
+  <div class="page-hd">
+    <div class="page-hd__inner">
+      <p class="section-tag">이용 가이드</p>
+      <h1 class="page-hd__title">처음부터 안전한 거래까지</h1>
     </div>
-    <h3>🤝 근거리 직거래</h3>
-    <p>앱 내 위치 기반 매칭 → 예치금 시스템으로 노쇼 방지 → 직거래 완료 후 거래 기록 자동 등록</p>
-    <h3>✓ 인증 셀러 시스템</h3>
-    <p>SNS 팔로워 1,000명 이상 또는 거래 실적 기준 충족 셀러에게 인증 패키지 팩 발급. 인증 셀러는 홈 상단 우선 노출 혜택을 받습니다.</p>
-    <h3>⚠️ 사기 예방 가이드</h3>
-    <p>플랫폼 외부 결제 절대 금지 / 정품 확인서 요청 가능 / 거래 전 판매자 온도·거래 성공률 반드시 확인 / 의심 거래는 즉시 신고</p>
-    <h3>📦 발송 및 검수</h3>
-    <p>판매 상품 검수 서비스 신청 가능. 파트너 검수 기관을 통해 정품 여부 확인 후 인증 패키지 팩 부여.</p>
+  </div>
+
+  <div class="info-pg">
+    <div style="
+      background:linear-gradient(135deg,var(--brand),#1d4ed8);
+      border-radius:var(--radius-lg);
+      padding:var(--s6);
+      color:#fff;
+      margin-bottom:var(--s6);
+      box-shadow:var(--shadow-sm);
+    ">
+      <p style="font-size:13px;font-weight:800;color:rgba(255,255,255,.75);margin-bottom:var(--s2)">
+        RESELLGROUND GUIDE
+      </p>
+      <h3 style="font-size:26px;font-weight:900;margin-bottom:var(--s3);line-height:1.35">
+        처음 오셨나요?<br>
+        리셀그라운드에서 더 쉽고 안전하게 거래하는 방법을 안내해드릴게요.
+      </h3>
+      <p style="font-size:14px;line-height:1.8;color:rgba(255,255,255,.82);word-break:keep-all">
+        회원가입부터 상품 등록, 안전 거래, 커뮤니티 이용, 셀러 성장까지
+        처음 이용하는 사람도 바로 이해할 수 있도록 핵심만 정리했습니다.
+      </p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s4);margin-bottom:var(--s6)">
+      <div class="side-card">
+        <p class="side-card__t">🚀 시작하기</p>
+        <p style="font-size:13px;color:var(--text-sub);line-height:1.8;margin-bottom:var(--s3)">
+          처음 가입한 사용자가 기본 설정을 마치고 바로 서비스를 이용할 수 있도록 도와줍니다.
+        </p>
+        <ul style="font-size:13px;color:var(--text);line-height:2;padding-left:18px">
+          <li>회원가입 방법</li>
+          <li>프로필 설정</li>
+          <li>판매자 인증</li>
+          <li>관심 카테고리 설정</li>
+        </ul>
+      </div>
+
+      <div class="side-card">
+        <p class="side-card__t">📦 판매 가이드</p>
+        <p style="font-size:13px;color:var(--text-sub);line-height:1.8;margin-bottom:var(--s3)">
+          상품을 더 잘 보이게 등록하고, 빠르게 판매될 수 있도록 돕는 셀러용 가이드입니다.
+        </p>
+        <ul style="font-size:13px;color:var(--text);line-height:2;padding-left:18px">
+          <li>상품 등록 방법</li>
+          <li>사진 잘 올리는 팁</li>
+          <li>빠르게 판매되는 제목 작성법</li>
+          <li>가격 설정 팁</li>
+          <li>거래 상태 변경 방법</li>
+        </ul>
+      </div>
+
+      <div class="side-card">
+        <p class="side-card__t">🛒 구매 가이드</p>
+        <p style="font-size:13px;color:var(--text-sub);line-height:1.8;margin-bottom:var(--s3)">
+          원하는 상품을 안전하게 찾고, 믿을 수 있는 셀러와 거래하는 방법을 안내합니다.
+        </p>
+        <ul style="font-size:13px;color:var(--text);line-height:2;padding-left:18px">
+          <li>안전하게 구매하는 방법</li>
+          <li>판매자 확인 팁</li>
+          <li>거래 요청 방법</li>
+          <li>결제 및 배송 확인</li>
+          <li>환불 / 분쟁 안내</li>
+        </ul>
+      </div>
+
+      <div class="side-card">
+        <p class="side-card__t">🛡 안전 거래</p>
+        <p style="font-size:13px;color:var(--text-sub);line-height:1.8;margin-bottom:var(--s3)">
+          리셀 거래에서 가장 중요한 정품성, 사기 예방, 신고 절차를 정리한 필수 가이드입니다.
+        </p>
+        <ul style="font-size:13px;color:var(--text);line-height:2;padding-left:18px">
+          <li>사기 예방 방법</li>
+          <li>정품 확인 팁</li>
+          <li>의심 거래 신고</li>
+          <li>안전결제 시스템</li>
+          <li>패널티 정책</li>
+        </ul>
+      </div>
+
+      <div class="side-card">
+        <p class="side-card__t">💰 수수료 / 정산</p>
+        <p style="font-size:13px;color:var(--text-sub);line-height:1.8;margin-bottom:var(--s3)">
+          판매 후 남는 금액과 정산 흐름을 쉽게 이해할 수 있도록 안내합니다.
+        </p>
+        <ul style="font-size:13px;color:var(--text);line-height:2;padding-left:18px">
+          <li>수수료 안내</li>
+          <li>실수령액 확인</li>
+          <li>정산 일정</li>
+          <li>출금 방법</li>
+          <li>정산 상태 확인</li>
+        </ul>
+      </div>
+
+      <div class="side-card">
+        <p class="side-card__t">💬 커뮤니티 이용 방법</p>
+        <p style="font-size:13px;color:var(--text-sub);line-height:1.8;margin-bottom:var(--s3)">
+          게시글, 거래 후기, 신고 기능 등 커뮤니티를 안전하게 이용하는 방법을 안내합니다.
+        </p>
+        <ul style="font-size:13px;color:var(--text);line-height:2;padding-left:18px">
+          <li>게시글 작성법</li>
+          <li>자유게시판 이용</li>
+          <li>거래 후기 작성</li>
+          <li>신고 기능</li>
+          <li>활동 규칙</li>
+        </ul>
+      </div>
+    </div>
+
+    <div style="
+      background:var(--three-l);
+      border:1px solid rgba(5,150,105,.18);
+      border-radius:var(--radius-lg);
+      padding:var(--s5);
+      margin-bottom:var(--s5);
+    ">
+      <p class="section-tag">셀러 성장 가이드</p>
+      <h3 style="font-size:20px;font-weight:900;color:var(--text);margin-bottom:var(--s3)">
+        좋은 거래가 쌓일수록 셀러의 신뢰도도 함께 성장합니다.
+      </h3>
+      <p style="font-size:13px;color:var(--text-sub);line-height:1.9;word-break:keep-all;margin-bottom:var(--s4)">
+        리셀그라운드는 단순히 상품을 올리는 곳이 아니라, 셀러가 더 잘 팔고 더 신뢰받을 수 있도록 돕는 플랫폼을 지향합니다.
+        빠른 응답, 정확한 상품 설명, 정품 인증 자료, 좋은 후기, 안정적인 거래 완료는 셀러 성장에 중요한 기준이 됩니다.
+      </p>
+
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s3)">
+        <div style="background:#fff;border-radius:var(--radius);padding:var(--s4);border:1px solid var(--border)">
+          <p style="font-size:14px;font-weight:800;color:var(--text);margin-bottom:var(--s2)">사진은 선명하게</p>
+          <p style="font-size:12px;color:var(--text-sub);line-height:1.7">상품 전체, 디테일, 구성품, 하자 부분을 함께 보여주세요.</p>
+        </div>
+
+        <div style="background:#fff;border-radius:var(--radius);padding:var(--s4);border:1px solid var(--border)">
+          <p style="font-size:14px;font-weight:800;color:var(--text);margin-bottom:var(--s2)">제목은 정확하게</p>
+          <p style="font-size:12px;color:var(--text-sub);line-height:1.7">브랜드명, 모델명, 사이즈, 상태를 한눈에 보이게 작성하세요.</p>
+        </div>
+
+        <div style="background:#fff;border-radius:var(--radius);padding:var(--s4);border:1px solid var(--border)">
+          <p style="font-size:14px;font-weight:800;color:var(--text);margin-bottom:var(--s2)">응답은 빠르게</p>
+          <p style="font-size:12px;color:var(--text-sub);line-height:1.7">빠른 응답은 구매자의 신뢰와 거래 완료율을 높여줍니다.</p>
+        </div>
+      </div>
+    </div>
   </div>
 </main>
 <main class="page" id="page-verify">
