@@ -501,6 +501,8 @@ function initScrollTopBtn() {
   });
 }
 
+
+
 /* ═══ [8] 엔터키 폼 제출 ═══ */
 function initEnterSubmit() {
   // 로그인 폼
@@ -534,64 +536,421 @@ function initEnterSubmit() {
 
   // 채팅창은 ui.js에서 이미 처리됨
 }
-function initEnterSubmit() {
-  // 로그인 폼
-  const loginPw = document.getElementById('loginPw');
-  const doLoginBtn = document.getElementById('doLoginBtn');
-  if (loginPw && doLoginBtn) {
-    loginPw.addEventListener('keydown', e => { if (e.key === 'Enter') doLoginBtn.click(); });
-    const loginEmail = document.getElementById('loginEmail');
-    if (loginEmail) loginEmail.addEventListener('keydown', e => { if (e.key === 'Enter') loginPw.focus(); });
+/* ═══ 거래 가이드 세부 내용 ═══ */
+const GUIDE_DATA = {
+  join: {
+    title: '회원가입 방법',
+    icon: '👤',
+    steps: [
+      { step: '01', title: '이메일 입력', desc: '리셀그라운드 로그인 또는 회원가입 화면에서 이메일과 비밀번호를 입력합니다.' },
+      { step: '02', title: '기본 정보 입력', desc: '닉네임, 연락처, 관심 카테고리 등 서비스 이용에 필요한 기본 정보를 입력합니다.' },
+      { step: '03', title: '프로필 완성', desc: '프로필 이미지와 소개글을 설정하면 거래 신뢰도를 높일 수 있습니다.' },
+      { step: '04', title: '서비스 이용 시작', desc: '가입 후 상품 탐색, 커뮤니티 활동, 셀러 팔로우 기능을 이용할 수 있습니다.' },
+    ],
+    tip: '💡 프로필을 꼼꼼히 작성할수록 구매자와 판매자 모두에게 신뢰를 줄 수 있어요.'
+  },
+
+  profile: {
+    title: '프로필 설정',
+    icon: '🖼',
+    steps: [
+      { step: '01', title: '마이페이지 접속', desc: '우측 상단 프로필 아이콘 또는 모바일 하단 MY 버튼을 눌러 마이페이지로 이동합니다.' },
+      { step: '02', title: '닉네임 설정', desc: '거래 상대방이 쉽게 알아볼 수 있는 닉네임을 설정합니다.' },
+      { step: '03', title: '소개글 작성', desc: '주로 거래하는 카테고리, 활동 지역, 직거래 가능 여부를 적어두면 좋습니다.' },
+      { step: '04', title: 'SNS 정보 입력', desc: '인스타그램, 틱톡 등 활동 계정을 연결하면 셀러 신뢰도를 높이는 데 도움이 됩니다.' },
+    ],
+    tip: '💡 리셀 거래에서는 프로필 완성도가 곧 신뢰의 시작이에요.'
+  },
+
+  verify: {
+    title: '셀러 정보 등록',
+    icon: '✓',
+    steps: [
+      { step: '01', title: '셀러 정보 입력', desc: '판매 활동을 원하는 경우 마이페이지에서 셀러 정보를 등록합니다.' },
+      { step: '02', title: '활동 카테고리 선택', desc: '스니커즈, 명품, 시계, 의류 등 주로 판매할 카테고리를 선택합니다.' },
+      { step: '03', title: 'SNS 또는 거래 이력 등록', desc: '기존 거래 후기나 SNS 활동 이력이 있다면 신뢰 자료로 활용할 수 있습니다.' },
+      { step: '04', title: '추후 인증 확장', desc: '향후 인증 셀러, 인증 패키지 팩, RG 셀러지수와 연동될 수 있습니다.' },
+    ],
+    tip: '💡 현재는 “판매자 인증”보다 “셀러 정보 등록”으로 표현하는 것이 기능 오해를 줄일 수 있어요.'
+  },
+
+  category: {
+    title: '관심 카테고리 설정',
+    icon: '🏷',
+    steps: [
+      { step: '01', title: '관심 분야 선택', desc: '스니커즈, 명품, 시계, 의류 등 관심 있는 리셀 카테고리를 선택합니다.' },
+      { step: '02', title: '피드 맞춤화', desc: '선택한 카테고리를 기준으로 상품, 드롭, 셀러 추천이 더 정확해집니다.' },
+      { step: '03', title: '알림 확장', desc: '추후 관심 카테고리 기반 새 드롭 알림과 시세 알림으로 확장할 수 있습니다.' },
+    ],
+    tip: '💡 관심 카테고리를 설정하면 원하는 상품을 더 빠르게 찾을 수 있어요.'
+  },
+
+  register: {
+    title: '상품 등록 방법',
+    icon: '📸',
+    steps: [
+      { step: '01', title: '상품 등록 클릭', desc: '드롭스 페이지의 상품 등록 버튼 또는 모바일 플로팅 버튼을 눌러 등록 화면을 엽니다.' },
+      { step: '02', title: '상품 정보 입력', desc: '상품명, 브랜드, 카테고리, 사이즈, 상태, 가격을 입력합니다.' },
+      { step: '03', title: '이미지 업로드', desc: '상품 전체 사진, 디테일 사진, 구성품 사진을 함께 올리면 신뢰도가 높아집니다.' },
+      { step: '04', title: '설명 작성', desc: '구매 경로, 사용감, 하자 여부, 구성품 여부를 솔직하게 작성합니다.' },
+      { step: '05', title: '등록 완료', desc: '입력한 내용을 확인한 뒤 상품을 등록합니다.' },
+    ],
+    tip: '💡 하자나 사용감을 숨기지 않고 명확히 적는 것이 오히려 거래 신뢰도를 높입니다.'
+  },
+
+  photo: {
+    title: '사진 잘 올리는 팁',
+    icon: '📷',
+    steps: [
+      { step: '01', title: '밝은 배경 사용', desc: '흰색 또는 밝은 단색 배경에서 촬영하면 상품이 더 선명하게 보입니다.' },
+      { step: '02', title: '여러 각도 촬영', desc: '정면, 측면, 후면, 로고, 구성품, 하자 부위를 각각 촬영합니다.' },
+      { step: '03', title: '실물 색감 유지', desc: '과한 필터를 사용하면 실제 상품과 달라 보여 분쟁이 생길 수 있습니다.' },
+      { step: '04', title: '구성품 포함', desc: '박스, 영수증, 더스트백, 보증서 등 구성품을 함께 보여주세요.' },
+    ],
+    tip: '💡 리셀 상품은 사진이 곧 첫 번째 신뢰 자료예요.'
+  },
+
+  title: {
+    title: '빠르게 판매되는 제목 작성법',
+    icon: '✍',
+    steps: [
+      { step: '01', title: '브랜드명 포함', desc: '나이키, 조던, 구찌, 롤렉스처럼 검색될 가능성이 높은 브랜드명을 넣습니다.' },
+      { step: '02', title: '모델명 정확히 작성', desc: '정확한 모델명과 제품명을 입력하면 검색 노출이 좋아집니다.' },
+      { step: '03', title: '사이즈와 상태 추가', desc: '예: “나이키 덩크 로우 팬더 270 새상품”처럼 핵심 정보를 넣습니다.' },
+      { step: '04', title: '과한 문구 지양', desc: '급처, 초특가, 무조건 정품 같은 과한 표현은 신뢰도를 낮출 수 있습니다.' },
+    ],
+    tip: '💡 좋은 제목은 검색에 잘 걸리고, 구매자가 빠르게 판단할 수 있게 해줍니다.'
+  },
+
+  price: {
+    title: '가격 설정 팁',
+    icon: '💵',
+    steps: [
+      { step: '01', title: '최근 시세 확인', desc: '시세조회 페이지나 최근 거래가를 참고해 적정 가격을 확인합니다.' },
+      { step: '02', title: '상품 상태 반영', desc: '새상품, 미사용, 사용감 있음, 구성품 여부에 따라 가격을 조정합니다.' },
+      { step: '03', title: '수수료 반영', desc: '리셀그라운드 수수료 2.5%를 고려해 실수령액을 계산합니다.' },
+      { step: '04', title: '협상 가능성 고려', desc: '가격 제안 가능 여부를 설명에 적어두면 거래 문의가 늘어날 수 있습니다.' },
+    ],
+    tip: '💡 실수령액 = 판매가 × 0.975 기준으로 계산하면 돼요.'
+  },
+
+  tradeStatus: {
+    title: '거래 상태 변경 방법',
+    icon: '🔄',
+    steps: [
+      { step: '01', title: '내 상품 확인', desc: '마이페이지 또는 내 상품 목록에서 등록한 상품을 확인합니다.' },
+      { step: '02', title: '상태 선택', desc: '판매중, 예약중, 거래완료 등 현재 거래 상태에 맞게 변경합니다.' },
+      { step: '03', title: '구매자 혼선 방지', desc: '예약중이거나 판매 완료된 상품은 빠르게 상태를 바꿔 불필요한 문의를 줄입니다.' },
+      { step: '04', title: '거래 이력 반영', desc: '거래 완료 처리는 추후 RG 셀러지수와 거래 이력에 반영될 수 있습니다.' },
+    ],
+    tip: '💡 상태 변경을 빠르게 해두면 셀러 신뢰도가 좋아집니다.'
+  },
+
+  howbuy: {
+    title: '안전하게 구매하는 방법',
+    icon: '🛒',
+    steps: [
+      { step: '01', title: '판매자 정보 확인', desc: '거래 전 판매자의 프로필, 후기, 거래 이력, 활동 카테고리를 확인합니다.' },
+      { step: '02', title: 'RG 셀러지수 확인', desc: 'RG 셀러지수가 높을수록 거래 성공률, 후기 품질, 응답 속도가 안정적인 셀러예요.' },
+      { step: '03', title: '상품 정보 확인', desc: '사진, 설명, 구성품, 하자 여부, 정품 자료를 꼼꼼히 확인합니다.' },
+      { step: '04', title: '외부 결제 주의', desc: '플랫폼 외부 결제나 개인 송금을 유도하는 거래는 피하는 것이 좋습니다.' },
+    ],
+    tip: '💡 가격이 너무 저렴한 상품은 정품 여부와 판매자 신뢰도를 더 꼼꼼히 확인하세요.'
+  },
+
+  checkseller: {
+    title: '판매자 확인 팁',
+    icon: '🔍',
+    steps: [
+      { step: '01', title: '프로필 완성도 확인', desc: '프로필 사진, 소개글, 활동 카테고리가 잘 작성되어 있는지 확인합니다.' },
+      { step: '02', title: '거래 이력 확인', desc: '거래 완료 횟수와 후기 내용을 함께 확인합니다.' },
+      { step: '03', title: '응답 태도 확인', desc: '상품 질문에 빠르고 정확하게 답변하는 셀러는 신뢰도가 높습니다.' },
+      { step: '04', title: '인증 정보 확인', desc: '인증 셀러, 인증 패키지 팩, 정품 자료 여부를 확인합니다.' },
+    ],
+    tip: '💡 별점보다 실제 후기 내용과 응답 태도를 함께 보는 것이 중요합니다.'
+  },
+
+  request: {
+    title: '거래 요청 방법',
+    icon: '🤝',
+    steps: [
+      { step: '01', title: '상품 선택', desc: '구매하고 싶은 상품을 선택한 뒤 판매자 정보를 확인합니다.' },
+      { step: '02', title: '채팅 시작', desc: '거래 채팅을 통해 상품 상태, 가격, 배송 방식 등을 문의합니다.' },
+      { step: '03', title: '조건 협의', desc: '가격, 직거래 장소, 배송 방식, 결제 방식을 협의합니다.' },
+      { step: '04', title: '거래 진행', desc: '서로 조건이 맞으면 안전한 방식으로 거래를 진행합니다.' },
+    ],
+    tip: '💡 중요한 합의 내용은 채팅 기록으로 남겨두는 것이 좋아요.'
+  },
+
+  delivery: {
+    title: '결제 및 배송 확인',
+    icon: '📬',
+    steps: [
+      { step: '01', title: '결제 방식 확인', desc: '안전결제 또는 합의된 결제 방식을 확인합니다.' },
+      { step: '02', title: '배송 정보 확인', desc: '운송장 번호, 택배사, 발송 예정일을 확인합니다.' },
+      { step: '03', title: '수령 후 확인', desc: '상품을 받은 뒤 상태, 구성품, 설명과 일치하는지 확인합니다.' },
+      { step: '04', title: '거래 완료', desc: '문제가 없다면 거래 완료 처리를 진행합니다.' },
+    ],
+    tip: '💡 수령 직후 사진이나 영상으로 개봉 기록을 남겨두면 분쟁 예방에 도움이 됩니다.'
+  },
+
+  refund: {
+    title: '환불 / 분쟁 안내',
+    icon: '↩',
+    steps: [
+      { step: '01', title: '문제 확인', desc: '상품 설명과 다른 점, 하자, 구성품 누락, 정품 의심 여부를 확인합니다.' },
+      { step: '02', title: '증거 확보', desc: '사진, 영상, 채팅 기록 등 확인 가능한 자료를 보관합니다.' },
+      { step: '03', title: '판매자와 협의', desc: '먼저 판매자와 문제 해결을 시도합니다.' },
+      { step: '04', title: '고객센터 문의', desc: '해결되지 않는 경우 고객센터 또는 신고 기능을 이용합니다.' },
+    ],
+    tip: '💡 단순 변심과 상품 설명 불일치는 처리 기준이 다를 수 있어요.'
+  },
+
+  fraud: {
+    title: '사기 예방 방법',
+    icon: '⚠️',
+    steps: [
+      { step: '01', title: '외부 결제 주의', desc: '카카오톡, 문자, 개인 송금으로 유도하는 거래는 주의해야 합니다.' },
+      { step: '02', title: '시세보다 낮은 가격 주의', desc: '시세보다 지나치게 저렴한 상품은 추가 확인이 필요합니다.' },
+      { step: '03', title: '정품 자료 확인', desc: '고가 상품은 영수증, 보증서, 구성품, 시리얼 정보 등을 확인합니다.' },
+      { step: '04', title: '의심 시 신고', desc: '의심스러운 거래는 즉시 신고하거나 고객센터에 문의합니다.' },
+    ],
+    tip: '💡 급하게 결제를 유도하는 판매자는 특히 조심하세요.'
+  },
+
+  auth: {
+    title: '정품 확인 팁',
+    icon: '🔎',
+    steps: [
+      { step: '01', title: '구성품 확인', desc: '박스, 영수증, 보증서, 더스트백 등 구성품 여부를 확인합니다.' },
+      { step: '02', title: '디테일 사진 요청', desc: '로고, 마감, 시리얼, 라벨 등 정품 판단에 필요한 사진을 요청합니다.' },
+      { step: '03', title: '구매 경로 확인', desc: '공식 매장, 온라인 스토어, 리셀 플랫폼 등 구매 경로를 확인합니다.' },
+      { step: '04', title: '인증 패키지 팩 활용', desc: '향후 리셀그라운드 인증 패키지 팩과 연동해 신뢰도를 높일 수 있습니다.' },
+    ],
+    tip: '💡 정품 여부가 중요한 상품일수록 사진과 증빙 자료를 충분히 확인해야 합니다.'
+  },
+
+  report: {
+    title: '의심 거래 신고',
+    icon: '🚨',
+    steps: [
+      { step: '01', title: '의심 상황 확인', desc: '외부 결제 유도, 허위 상품 정보, 욕설, 가품 의심 등 신고 사유를 확인합니다.' },
+      { step: '02', title: '증거 확보', desc: '채팅 내용, 상품 페이지, 결제 요청 화면 등을 캡처합니다.' },
+      { step: '03', title: '신고 접수', desc: '고객센터 또는 신고 기능을 통해 내용을 제출합니다.' },
+      { step: '04', title: '검토 대기', desc: '접수된 신고는 운영 기준에 따라 검토됩니다.' },
+    ],
+    tip: '💡 허위 신고는 오히려 본인 계정에 불이익이 될 수 있습니다.'
+  },
+
+  escrow: {
+    title: '안전결제 시스템',
+    icon: '🔒',
+    steps: [
+      { step: '01', title: '구매자 결제', desc: '구매자가 결제를 진행하면 금액이 안전하게 예치됩니다.' },
+      { step: '02', title: '판매자 발송', desc: '판매자는 상품을 발송하고 배송 정보를 입력합니다.' },
+      { step: '03', title: '구매자 수령 확인', desc: '구매자가 상품 상태를 확인한 뒤 수령 확인을 진행합니다.' },
+      { step: '04', title: '판매자 정산', desc: '거래가 정상 완료되면 판매자에게 정산됩니다.' },
+    ],
+    tip: '💡 안전결제는 구매자와 판매자 모두를 보호하기 위한 구조입니다.'
+  },
+
+  penalty: {
+    title: '패널티 정책',
+    icon: '⛔',
+    steps: [
+      { step: '01', title: '경고', desc: '가벼운 규정 위반은 경고 처리될 수 있습니다.' },
+      { step: '02', title: '기능 제한', desc: '반복 위반 시 상품 등록, 채팅, 커뮤니티 활동이 제한될 수 있습니다.' },
+      { step: '03', title: '계정 정지', desc: '사기, 가품 판매, 악성 행위는 계정 정지로 이어질 수 있습니다.' },
+      { step: '04', title: '이의 제기', desc: '제재에 이의가 있는 경우 고객센터를 통해 문의할 수 있습니다.' },
+    ],
+    tip: '💡 좋은 거래 문화를 유지하는 것이 플랫폼 전체 신뢰도를 높입니다.'
+  },
+
+  feeguide: {
+    title: '수수료 안내',
+    icon: '💰',
+    steps: [
+      { step: '01', title: '고정 수수료', desc: '리셀그라운드는 2.5% 고정 수수료 구조를 지향합니다.' },
+      { step: '02', title: '실수령액 계산', desc: '실수령액은 판매가에서 2.5%를 제외한 금액입니다.' },
+      { step: '03', title: '비교 확인', desc: '수수료 안내 페이지에서 타 플랫폼과 실수령액을 비교할 수 있습니다.' },
+      { step: '04', title: '정산 확장 예정', desc: '정산 내역과 출금 기능은 추후 마이페이지에서 확장할 수 있습니다.' },
+    ],
+    tip: '💡 100만원 판매 시 리셀그라운드 기준 실수령액은 975,000원입니다.'
+  },
+
+  calc: {
+    title: '실수령액 확인',
+    icon: '🧮',
+    steps: [
+      { step: '01', title: '판매가 입력', desc: '판매하려는 상품 가격을 기준으로 계산합니다.' },
+      { step: '02', title: '수수료 적용', desc: '판매가의 2.5%를 수수료로 계산합니다.' },
+      { step: '03', title: '정산 금액 확인', desc: '판매가에서 수수료를 제외한 금액이 실수령액입니다.' },
+      { step: '04', title: '타 플랫폼 비교', desc: '같은 판매가 기준으로 다른 플랫폼과 비교하면 차이를 쉽게 확인할 수 있습니다.' },
+    ],
+    tip: '💡 판매가 × 0.975 = 리셀그라운드 기준 실수령액입니다.'
+  },
+
+  schedule: {
+    title: '정산 일정',
+    icon: '📅',
+    steps: [
+      { step: '01', title: '거래 완료', desc: '구매자가 상품을 수령하고 거래가 완료되면 정산 단계로 넘어갑니다.' },
+      { step: '02', title: '정산 대기', desc: '분쟁 가능 기간 또는 운영 정책에 따라 일정 기간 정산 대기 상태가 될 수 있습니다.' },
+      { step: '03', title: '정산 처리', desc: '정산 조건이 충족되면 판매자 계좌로 정산됩니다.' },
+      { step: '04', title: '내역 확인', desc: '추후 마이페이지에서 거래별 정산 내역을 확인할 수 있도록 확장할 수 있습니다.' },
+    ],
+    tip: '💡 정산 구조는 안전 거래와 연결되는 핵심 기능입니다.'
+  },
+
+  withdraw: {
+    title: '출금 방법',
+    icon: '🏦',
+    steps: [
+      { step: '01', title: '계좌 등록', desc: '본인 명의의 정산 계좌를 등록합니다.' },
+      { step: '02', title: '출금 가능 금액 확인', desc: '정산 완료된 금액 중 출금 가능한 금액을 확인합니다.' },
+      { step: '03', title: '출금 신청', desc: '출금 신청 버튼을 눌러 정산금을 출금합니다.' },
+      { step: '04', title: '입금 확인', desc: '운영 정책에 따른 처리 기간 이후 계좌로 입금됩니다.' },
+    ],
+    tip: '💡 출금 기능은 실제 정산 시스템 구현 시 연결하면 됩니다.'
+  },
+
+  settlementStatus: {
+    title: '정산 상태 확인',
+    icon: '📊',
+    steps: [
+      { step: '01', title: '정산 대기', desc: '거래는 완료됐지만 아직 정산 처리 전인 상태입니다.' },
+      { step: '02', title: '정산 완료', desc: '판매자에게 정산이 완료된 상태입니다.' },
+      { step: '03', title: '정산 보류', desc: '분쟁이나 신고가 접수된 거래는 정산이 보류될 수 있습니다.' },
+      { step: '04', title: '정산 취소', desc: '환불 또는 거래 취소가 확정된 경우 정산이 취소될 수 있습니다.' },
+    ],
+    tip: '💡 정산 상태는 판매자 신뢰와 거래 안정성 관리에 중요합니다.'
+  },
+
+  post: {
+    title: '게시글 작성법',
+    icon: '✍',
+    steps: [
+      { step: '01', title: '게시판 선택', desc: 'RESELL TALK, 자유게시판, 시세 분석, 거래 후기 등 목적에 맞는 게시판을 선택합니다.' },
+      { step: '02', title: '제목 작성', desc: '내용을 한눈에 이해할 수 있는 제목을 작성합니다.' },
+      { step: '03', title: '본문 작성', desc: '정보, 질문, 후기, 분석 내용을 구체적으로 작성합니다.' },
+      { step: '04', title: '등록 완료', desc: '작성한 내용을 확인한 뒤 게시글 등록 버튼을 누릅니다.' },
+    ],
+    tip: '💡 좋은 정보성 글은 커뮤니티 신뢰도를 높이고 셀러 브랜딩에도 도움이 됩니다.'
+  },
+
+  board: {
+    title: '자유게시판 이용',
+    icon: '💬',
+    steps: [
+      { step: '01', title: '주제 선택', desc: '리셀, 패션, 시세, 거래 경험 등 자유롭게 이야기를 나눌 수 있습니다.' },
+      { step: '02', title: '기본 매너 지키기', desc: '욕설, 비방, 허위 정보, 광고성 글은 피해야 합니다.' },
+      { step: '03', title: '정보 공유', desc: '상품 정보, 시세 흐름, 판매 팁 등을 공유할 수 있습니다.' },
+      { step: '04', title: '커뮤니티 활동', desc: '좋은 활동은 향후 셀러 신뢰도와 플랫폼 내 평판에 긍정적으로 작용할 수 있습니다.' },
+    ],
+    tip: '💡 리셀그라운드는 거래뿐 아니라 정보를 나누는 커뮤니티를 지향합니다.'
+  },
+
+  review: {
+    title: '거래 후기 작성',
+    icon: '⭐',
+    steps: [
+      { step: '01', title: '거래 완료 확인', desc: '거래가 완료된 뒤 후기를 작성할 수 있습니다.' },
+      { step: '02', title: '후기 내용 작성', desc: '응답 속도, 상품 상태, 포장, 거래 매너 등을 구체적으로 작성합니다.' },
+      { step: '03', title: '평점 반영', desc: '작성된 후기는 셀러 평판과 RG 셀러지수에 반영될 수 있습니다.' },
+      { step: '04', title: '다른 사용자 도움', desc: '후기는 다른 구매자가 안전하게 거래하는 데 중요한 자료가 됩니다.' },
+    ],
+    tip: '💡 좋은 후기는 셀러 성장에 직접적인 도움이 됩니다.'
+  },
+
+  signal: {
+    title: '신고 기능',
+    icon: '🚨',
+    steps: [
+      { step: '01', title: '신고 사유 선택', desc: '허위 정보, 사기 의심, 욕설, 가품 의심 등 신고 사유를 선택합니다.' },
+      { step: '02', title: '내용 작성', desc: '문제가 된 내용을 구체적으로 작성합니다.' },
+      { step: '03', title: '증거 첨부', desc: '캡처 이미지나 거래 기록을 첨부하면 검토에 도움이 됩니다.' },
+      { step: '04', title: '운영 검토', desc: '접수된 신고는 운영 기준에 따라 검토됩니다.' },
+    ],
+    tip: '💡 신고 기능은 안전한 거래 환경을 만들기 위한 장치입니다.'
+  },
+
+  rules: {
+    title: '활동 규칙',
+    icon: '📋',
+    steps: [
+      { step: '01', title: '존중 기반 소통', desc: '다른 사용자에게 불쾌감을 주는 표현은 피합니다.' },
+      { step: '02', title: '허위 정보 금지', desc: '시세, 상품 상태, 정품 여부에 대한 허위 정보를 올리지 않습니다.' },
+      { step: '03', title: '외부 거래 유도 금지', desc: '플랫폼 외부 결제나 외부 거래 유도는 제한될 수 있습니다.' },
+      { step: '04', title: '건강한 커뮤니티 유지', desc: '정보 공유와 안전 거래를 중심으로 커뮤니티 문화를 만들어갑니다.' },
+    ],
+    tip: '💡 좋은 커뮤니티 문화는 플랫폼의 신뢰도를 높입니다.'
   }
+};
 
-  // 회원가입 폼 — 마지막 입력 필드에서 엔터
-  const doSignupBtn = document.getElementById('doSignupBtn');
-  if (doSignupBtn) {
-    ['signupPw2'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.addEventListener('keydown', e => { if (e.key === 'Enter') doSignupBtn.click(); });
-    });
-  }
+function initGuide() {
+  const tabs = document.querySelectorAll('.guide-tab');
+  const cards = document.querySelectorAll('.guide-card');
+  const grid = document.getElementById('guideGrid');
+  const detail = document.getElementById('guideDetail');
+  const body = document.getElementById('guideDetailBody');
+  const backBtn = document.getElementById('guideBackBtn');
 
-  // 사전신청 폼
-  const doPreregBtn = document.getElementById('doPreregBtn');
-  if (doPreregBtn) {
-    ['prName','prEmail','prTel','prIntro'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.addEventListener('keydown', e => {
-        if (e.key === 'Enter' && el.tagName !== 'TEXTAREA') doPreregBtn.click();
-      });
-    });
-  }
-
-  // 채팅창은 ui.js에서 이미 처리됨
-}
-
-/* ═══ 이용 가이드 탭 기능 ═══ */
-function initGuideTabs() {
-  const tabs = document.querySelectorAll('[data-guide-tab]');
-  const items = document.querySelectorAll('[data-guide-card]');
-  const cardGrid = document.getElementById('guideCardGrid');
-
-  if (!tabs.length || !items.length) return;
+  if (!tabs.length || !cards.length || !grid || !detail || !body) return;
 
   tabs.forEach(tab => {
     tab.addEventListener('click', () => {
-      const target = tab.dataset.guideTab;
-
       tabs.forEach(t => t.classList.remove('act'));
       tab.classList.add('act');
 
-      items.forEach(item => {
-        const key = item.dataset.guideCard;
-        item.style.display = (target === 'all' || key === target) ? '' : 'none';
+      const cat = tab.dataset.guide;
+
+      cards.forEach(card => {
+        card.style.display = (cat === 'all' || card.dataset.cat === cat) ? '' : 'none';
       });
 
-      if (cardGrid) {
-        cardGrid.style.display = target === 'growth' ? 'none' : 'grid';
-      }
+      detail.style.display = 'none';
+      grid.style.display = '';
     });
   });
-}
 
-initGuideTabs();
+  document.querySelectorAll('.guide-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const key = item.dataset.key;
+      const data = GUIDE_DATA[key];
+
+      if (!data) return;
+
+      body.innerHTML = `
+        <div class="guide-detail__title">
+          <span class="guide-detail__icon">${data.icon}</span>
+          <h2>${data.title}</h2>
+        </div>
+
+        <div class="guide-detail__steps">
+          ${data.steps.map(s => `
+            <div class="guide-step">
+              <div class="guide-step__num">${s.step}</div>
+              <div class="guide-step__content">
+                <p class="guide-step__title">${s.title}</p>
+                <p class="guide-step__desc">${s.desc}</p>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+
+        ${data.tip ? `<div class="guide-tip">${data.tip}</div>` : ''}
+      `;
+
+      grid.style.display = 'none';
+      detail.style.display = 'block';
+      detail.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+
+  if (backBtn) {
+    backBtn.addEventListener('click', () => {
+      detail.style.display = 'none';
+      grid.style.display = '';
+    });
+  }
+}

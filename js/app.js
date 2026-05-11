@@ -256,6 +256,9 @@ initMarketSearch();
 initScrollTopBtn();
 initEnterSubmit();
 
+if (typeof initGuide === 'function') {
+  initGuide();
+}
 
 
 /* 주간 TOP 셀러 그리드 */
