@@ -534,3 +534,64 @@ function initEnterSubmit() {
 
   // 채팅창은 ui.js에서 이미 처리됨
 }
+function initEnterSubmit() {
+  // 로그인 폼
+  const loginPw = document.getElementById('loginPw');
+  const doLoginBtn = document.getElementById('doLoginBtn');
+  if (loginPw && doLoginBtn) {
+    loginPw.addEventListener('keydown', e => { if (e.key === 'Enter') doLoginBtn.click(); });
+    const loginEmail = document.getElementById('loginEmail');
+    if (loginEmail) loginEmail.addEventListener('keydown', e => { if (e.key === 'Enter') loginPw.focus(); });
+  }
+
+  // 회원가입 폼 — 마지막 입력 필드에서 엔터
+  const doSignupBtn = document.getElementById('doSignupBtn');
+  if (doSignupBtn) {
+    ['signupPw2'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('keydown', e => { if (e.key === 'Enter') doSignupBtn.click(); });
+    });
+  }
+
+  // 사전신청 폼
+  const doPreregBtn = document.getElementById('doPreregBtn');
+  if (doPreregBtn) {
+    ['prName','prEmail','prTel','prIntro'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('keydown', e => {
+        if (e.key === 'Enter' && el.tagName !== 'TEXTAREA') doPreregBtn.click();
+      });
+    });
+  }
+
+  // 채팅창은 ui.js에서 이미 처리됨
+}
+
+/* ═══ 이용 가이드 탭 기능 ═══ */
+function initGuideTabs() {
+  const tabs = document.querySelectorAll('[data-guide-tab]');
+  const items = document.querySelectorAll('[data-guide-card]');
+  const cardGrid = document.getElementById('guideCardGrid');
+
+  if (!tabs.length || !items.length) return;
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const target = tab.dataset.guideTab;
+
+      tabs.forEach(t => t.classList.remove('act'));
+      tab.classList.add('act');
+
+      items.forEach(item => {
+        const key = item.dataset.guideCard;
+        item.style.display = (target === 'all' || key === target) ? '' : 'none';
+      });
+
+      if (cardGrid) {
+        cardGrid.style.display = target === 'growth' ? 'none' : 'grid';
+      }
+    });
+  });
+}
+
+initGuideTabs();

@@ -666,9 +666,19 @@
         처음 이용하는 사람도 바로 이해할 수 있도록 핵심만 정리했습니다.
       </p>
     </div>
+    <div id="guideTabs" style="display:flex;gap:var(--s2);flex-wrap:wrap;margin-bottom:var(--s5)">
+  <button type="button" class="drops-flt-btn act" data-guide-tab="all">전체</button>
+  <button type="button" class="drops-flt-btn" data-guide-tab="start">시작하기</button>
+  <button type="button" class="drops-flt-btn" data-guide-tab="sell">판매 가이드</button>
+  <button type="button" class="drops-flt-btn" data-guide-tab="buy">구매 가이드</button>
+  <button type="button" class="drops-flt-btn" data-guide-tab="safe">안전 거래</button>
+  <button type="button" class="drops-flt-btn" data-guide-tab="fee">수수료 / 정산</button>
+  <button type="button" class="drops-flt-btn" data-guide-tab="community">커뮤니티</button>
+  <button type="button" class="drops-flt-btn" data-guide-tab="growth">셀러 성장</button>
+</div>
 
-    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s4);margin-bottom:var(--s6)">
-      <div class="side-card">
+    <div id="guideCardGrid" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s4);margin-bottom:var(--s6)">
+      <div class="side-card" data-guide-card="start">
         <p class="side-card__t">🚀 시작하기</p>
         <p style="font-size:13px;color:var(--text-sub);line-height:1.8;margin-bottom:var(--s3)">
           처음 가입한 사용자가 기본 설정을 마치고 바로 서비스를 이용할 수 있도록 도와줍니다.
@@ -681,7 +691,7 @@
         </ul>
       </div>
 
-      <div class="side-card">
+      <div class="side-card" data-guide-card="sell">
         <p class="side-card__t">📦 판매 가이드</p>
         <p style="font-size:13px;color:var(--text-sub);line-height:1.8;margin-bottom:var(--s3)">
           상품을 더 잘 보이게 등록하고, 빠르게 판매될 수 있도록 돕는 셀러용 가이드입니다.
@@ -695,7 +705,7 @@
         </ul>
       </div>
 
-      <div class="side-card">
+      <div class="side-card" data-guide-card="buy">
         <p class="side-card__t">🛒 구매 가이드</p>
         <p style="font-size:13px;color:var(--text-sub);line-height:1.8;margin-bottom:var(--s3)">
           원하는 상품을 안전하게 찾고, 믿을 수 있는 셀러와 거래하는 방법을 안내합니다.
@@ -709,7 +719,7 @@
         </ul>
       </div>
 
-      <div class="side-card">
+      <div class="side-card" data-guide-card="safe">
         <p class="side-card__t">🛡 안전 거래</p>
         <p style="font-size:13px;color:var(--text-sub);line-height:1.8;margin-bottom:var(--s3)">
           리셀 거래에서 가장 중요한 정품성, 사기 예방, 신고 절차를 정리한 필수 가이드입니다.
@@ -723,7 +733,7 @@
         </ul>
       </div>
 
-      <div class="side-card">
+      <div class="side-card" data-guide-card="fee">
         <p class="side-card__t">💰 수수료 / 정산</p>
         <p style="font-size:13px;color:var(--text-sub);line-height:1.8;margin-bottom:var(--s3)">
           판매 후 남는 금액과 정산 흐름을 쉽게 이해할 수 있도록 안내합니다.
@@ -737,7 +747,7 @@
         </ul>
       </div>
 
-      <div class="side-card">
+      <div class="side-card" data-guide-card="community">
         <p class="side-card__t">💬 커뮤니티 이용 방법</p>
         <p style="font-size:13px;color:var(--text-sub);line-height:1.8;margin-bottom:var(--s3)">
           게시글, 거래 후기, 신고 기능 등 커뮤니티를 안전하게 이용하는 방법을 안내합니다.
@@ -752,9 +762,9 @@
       </div>
     </div>
 
-    <div style="
-      background:var(--three-l);
-      border:1px solid rgba(5,150,105,.18);
+    <div data-guide-card="growth" style="
+  background:var(--three-l);
+  border:1px solid rgba(5,150,105,.18);
       border-radius:var(--radius-lg);
       padding:var(--s5);
       margin-bottom:var(--s5);
@@ -788,9 +798,9 @@
       </div>
     </div>
 
-    <div style="
-      background:#fff;
-      border:1px solid var(--border);
+   <div data-guide-card="growth" style="
+  background:#fff;
+  border:1px solid var(--border);
       border-radius:var(--radius-lg);
       padding:var(--s5);
       margin-bottom:var(--s5);
