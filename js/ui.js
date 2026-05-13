@@ -435,25 +435,25 @@ function openPostDetail(post) {
   title.textContent = post.title || '제목 없음';
 
   if (boardBadge) boardBadge.textContent = post.badge || '커뮤니티';
-  if (meta) meta.textContent = post.time || '방금 전';
+  if (meta) meta.textContent = post.time ? `작성 ${post.time}` : '작성 방금 전';
 
-  if (authorAv) {
-    authorAv.className = `pc__av ${post.av || 'av-a'}`;
-    authorAv.textContent = post.em || '💬';
-  }
+if (authorAv) {
+  authorAv.className = `pc__av ${post.av || 'av-a'}`;
+  authorAv.textContent = post.em || '💬';
+}
 
-  if (authorName) authorName.textContent = post.author || '익명';
-  if (authorSub) authorSub.textContent = '리셀그라운드 커뮤니티';
+if (authorName) authorName.textContent = post.author || '익명';
+if (authorSub) authorSub.textContent = '리셀그라운드 커뮤니티';
 
-  if (tags) {
-    tags.innerHTML = postTags(post.tags || []);
-  }
+if (tags) {
+  tags.innerHTML = postTags(post.tags || []);
+}
 
-  content.textContent = post.content || post.preview || '게시글 내용이 없습니다.';
+content.textContent = post.content || post.preview || '게시글 내용이 없습니다.';
 
-  if (likes) likes.textContent = `👍 ${post.likes || 0}`;
-  if (comments) comments.textContent = `💬 ${post.comments || 0}`;
-  if (views) views.textContent = `👁 ${post.views || 0}`;
+if (likes) likes.textContent = `👍 ${post.likes || 0}`;
+if (comments) comments.textContent = `댓글 ${post.comments || 0}`;
+if (views) views.textContent = `조회 ${post.views || 0}`;
 
   if (bookmarkBtn) {
     bookmarkBtn.onclick = () => {

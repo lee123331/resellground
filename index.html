@@ -1136,42 +1136,79 @@
 </div>
 <!-- POST DETAIL MODAL -->
 <div class="modal-ov" id="modal-postDetail">
-  <div class="modal wide">
-    <div class="modal__hd">
-      <h2 class="modal__title">게시글 상세</h2>
+  <div class="modal wide dc-post-modal">
+    <div class="modal__hd dc-post-modal__hd">
+      <h2 class="modal__title">커뮤니티 게시글</h2>
       <button class="modal__close" data-close="postDetail" aria-label="닫기">✕</button>
     </div>
 
-    <div class="modal__body">
-      <div class="post-detail">
-        <div class="post-detail__meta">
-          <span class="pc__badge" id="pdBoardBadge">RESELL TALK</span>
-          <span id="pdMeta">방금 전</span>
+    <div class="modal__body dc-post-body">
+      <article class="dc-post">
+        <div class="dc-post__board-row">
+          <span class="dc-post__board" id="pdBoardBadge">RESELL TALK</span>
+          <span class="dc-post__path">리셀그라운드 커뮤니티</span>
         </div>
 
-        <h2 class="post-detail__title" id="pdTitle">제목</h2>
+        <header class="dc-post__head">
+          <h1 class="dc-post__title" id="pdTitle">제목</h1>
 
-        <div class="post-detail__author">
-          <div class="pc__av av-a" id="pdAuthorAv">🔥</div>
-          <div>
-            <p class="post-detail__author-name" id="pdAuthorName">작성자</p>
-            <p class="post-detail__author-sub" id="pdAuthorSub">커뮤니티 게시글</p>
+          <div class="dc-post__info">
+            <div class="dc-post__writer">
+              <div class="pc__av av-a dc-post__av" id="pdAuthorAv">🔥</div>
+              <div>
+                <p class="dc-post__name" id="pdAuthorName">작성자</p>
+                <p class="dc-post__sub" id="pdAuthorSub">커뮤니티 게시글</p>
+              </div>
+            </div>
+
+            <div class="dc-post__meta">
+              <span id="pdMeta">방금 전</span>
+              <span id="pdViews">👁 0</span>
+              <span id="pdComments">💬 0</span>
+            </div>
+          </div>
+        </header>
+
+        <div class="dc-post__tags" id="pdTags"></div>
+
+        <section class="dc-post__content" id="pdContent">
+          내용이 들어갑니다.
+        </section>
+
+        <div class="dc-post__reaction">
+          <button type="button" class="dc-post__recommend">
+            <span id="pdLikes">👍 0</span>
+            <em>추천</em>
+          </button>
+
+          <button type="button" class="dc-post__bookmark" id="pdBookmarkBtn">
+            북마크
+          </button>
+        </div>
+
+        <div class="dc-post__comment-box">
+          <div class="dc-post__comment-hd">
+            <strong>댓글</strong>
+            <span>댓글 기능은 추후 정식 연동 예정입니다.</span>
+          </div>
+
+          <div class="dc-post__comment-empty">
+            아직 등록된 댓글이 없습니다.
+          </div>
+
+          <div class="dc-post__comment-write">
+            <textarea placeholder="댓글을 입력해주세요." disabled></textarea>
+            <button type="button" disabled>등록</button>
           </div>
         </div>
 
-        <div class="post-detail__tags" id="pdTags"></div>
-
-        <div class="post-detail__content" id="pdContent">
-          내용이 들어갑니다.
+        <div class="dc-post__actions">
+          <button type="button" class="dc-post__btn" data-close="postDetail">목록</button>
+          <button type="button" class="dc-post__btn">수정</button>
+          <button type="button" class="dc-post__btn">삭제</button>
+          <button type="button" class="dc-post__btn dc-post__btn--report">신고</button>
         </div>
-
-        <div class="post-detail__foot">
-          <span id="pdLikes">👍 0</span>
-          <span id="pdComments">💬 0</span>
-          <span id="pdViews">👁 0</span>
-          <button class="pc__action-btn" id="pdBookmarkBtn" type="button">북마크</button>
-        </div>
-      </div>
+      </article>
     </div>
   </div>
 </div>
