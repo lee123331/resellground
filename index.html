@@ -1134,7 +1134,47 @@
     </div>
   </div>
 </div>
+<!-- POST DETAIL MODAL -->
+<div class="modal-ov" id="modal-postDetail">
+  <div class="modal wide">
+    <div class="modal__hd">
+      <h2 class="modal__title">게시글 상세</h2>
+      <button class="modal__close" data-close="postDetail" aria-label="닫기">✕</button>
+    </div>
 
+    <div class="modal__body">
+      <div class="post-detail">
+        <div class="post-detail__meta">
+          <span class="pc__badge" id="pdBoardBadge">RESELL TALK</span>
+          <span id="pdMeta">방금 전</span>
+        </div>
+
+        <h2 class="post-detail__title" id="pdTitle">제목</h2>
+
+        <div class="post-detail__author">
+          <div class="pc__av av-a" id="pdAuthorAv">🔥</div>
+          <div>
+            <p class="post-detail__author-name" id="pdAuthorName">작성자</p>
+            <p class="post-detail__author-sub" id="pdAuthorSub">커뮤니티 게시글</p>
+          </div>
+        </div>
+
+        <div class="post-detail__tags" id="pdTags"></div>
+
+        <div class="post-detail__content" id="pdContent">
+          내용이 들어갑니다.
+        </div>
+
+        <div class="post-detail__foot">
+          <span id="pdLikes">👍 0</span>
+          <span id="pdComments">💬 0</span>
+          <span id="pdViews">👁 0</span>
+          <button class="pc__action-btn" id="pdBookmarkBtn" type="button">북마크</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 <!-- CHAT PANEL -->
 <aside class="chat-panel" id="chatPanel" aria-hidden="true">
   <div class="chat-panel__hd">

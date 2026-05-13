@@ -415,7 +415,55 @@ function renderNotifications() {
     </div>
   `).join('');
 }
+/* ── 게시글 상세보기 ── */
+function openPostDetail(post) {
+  const title = document.getElementById('pdTitle');
+  const boardBadge = document.getElementById('pdBoardBadge');
+  const meta = document.getElementById('pdMeta');
+  const authorAv = document.getElementById('pdAuthorAv');
+  const authorName = document.getElementById('pdAuthorName');
+  const authorSub = document.getElementById('pdAuthorSub');
+  const tags = document.getElementById('pdTags');
+  const content = document.getElementById('pdContent');
+  const likes = document.getElementById('pdLikes');
+  const comments = document.getElementById('pdComments');
+  const views = document.getElementById('pdViews');
+  const bookmarkBtn = document.getElementById('pdBookmarkBtn');
 
+  if (!title || !content) return;
+
+  title.textContent = post.title || '제목 없음';
+
+  if (boardBadge) boardBadge.textContent = post.badge || '커뮤니티';
+  if (meta) meta.textContent = post.time || '방금 전';
+
+  if (authorAv) {
+    authorAv.className = `pc__av ${post.av || 'av-a'}`;
+    authorAv.textContent = post.em || '💬';
+  }
+
+  if (authorName) authorName.textContent = post.author || '익명';
+  if (authorSub) authorSub.textContent = '리셀그라운드 커뮤니티';
+
+  if (tags) {
+    tags.innerHTML = postTags(post.tags || []);
+  }
+
+  content.textContent = post.content || post.preview || '게시글 내용이 없습니다.';
+
+  if (likes) likes.textContent = `👍 ${post.likes || 0}`;
+  if (comments) comments.textContent = `💬 ${post.comments || 0}`;
+  if (views) views.textContent = `👁 ${post.views || 0}`;
+
+  if (bookmarkBtn) {
+    bookmarkBtn.onclick = () => {
+      if (!requireLogin()) return;
+      showToast('북마크에 저장됐어요.', 'success');
+    };
+  }
+
+  openModal('postDetail');
+}
 /* ── 전역 이벤트 위임 ── */
 document.addEventListener('click', e => {
   const gotoEl = e.target.closest('[data-goto]');

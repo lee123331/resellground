@@ -173,6 +173,21 @@ function renderPostCard(post) {
       <button class="pc__action-btn" onclick="event.stopPropagation();requireLogin()">북마크</button>
     </div>
   `;
+
+  // 게시물 고유 ID 부여
+  const postId = post.id || (Date.now() + Math.random()).toString(36);
+  div.dataset.postId = postId;
+  div._postData = post;
+
+  // 게시글 카드 클릭 시 상세보기 열기
+  div.addEventListener('click', (e) => {
+    if (e.target.closest('.pc__action-btn')) return;
+
+    if (typeof openPostDetail === 'function') {
+      openPostDetail({ ...post, id: postId });
+    }
+  });
+
   return div;
 }
 
