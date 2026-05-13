@@ -293,6 +293,11 @@ if (chatInp) {
     if (e.key === 'Enter') sendChatMsg();
   });
 }
+document.querySelectorAll('.chat-conv').forEach(conv => {
+  conv.addEventListener('click', () => {
+    openChatWith(conv.dataset.user);
+  });
+});
 
 /* 거래 카드 전송 버튼 */
 const chatSendDrop = document.getElementById('chatSendDrop');
@@ -319,18 +324,25 @@ if (chatSendDrop) {
 }
 
 /* ── FILTERS ── */
-document.querySelectorAll('[data-cat]').forEach(btn => {
+document.querySelectorAll('.sellers-side [data-cat]').forEach(btn => {
   btn.addEventListener('click', function() {
-    document.querySelectorAll('[data-cat]').forEach(b=>b.classList.remove('act'));
+    document.querySelectorAll('.sellers-side [data-cat]').forEach(b => b.classList.remove('act'));
     this.classList.add('act');
+
     const val = this.dataset.cat;
     const grid = document.getElementById('fullSellerGrid');
+    if (!grid) return;
+
     grid.innerHTML = '';
-    const filtered = val==='전체' ? DATA.sellers : DATA.sellers.filter(s=>s.cat===val);
-    if (filtered.length===0) {
+
+    const filtered = val === '전체'
+      ? DATA.sellers
+      : DATA.sellers.filter(s => s.cat === val);
+
+    if (filtered.length === 0) {
       grid.innerHTML = '<div class="empty-state"><p class="empty-state__icon">🔍</p><p class="empty-state__title">검색 결과 없음</p><p class="empty-state__desc">해당 카테고리의 셀러가 없습니다.</p></div>';
     } else {
-      filtered.forEach((s,i)=>grid.appendChild(renderSellerCard(s,i)));
+      filtered.forEach((s, i) => grid.appendChild(renderSellerCard(s, i)));
     }
   });
 });

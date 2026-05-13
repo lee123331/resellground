@@ -222,18 +222,19 @@ function initTradeBarAnimation() {
         if (el.dataset.animated) return;
         el.dataset.animated = '1';
 
-        // 수수료 2.5%는 카운트업하지 않고 그대로 유지
-        if (el.classList.contains('brand')) {
-          el.textContent = '2.5%';
-          return;
-        }
+       // 수수료 2.5%는 숫자 카운트업 대상에서 제외
+if (el.classList.contains('brand')) {
+  el.dataset.animated = '1';
+  el.textContent = '2.5%';
+  return;
+}
 
-        const raw = el.textContent.replace(/[^0-9]/g, '');
-        const num = parseInt(raw, 10);
+const raw = el.textContent.replace(/[^0-9]/g, '');
+const num = parseInt(raw, 10);
 
-        if (!isNaN(num) && num > 1) {
-          animateCountUp(el, num, 1000);
-        }
+if (!isNaN(num) && num > 1) {
+  animateCountUp(el, num, 1000);
+}
       });
 
       observer.disconnect();
@@ -257,7 +258,9 @@ initScrollTopBtn();
 initEnterSubmit();
 
 if (typeof initGuide === 'function') {
+  if (typeof initGuide === 'function') {
   initGuide();
+}
 }
 
 

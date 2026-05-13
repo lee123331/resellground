@@ -521,7 +521,7 @@
 <tr>
   <td>후르츠</td>
   <td>3.85%</td>
-  <td>제한적</td>
+  <td>△ 일부 가능</td>
   <td>제한적</td>
 </tr>
   <tr class="rslx-row">
@@ -896,7 +896,7 @@
         <div class="form-group"><label class="form-label">지역</label><input class="form-input" value="서울"/></div>
         <div class="form-group" style="grid-column:1/-1"><label class="form-label">소개글</label><textarea class="form-textarea" id="mpBio" maxlength="200">스니커즈 전문 셀러입니다. Jordan 브랜드 중심으로 거래합니다.</textarea>
       <p class="form-char"><span class="char-count-cur" id="mpBioCount">0</span>/200</p></div>
-        <div class="form-group"><label class="form-label">인스타그램</label><input class="form-input" id="prInstagram" placeholder="@아이디"/></div>
+        <div class="form-group"><label class="form-label">인스타그램</label><input class="form-input" id="mpInstagram" placeholder="@아이디"/></div>
         <div class="form-group"><label class="form-label">틱톡</label><input class="form-input" placeholder="@아이디"/></div>
       </div>
       <p class="mp-sec-title">관심 카테고리</p>
@@ -1008,7 +1008,7 @@
         <div class="form-group"><label class="form-label">이메일 *</label><input class="form-input" id="prEmail" type="email" placeholder="이메일" autocomplete="email"/><p class="form-error" id="prEmailErr">올바른 이메일을 입력해주세요.</p></div>
         <div class="form-group"><label class="form-label">연락처 *</label><input class="form-input" id="prTel" type="tel" placeholder="010-0000-0000" autocomplete="tel" inputmode="numeric"/></div>
         <div class="form-group"><label class="form-label">팔로워 수</label><select class="form-select"><option value="">선택</option><option>1,000~5,000명</option><option>5,000~1만명</option><option>1만~5만명</option><option>5만명 이상</option></select></div>
-        <div class="form-group"><label class="form-label">인스타그램 *</label><input class="form-input" placeholder="@아이디"/></div>
+        <div class="form-group"><label class="form-label">인스타그램 *</label><input class="form-input" id="prInstagram" placeholder="@아이디"/></div>
         <div class="form-group"><label class="form-label">틱톡</label><input class="form-input" placeholder="@아이디"/></div>
         <div class="form-group"><label class="form-label">유튜브</label><input class="form-input" placeholder="채널명 또는 URL"/></div>
         <div class="form-group"><label class="form-label">기타 SNS</label><input class="form-input" placeholder="플랫폼명 + 아이디"/></div>
@@ -1094,7 +1094,10 @@
         </div>
         <div class="form-group">
           <label class="form-label" for="dropVerify">검수 희망</label>
-          <select class="form-select" id="dropVerify"><option>검수 없이 등록</option><option>검수 후 인증배지 희망</option></select>
+          <select class="form-select" id="dropVerify">
+  <option>검수 없이 등록</option>
+  <option disabled>검수 서비스 준비중</option>
+</select>
         </div>
       </div>
       <button class="btn btn--p btn--full" id="dropSubmitBtn">상품 등록하기</button>
