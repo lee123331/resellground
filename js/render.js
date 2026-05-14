@@ -56,7 +56,11 @@
       <div class="sc__tier-row">${tierBadge(seller)}</div>
       <p class="sc__name">
         ${seller.name}
-        ${seller.onlineNow ? '<span class="sc__online"><span class="sc__online-dot"></span>온라인</span>' : ''}
+        ${
+  seller.onlineNow
+    ? '<span class="sc__online sc__online--on"><span class="sc__online-dot"></span>온라인</span>'
+    : '<span class="sc__online sc__online--off"><span class="sc__online-dot"></span>오프라인</span>'
+}
       </p>
       <p class="sc__handle">${seller.handle} · ${seller.loc}</p>
       <div class="sc__live-signals">

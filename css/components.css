@@ -1112,3 +1112,39 @@
   border-color:var(--three);
   color:#fff;
 }
+.sc__online{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  margin-left:6px;
+  font-size:10px;
+  font-weight:800;
+  padding:3px 7px;
+  border-radius:999px;
+  line-height:1;
+}
+
+.sc__online-dot{
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  flex-shrink:0;
+}
+
+.sc__online--on{
+  color:#059669;
+  background:#ecfdf5;
+}
+
+.sc__online--on .sc__online-dot{
+  background:#10b981;
+}
+
+.sc__online--off{
+  color:#6b7280;
+  background:#f3f4f6;
+}
+
+.sc__online--off .sc__online-dot{
+  background:#9ca3af;
+}
