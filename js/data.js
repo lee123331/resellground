@@ -156,8 +156,13 @@ const DATA = {
     {em:'⌚',name:'Rolex Sub 41mm',price:'₩12,800,000',cat:'시계'},
     {em:'👜',name:'Gucci Ophidia GG',price:'₩1,240,000',cat:'명품'},
   ],
-  /* 북마크 */
+
+  /* 북마크 — { postId, post } 형태로 저장 */
   bookmarks: [],
+
+  /* 사용자가 직접 등록한 게시물 */
+  userPosts: [],
+
   /* 알림 */
   notifications: [
     {type:'trade',msg:'sneaker.kang님의 Jordan 1이 예약됐습니다.',time:'3분 전',read:false},

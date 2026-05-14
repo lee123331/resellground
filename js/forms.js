@@ -660,54 +660,124 @@ function initDropForm() {
 }
 
 /* ═══════════════════════════════════════════════════
-   WRITE POST FORM
+   WRITE POST FORM — 게시물 등록
 ═══════════════════════════════════════════════════ */
 function initPostForm() {
-  const draftBtn = document.getElementById('postDraftBtn');
-if (draftBtn) {
-  draftBtn.addEventListener('click', () => {
-    const form = document.getElementById('postFormInner');
-    saveDraft(form, 'post');
-    showToast('게시글이 임시저장되었습니다.', 'success');
-  });
-}
-  initCharCounter('postContent', 'postCount', 5000);
+  const btn = document.getElementById('postSubmitBtn');
+  const titleEl = document.getElementById('postTitle');
+  const contentEl = document.getElementById('postContent');
+  const boardEl = document.getElementById('postBoard');
+  const formEl = document.getElementById('postFormInner');
+
+  if (!btn || !titleEl || !contentEl) return;
+
+  // 중복 이벤트 방지
+  if (btn.dataset.bound === '1') return;
+  btn.dataset.bound = '1';
+
+  initCharCounter('postContent', 'postContentCount', 5000);
   initDraftSave('postFormInner', 'post');
   initCloseGuard('writePost', 'postFormInner', 'post');
 
-  initRealTimeValidation('postTitle','postTitleErr', V.required, '제목을 입력해주세요.');
+  btn.addEventListener('click', () => {
+    const title = titleEl.value.trim();
+    const content = contentEl.value.trim();
+    const board = boardEl ? boardEl.value : 'RESELL TALK';
 
-  document.getElementById('postSubmitBtn').addEventListener('click', () => {
-    const title = document.getElementById('postTitle').value.trim();
-    const content = document.getElementById('postContent').value.trim();
     let ok = true;
 
-    if (!V.required(title)) { setErr('postTitle','postTitleErr','제목을 입력해주세요.'); ok=false; }
-    else setOk('postTitle','postTitleErr');
-if (!content) {
-  const ta = document.getElementById('postContent');
-  ta.classList.add('err');
+    titleEl.classList.remove('err');
+    contentEl.classList.remove('err');
 
-  showToast('내용을 입력해주세요.', 'error');
-  ok = false;
-} else {
-  document.getElementById('postContent').classList.remove('err');
-}
+    if (!title) {
+      titleEl.classList.add('err');
+      ok = false;
+    }
 
-if (!ok) return;
+    if (!content) {
+      contentEl.classList.add('err');
+      ok = false;
+    }
 
-const btn = document.getElementById('postSubmitBtn');
-    btnLoad(btn, '등록 중...');
+    if (!ok) {
+      showToast('제목과 내용을 입력해주세요.', 'error');
+      return;
+    }
+
+    if (!Array.isArray(DATA.userPosts)) DATA.userPosts = [];
+    if (!Array.isArray(DATA.posts)) DATA.posts = [];
+    if (!Array.isArray(DATA.bookmarks)) DATA.bookmarks = [];
+
+    const selectedTags = [...document.querySelectorAll('#postTagSelect .tag-opt.sel')]
+      .map(tag => tag.dataset.tag || tag.textContent.trim());
+
+    const user = getAuthUser();
+
+    const newPost = {
+      id: `post_${Date.now()}`,
+      av: 'av-a',
+      em: '📝',
+      author: user?.nickname || user?.email || '나',
+      authorTier: '',
+      time: '방금 전',
+      badge: board || 'RESELL TALK',
+      tags: selectedTags,
+      title,
+      content,
+      preview: content.length > 90 ? content.slice(0, 90) + '…' : content,
+      likes: 0,
+      comments: 0,
+      views: 0,
+
+      // DB 연동 시 사용할 예비 필드
+      dbPending: true
+    };
+
+    const submitBtn = document.getElementById('postSubmitBtn');
+    btnLoad(submitBtn, '등록 중...');
+
     setTimeout(() => {
-      btnReset(btn);
+      DATA.userPosts.unshift(newPost);
+      DATA.posts.unshift(newPost);
+
+      const postList = document.getElementById('postList');
+      if (postList && typeof renderPostCard === 'function') {
+        postList.innerHTML = '';
+        DATA.posts.forEach(post => {
+          postList.appendChild(renderPostCard(post));
+        });
+      }
+
+      btnReset(submitBtn);
       clearDraft('post');
-      resetForm(document.getElementById('postFormInner'));
+
+      if (formEl) resetForm(formEl);
+
+      document.querySelectorAll('#postTagSelect .tag-opt.sel')
+        .forEach(tag => tag.classList.remove('sel'));
+
       closeModal('writePost');
       showToast('게시글이 등록되었습니다! 🎉', 'success');
-    }, 1000);
+
+      if (typeof openPostDetail === 'function') {
+        setTimeout(() => openPostDetail(newPost), 250);
+      }
+
+      /*
+      TODO: DB 연동 시 이 부분 활성화
+
+      fetch('/api/posts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('rg_token') || ''}`
+        },
+        body: JSON.stringify(newPost)
+      });
+      */
+    }, 600);
   });
 }
-
 /* ═══════════════════════════════════════════════════
    SUPPORT / MYPAGE
 ═══════════════════════════════════════════════════ */

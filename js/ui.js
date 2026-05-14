@@ -12,6 +12,9 @@ function navigateTo(pageId) {
   S.page = pageId;
   window.scrollTo({top:0,behavior:'smooth'});
   closeMobileDrawer();
+  if (pageId === 'mypage' && typeof refreshMpBookmarks === 'function') {
+  refreshMpBookmarks();
+}
   /* 하단 네비 활성 표시 */
   document.querySelectorAll('.bottom-nav__item').forEach(item => {
     item.classList.toggle('act', item.dataset.goto === pageId);
@@ -417,6 +420,8 @@ function renderNotifications() {
 }
 /* ── 게시글 상세보기 ── */
 function openPostDetail(post) {
+  window._currentPost = post;
+
   const title = document.getElementById('pdTitle');
   const boardBadge = document.getElementById('pdBoardBadge');
   const meta = document.getElementById('pdMeta');
@@ -456,13 +461,90 @@ if (comments) comments.textContent = `댓글 ${post.comments || 0}`;
 if (views) views.textContent = `조회 ${post.views || 0}`;
 
   if (bookmarkBtn) {
-    bookmarkBtn.onclick = () => {
-      if (!requireLogin()) return;
+  const postId = post.id || post.title || String(Date.now());
+
+  if (!Array.isArray(DATA.bookmarks)) DATA.bookmarks = [];
+
+  const alreadyBookmarked = DATA.bookmarks.some(item => {
+    const saved = item.post || item;
+    return saved.id === postId || saved.title === post.title;
+  });
+
+  bookmarkBtn.textContent = alreadyBookmarked ? '북마크 해제' : '북마크';
+  bookmarkBtn.classList.toggle('act', alreadyBookmarked);
+
+  bookmarkBtn.onclick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!requireLogin()) return;
+
+    const idx = DATA.bookmarks.findIndex(item => {
+      const saved = item.post || item;
+      return saved.id === postId || saved.title === post.title;
+    });
+
+    if (idx >= 0) {
+      DATA.bookmarks.splice(idx, 1);
+      bookmarkBtn.textContent = '북마크';
+      bookmarkBtn.classList.remove('act');
+      showToast('북마크를 해제했어요.', 'info');
+    } else {
+      DATA.bookmarks.unshift({
+        postId,
+        post: { ...post, id: postId }
+      });
+
+      bookmarkBtn.textContent = '북마크 해제';
+      bookmarkBtn.classList.add('act');
       showToast('북마크에 저장됐어요.', 'success');
-    };
-  }
+    }
+
+    if (typeof refreshMpBookmarks === 'function') {
+      refreshMpBookmarks();
+    }
+  };
+}
 
   openModal('postDetail');
+}
+/* ── 마이페이지 북마크 렌더링 ── */
+function refreshMpBookmarks() {
+  const list = document.getElementById('mpBookmarkList');
+  if (!list) return;
+
+  if (!Array.isArray(DATA.bookmarks)) DATA.bookmarks = [];
+
+  if (DATA.bookmarks.length === 0) {
+    list.innerHTML = `
+      <div class="empty-state">
+        <p class="empty-state__icon">🔖</p>
+        <p class="empty-state__title">저장한 북마크가 없어요</p>
+        <p class="empty-state__desc">관심 있는 게시글을 북마크하면 이곳에서 다시 볼 수 있어요.</p>
+      </div>
+    `;
+    return;
+  }
+
+  list.innerHTML = '';
+
+  DATA.bookmarks.forEach(item => {
+    if (typeof renderBookmarkCard === 'function') {
+      list.appendChild(renderBookmarkCard(item));
+    }
+  });
+}
+
+function removeBookmark(postId) {
+  if (!Array.isArray(DATA.bookmarks)) DATA.bookmarks = [];
+
+  DATA.bookmarks = DATA.bookmarks.filter(item => {
+    const post = item.post || item;
+    return item.postId !== postId && post.id !== postId;
+  });
+
+  refreshMpBookmarks();
+  showToast('북마크를 해제했어요.', 'info');
 }
 /* ── 전역 이벤트 위임 ── */
 document.addEventListener('click', e => {

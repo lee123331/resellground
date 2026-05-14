@@ -1107,3 +1107,8 @@
     flex:1;
   }
 }
+.dc-post__bookmark.act{
+  background:var(--three);
+  border-color:var(--three);
+  color:#fff;
+}

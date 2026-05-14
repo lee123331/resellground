@@ -253,16 +253,16 @@ updateNotifBadge();
 updateDrawerState();
 initKpiAnimation();
 initTradeBarAnimation();
-initMarketSearch();
-initScrollTopBtn();
-initEnterSubmit();
 
-if (typeof initGuide === 'function') {
-  if (typeof initGuide === 'function') {
-  initGuide();
-}
-}
-
+if (typeof initMarketSearch === 'function') initMarketSearch();
+if (typeof initScrollTopBtn === 'function') initScrollTopBtn();
+if (typeof initEnterSubmit === 'function') initEnterSubmit();
+if (typeof initGuide === 'function') initGuide();
+if (typeof initWebSocket === 'function') initWebSocket();
+if (typeof initChatToolbar === 'function') initChatToolbar();
+if (typeof initTypingEvent === 'function') initTypingEvent();
+if (typeof renderWeeklyTop === 'function') renderWeeklyTop();
+if (typeof _hookPostDetail === 'function') _hookPostDetail();
 
 /* 주간 TOP 셀러 그리드 */
 function renderWeeklyTop() {
@@ -280,4 +280,4 @@ function renderWeeklyTop() {
     </div>
   `).join('');
 }
-renderWeeklyTop();
+
