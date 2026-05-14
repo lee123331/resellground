@@ -748,6 +748,7 @@ function initPostForm() {
         });
       }
 
+
       btnReset(submitBtn);
       clearDraft('post');
 
@@ -763,18 +764,34 @@ function initPostForm() {
         setTimeout(() => openPostDetail(newPost), 250);
       }
 
-      /*
-      TODO: DB 연동 시 이 부분 활성화
+     fetch('https://backend.di702934.workers.dev/api/posts', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${localStorage.getItem('rg_token') || ''}`
+  },
+  body: JSON.stringify({
+    ...newPost,
+    board: board || 'RESELL TALK',
+    author_email: user?.email || ''
+  })
+})
+  .then(async res => {
+    const data = await res.json().catch(() => ({}));
 
-      fetch('/api/posts', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('rg_token') || ''}`
-        },
-        body: JSON.stringify(newPost)
-      });
-      */
+    if (!res.ok) {
+      throw new Error(data.message || 'DB 저장에 실패했습니다.');
+    }
+
+    return data;
+  })
+  .then(() => {
+    console.log('게시글 DB 저장 완료');
+  })
+  .catch(err => {
+    console.error(err);
+    showToast('화면에는 등록됐지만 DB 저장에 실패했어요.', 'warn');
+  });
     }, 600);
   });
 }

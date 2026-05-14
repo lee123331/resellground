@@ -244,9 +244,44 @@ if (!isNaN(num) && num > 1) {
   const bar = document.querySelector('.trade-bar');
   if (bar) observer.observe(bar);
 }
+async function loadPostsFromDB() {
+  try {
+    const res = await fetch('https://backend.di702934.workers.dev/api/posts');
 
+    if (!res.ok) {
+      throw new Error('게시글을 불러오지 못했습니다.');
+    }
+
+    const posts = await res.json();
+
+    if (!Array.isArray(posts)) return;
+    if (!Array.isArray(DATA.posts)) DATA.posts = [];
+
+    const dbIds = new Set(posts.map(post => String(post.id)));
+    const localOnly = DATA.posts.filter(post => !dbIds.has(String(post.id)));
+
+    DATA.posts = [...posts, ...localOnly];
+
+    const postList = document.getElementById('postList');
+    if (postList && typeof renderPostCard === 'function') {
+      postList.innerHTML = '';
+      DATA.posts.forEach(post => {
+        postList.appendChild(renderPostCard(post));
+      });
+    }
+
+    console.log('DB 게시글 불러오기 완료');
+  } catch (err) {
+    console.warn('DB 게시글 불러오기 실패:', err);
+  }
+}
 /* BOOT */
 initGrids();
+
+if (typeof loadPostsFromDB === 'function') {
+  loadPostsFromDB();
+}
+
 startFeed();
 startTradeLogRotation();
 updateNotifBadge();
