@@ -460,8 +460,9 @@ if (likes) likes.textContent = `👍 ${post.likes || 0}`;
 if (comments) comments.textContent = `댓글 ${post.comments || 0}`;
 if (views) views.textContent = `조회 ${post.views || 0}`;
 
-  if (bookmarkBtn) {
+if (bookmarkBtn) {
   const postId = post.id || post.title || String(Date.now());
+  const user = getAuthUser();
 
   if (!Array.isArray(DATA.bookmarks)) DATA.bookmarks = [];
 
@@ -473,7 +474,7 @@ if (views) views.textContent = `조회 ${post.views || 0}`;
   bookmarkBtn.textContent = alreadyBookmarked ? '북마크 해제' : '북마크';
   bookmarkBtn.classList.toggle('act', alreadyBookmarked);
 
-  bookmarkBtn.onclick = (e) => {
+  bookmarkBtn.onclick = async (e) => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -484,24 +485,55 @@ if (views) views.textContent = `조회 ${post.views || 0}`;
       return saved.id === postId || saved.title === post.title;
     });
 
-    if (idx >= 0) {
-      DATA.bookmarks.splice(idx, 1);
-      bookmarkBtn.textContent = '북마크';
-      bookmarkBtn.classList.remove('act');
-      showToast('북마크를 해제했어요.', 'info');
-    } else {
-      DATA.bookmarks.unshift({
-        postId,
-        post: { ...post, id: postId }
-      });
+    try {
+      if (idx >= 0) {
+        DATA.bookmarks.splice(idx, 1);
 
-      bookmarkBtn.textContent = '북마크 해제';
-      bookmarkBtn.classList.add('act');
-      showToast('북마크에 저장됐어요.', 'success');
-    }
+        await fetch('https://backend.di702934.workers.dev/api/bookmarks', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('rg_token') || ''}`
+          },
+          body: JSON.stringify({
+            user_email: user?.email || '',
+            post_id: postId
+          })
+        });
 
-    if (typeof refreshMpBookmarks === 'function') {
-      refreshMpBookmarks();
+        bookmarkBtn.textContent = '북마크';
+        bookmarkBtn.classList.remove('act');
+        showToast('북마크를 해제했어요.', 'info');
+      } else {
+        DATA.bookmarks.unshift({
+          postId,
+          post: { ...post, id: postId }
+        });
+
+        await fetch('https://backend.di702934.workers.dev/api/bookmarks', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('rg_token') || ''}`
+          },
+          body: JSON.stringify({
+            id: `bookmark_${Date.now()}`,
+            user_email: user?.email || '',
+            post_id: postId
+          })
+        });
+
+        bookmarkBtn.textContent = '북마크 해제';
+        bookmarkBtn.classList.add('act');
+        showToast('북마크에 저장됐어요.', 'success');
+      }
+
+      if (typeof refreshMpBookmarks === 'function') {
+        refreshMpBookmarks();
+      }
+    } catch (err) {
+      console.error(err);
+      showToast('북마크 DB 저장 중 오류가 발생했습니다.', 'warn');
     }
   };
 }
