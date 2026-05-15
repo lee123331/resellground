@@ -1148,3 +1148,42 @@
 .sc__online--off .sc__online-dot{
   background:#9ca3af;
 }
+.pd-comments-wrap{
+  margin-top:32px;
+  border-top:1px solid #222;
+  padding-top:24px;
+}
+
+.pd-comment-list{
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+  margin-bottom:20px;
+}
+
+.pd-comment-item{
+  padding:14px;
+  border-radius:14px;
+  background:#111;
+}
+
+.pd-comment-author{
+  font-weight:700;
+  margin-bottom:6px;
+}
+
+.pd-comment-content{
+  color:#ddd;
+  line-height:1.5;
+}
+
+.pd-comment-write{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+#pdCommentInput{
+  min-height:100px;
+  resize:vertical;
+}

@@ -1153,8 +1153,10 @@
     </div>
   </div>
 </div>
+
 <!-- POST DETAIL MODAL -->
 <div class="modal-ov" id="modal-postDetail">
+
   <div class="modal wide dc-post-modal">
     <div class="modal__hd dc-post-modal__hd">
       <h2 class="modal__title">커뮤니티 게시글</h2>
@@ -1205,21 +1207,6 @@
           </button>
         </div>
 
-        <div class="dc-post__comment-box">
-          <div class="dc-post__comment-hd">
-            <strong>댓글</strong>
-            <span>댓글 기능은 추후 정식 연동 예정입니다.</span>
-          </div>
-
-          <div class="dc-post__comment-empty">
-            아직 등록된 댓글이 없습니다.
-          </div>
-
-          <div class="dc-post__comment-write">
-            <textarea placeholder="댓글을 입력해주세요." disabled></textarea>
-            <button type="button" disabled>등록</button>
-          </div>
-        </div>
 
         <div class="dc-post__actions">
           <button type="button" class="dc-post__btn" data-close="postDetail">목록</button>
@@ -1228,6 +1215,20 @@
           <button type="button" class="dc-post__btn dc-post__btn--report">신고</button>
         </div>
       </article>
+        <div class="pd-comments-wrap">
+  <div id="pdCommentList" class="pd-comment-list"></div>
+
+  <div class="pd-comment-write">
+    <textarea
+      id="pdCommentInput"
+      placeholder="댓글을 입력하세요"
+    ></textarea>
+
+    <button id="pdCommentSubmit">
+      댓글 등록
+    </button>
+  </div>
+</div>
     </div>
   </div>
 </div>

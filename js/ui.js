@@ -505,8 +505,90 @@ if (views) views.textContent = `조회 ${post.views || 0}`;
     }
   };
 }
+ // 댓글 렌더링 및 등록 코드
+const commentList = document.getElementById('pdCommentList');
+const commentInput = document.getElementById('pdCommentInput');
+const commentSubmit = document.getElementById('pdCommentSubmit');
 
-  openModal('postDetail');
+if (commentList) {
+  commentList.innerHTML = '';
+
+  const commentsData = Array.isArray(post.commentList) ? post.commentList : [];
+
+  if (commentsData.length === 0) {
+    commentList.innerHTML = '<div class="pd-comment-empty">아직 등록된 댓글이 없습니다.</div>';
+  } else {
+    commentsData.forEach(c => {
+      const item = document.createElement('div');
+      item.className = 'pd-comment-item';
+      item.innerHTML = `
+        <div class="pd-comment-author">${c.author || '익명'}</div>
+        <div class="pd-comment-content">${c.content || ''}</div>
+      `;
+      commentList.appendChild(item);
+    });
+  }
+}
+
+if (commentSubmit) {
+  commentSubmit.onclick = async () => {
+    if (!requireLogin()) return;
+
+    const text = commentInput?.value.trim();
+
+    if (!text) {
+      showToast('댓글 내용을 입력해주세요.', 'error');
+      return;
+    }
+
+    const user = getAuthUser();
+
+    const newComment = {
+      id: `comment_${Date.now()}`,
+      post_id: post.id,
+      author: user?.nickname || user?.email || '나',
+      author_email: user?.email || '',
+      content: text,
+      created_at: '방금 전'
+    };
+
+    if (!Array.isArray(post.commentList)) post.commentList = [];
+
+    post.commentList.unshift(newComment);
+    post.comments = (post.comments || 0) + 1;
+
+    commentInput.value = '';
+    openPostDetail(post);
+
+    try {
+      const res = await fetch('https://backend.di702934.workers.dev/api/comments', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('rg_token') || ''}`
+        },
+        body: JSON.stringify({
+          id: newComment.id,
+          post_id: post.id,
+          author: newComment.author,
+          author_email: newComment.author_email,
+          content: text
+        })
+      });
+
+      if (!res.ok) {
+        throw new Error('댓글 DB 저장 실패');
+      }
+
+      console.log('댓글 DB 저장 완료');
+    } catch (err) {
+      console.error(err);
+      showToast('화면에는 등록됐지만 댓글 DB 저장에 실패했어요.', 'warn');
+    }
+  };
+}
+
+openModal('postDetail');
 }
 /* ── 마이페이지 북마크 렌더링 ── */
 function refreshMpBookmarks() {
