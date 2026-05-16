@@ -1376,3 +1376,14 @@
     min-height: 44px;
   }
 }
+/* 게시글 상세 모달 내부 스크롤 활성화 */
+#modal-postDetail .modal {
+  max-height: 88vh;
+  overflow: hidden;
+}
+
+#modal-postDetail .modal__body {
+  max-height: calc(88vh - 72px);
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
