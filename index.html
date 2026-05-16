@@ -1016,7 +1016,8 @@
         <div class="form-group"><label class="form-label">이름/닉네임 *</label><input class="form-input" id="prName" placeholder="닉네임"/><p class="form-error" id="prNameErr">이름을 입력해주세요.</p></div>
         <div class="form-group"><label class="form-label">이메일 *</label><input class="form-input" id="prEmail" type="email" placeholder="이메일" autocomplete="email"/><p class="form-error" id="prEmailErr">올바른 이메일을 입력해주세요.</p></div>
         <div class="form-group"><label class="form-label">연락처 *</label><input class="form-input" id="prTel" type="tel" placeholder="010-0000-0000" autocomplete="tel" inputmode="numeric"/></div>
-        <div class="form-group"><label class="form-label">팔로워 수</label><select class="form-select" id="postBoard"><option value="">선택</option><option>1,000~5,000명</option><option>5,000~1만명</option><option>1만~5만명</option><option>5만명 이상</option></select></div>
+        <div class="form-group"><label class="form-label">팔로워 수</label>
+<select class="form-select" id="prFollowerRange"><option value="">선택</option><option>1,000~5,000명</option><option>5,000~1만명</option><option>1만~5만명</option><option>5만명 이상</option></select></div>
         <div class="form-group"><label class="form-label">인스타그램 *</label><input class="form-input" id="prInstagram" placeholder="@아이디"/></div>
         <div class="form-group"><label class="form-label">틱톡</label><input class="form-input" placeholder="@아이디"/></div>
         <div class="form-group"><label class="form-label">유튜브</label><input class="form-input" placeholder="채널명 또는 URL"/></div>
@@ -1025,7 +1026,8 @@
       <div class="form-group"><label class="form-label">활동 분야</label>
         <div class="tag-select" style="margin-top:var(--sp-2)" id="actTags"><div class="tag-opt">스니커즈</div><div class="tag-opt">명품/럭셔리</div><div class="tag-opt">스트릿패션</div><div class="tag-opt">시계</div><div class="tag-opt">테크/가전</div><div class="tag-opt">아웃도어</div><div class="tag-opt">빈티지</div><div class="tag-opt">기타</div></div>
       </div>
-      <div class="form-group"><label class="form-label">리셀 관련 활동 여부</label><select class="form-select" id="postBoard">
+      <div class="form-group"><label class="form-label">리셀 관련 활동 여부</label>
+<select class="form-select" id="prResellActivity">
         <option value="">선택</option><option>현재 활발히 거래 중</option><option>가끔 거래함</option><option>관심만 있음</option><option>콘텐츠 제작 중심</option></select></div>
       <div class="form-group"><label class="form-label">인플루언서 증명 링크</label><input class="form-input" placeholder="대표 콘텐츠 URL"/></div>
       <div class="form-group">
@@ -1116,40 +1118,81 @@
 </div>
 
 <!-- WRITE POST MODAL -->
-<div class="modal-ov" id="modal-writePost">
-  <div class="modal wide">
-    <div class="modal__hd"><h2 class="modal__title">글쓰기</h2><button class="modal__close" data-close="writePost">✕</button></div>
-    <div class="modal__body" id="postFormInner">
-      <div class="form-group">
-  <label class="form-label">게시판</label>
-  <select class="form-select" id="postBoard">
-    <option>RESELL TALK</option>
-    <option>자유게시판</option>
-    <option>셀러에게 묻다</option>
-    <option>시세 분석</option>
-    <option>드롭 정보</option>
-    <option>거래 후기 🏷</option>
-  </select>
-</div>
-      <div class="form-group"><label class="form-label">제목 *</label><input class="form-input" id="postTitle" placeholder="제목을 입력해주세요"/><p class="form-error" id="postTitleErr">제목을 입력해주세요.</p></div>
-      <div class="form-group"><label class="form-label">내용 *</label>
-        <div class="post-tools"><button class="post-tool" type="button">이미지</button><button class="post-tool" type="button">링크</button><button class="post-tool" type="button">굵게</button></div>
-        <textarea class="form-textarea" id="postContent" placeholder="내용을 입력해주세요." rows="8" maxlength="5000"></textarea>
-        <p class="form-char"><span class="char-count-cur" id="postContentCount">0</span>/5000</p>
+<div class="modal-ov rg-write-modal" id="modal-writePost">
+  <div class="modal wide rg-write-dialog">
+    <div class="modal__hd rg-write-headbar">
+      <div>
+        <p class="rg-write-kicker">RESELLGROUND COMMUNITY</p>
+        <h2 class="modal__title rg-write-title">게시물 작성</h2>
       </div>
-      <div class="form-group">
-  <label class="form-label">태그 선택</label>
-  <div class="tag-select" id="postTagSelect">
-    <div class="tag-opt" data-tag="협업모집">협업모집</div>
-    <div class="tag-opt" data-tag="빠른거래">빠른거래</div>
-    <div class="tag-opt" data-tag="시세정보">시세정보</div>
-    <div class="tag-opt" data-tag="거래후기">거래후기</div>
-  </div>
-</div>
-      <div class="post-submit-row">
-  <button class="btn btn--g" type="button" id="postDraftBtn">임시저장</button>
-  <button class="btn btn--p" type="button" id="postSubmitBtn">게시글 등록</button>
-</div>
+      <button class="modal__close rg-write-close" data-close="writePost" aria-label="닫기">✕</button>
+    </div>
+
+    <div class="modal__body rg-write-body" id="postFormInner">
+      <div class="rg-write-field">
+        <label class="form-label" for="postBoard">게시판</label>
+        <select class="form-select rg-write-select" id="postBoard">
+          <option>RESELL TALK</option>
+          <option>자유게시판</option>
+          <option>셀러에게 묻다</option>
+          <option>시세 분석</option>
+          <option>드롭 정보</option>
+          <option>거래 후기 🏷</option>
+        </select>
+      </div>
+
+      <div class="rg-write-field">
+        <label class="form-label" for="postTitle">제목 *</label>
+        <input
+          class="form-input rg-write-input"
+          id="postTitle"
+          placeholder="제목을 입력해주세요"
+          autocomplete="off"
+        />
+        <p class="form-error" id="postTitleErr">제목을 입력해주세요.</p>
+      </div>
+
+      <div class="rg-write-field">
+        <label class="form-label" for="postContent">내용 *</label>
+
+        <div class="post-tools rg-write-tools">
+          <button class="post-tool" type="button">이미지</button>
+          <button class="post-tool" type="button">링크</button>
+          <button class="post-tool" type="button">굵게</button>
+        </div>
+
+        <textarea
+          class="form-textarea rg-write-textarea"
+          id="postContent"
+          placeholder="리셀 정보, 거래 후기, 시세 분석, 질문 등을 자유롭게 작성해주세요."
+          rows="8"
+          maxlength="5000"
+        ></textarea>
+
+        <p class="form-char">
+          <span class="char-count-cur" id="postContentCount">0</span>/5000
+        </p>
+      </div>
+
+      <div class="rg-write-field">
+        <label class="form-label">태그 선택</label>
+        <div class="tag-select rg-write-tags" id="postTagSelect">
+          <div class="tag-opt" data-tag="협업모집">협업모집</div>
+          <div class="tag-opt" data-tag="빠른거래">빠른거래</div>
+          <div class="tag-opt" data-tag="시세정보">시세정보</div>
+          <div class="tag-opt" data-tag="거래후기">거래후기</div>
+        </div>
+      </div>
+
+      <div class="rg-write-guide">
+        <span>TIP</span>
+        <p>욕설, 사기 유도, 개인정보 노출 게시물은 삭제될 수 있어요.</p>
+      </div>
+
+      <div class="post-submit-row rg-write-actions">
+        <button class="btn btn--g" type="button" id="postDraftBtn">임시저장</button>
+        <button class="btn btn--p" type="button" id="postSubmitBtn">게시글 등록</button>
+      </div>
     </div>
   </div>
 </div>

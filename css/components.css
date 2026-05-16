@@ -1387,3 +1387,261 @@
   overflow-y: auto;
   scroll-behavior: smooth;
 }
+/* ══════════════════════════════════════════
+   WRITE POST MODAL — ResellGround New Design
+══════════════════════════════════════════ */
+
+#modal-writePost.rg-write-modal {
+  background:
+    radial-gradient(circle at top left, rgba(5, 150, 105, .18), transparent 32%),
+    rgba(3, 7, 18, .68);
+  backdrop-filter: blur(10px);
+}
+
+#modal-writePost .rg-write-dialog {
+  max-width: 760px;
+  border-radius: 26px;
+  overflow: hidden;
+  background: #0f172a;
+  border: 1px solid rgba(255, 255, 255, .12);
+  box-shadow: 0 30px 90px rgba(0, 0, 0, .35);
+}
+
+#modal-writePost .rg-write-headbar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: 24px 28px;
+  background:
+    linear-gradient(135deg, rgba(15, 23, 42, .98), rgba(17, 24, 39, .98));
+  border-bottom: 1px solid rgba(255, 255, 255, .1);
+}
+
+.rg-write-kicker {
+  margin-bottom: 7px;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .16em;
+  color: var(--three);
+}
+
+#modal-writePost .rg-write-title {
+  color: #fff;
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+}
+
+#modal-writePost .rg-write-close {
+  background: rgba(255, 255, 255, .08);
+  color: rgba(255, 255, 255, .86);
+}
+
+#modal-writePost .rg-write-close:hover {
+  background: rgba(239, 68, 68, .18);
+  color: #fff;
+}
+
+#modal-writePost .rg-write-body {
+  padding: 28px;
+  background:
+    radial-gradient(circle at bottom right, rgba(5, 150, 105, .12), transparent 30%),
+    #111827;
+}
+
+.rg-write-field {
+  margin-bottom: 18px;
+}
+
+#modal-writePost .form-label {
+  display: block;
+  margin-bottom: 8px;
+  color: rgba(255, 255, 255, .88);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+#modal-writePost .rg-write-input,
+#modal-writePost .rg-write-select,
+#modal-writePost .rg-write-textarea {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, .12);
+  background: rgba(255, 255, 255, .07);
+  color: #fff;
+  border-radius: 16px;
+  transition: all var(--fast);
+}
+
+#modal-writePost .rg-write-input,
+#modal-writePost .rg-write-select {
+  height: 52px;
+  padding: 0 16px;
+}
+
+#modal-writePost .rg-write-textarea {
+  min-height: 230px;
+  padding: 16px;
+  line-height: 1.75;
+  resize: vertical;
+}
+
+#modal-writePost .rg-write-input::placeholder,
+#modal-writePost .rg-write-textarea::placeholder {
+  color: rgba(255, 255, 255, .38);
+}
+
+#modal-writePost .rg-write-input:focus,
+#modal-writePost .rg-write-select:focus,
+#modal-writePost .rg-write-textarea:focus {
+  border-color: rgba(5, 150, 105, .9);
+  background: rgba(255, 255, 255, .1);
+  box-shadow: 0 0 0 4px rgba(5, 150, 105, .18);
+}
+
+#modal-writePost .rg-write-select option {
+  color: #111827;
+}
+
+.rg-write-tools {
+  margin-bottom: 10px;
+}
+
+#modal-writePost .post-tool {
+  background: rgba(255, 255, 255, .08);
+  border-color: rgba(255, 255, 255, .12);
+  color: rgba(255, 255, 255, .72);
+}
+
+#modal-writePost .post-tool:hover {
+  background: rgba(5, 150, 105, .18);
+  border-color: rgba(5, 150, 105, .7);
+  color: #fff;
+}
+
+#modal-writePost .form-char {
+  margin-top: 8px;
+  color: rgba(255, 255, 255, .5);
+}
+
+.rg-write-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+#modal-writePost .tag-opt {
+  background: rgba(255, 255, 255, .08);
+  border: 1px solid rgba(255, 255, 255, .12);
+  color: rgba(255, 255, 255, .7);
+}
+
+#modal-writePost .tag-opt:hover,
+#modal-writePost .tag-opt.sel {
+  background: var(--three);
+  border-color: var(--three);
+  color: #fff;
+}
+
+.rg-write-guide {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 14px 16px;
+  margin: 4px 0 20px;
+  border-radius: 16px;
+  background: rgba(5, 150, 105, .12);
+  border: 1px solid rgba(5, 150, 105, .24);
+}
+
+.rg-write-guide span {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 24px;
+  padding: 0 9px;
+  border-radius: 999px;
+  background: var(--three);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.rg-write-guide p {
+  margin: 0;
+  color: rgba(255, 255, 255, .68);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+#modal-writePost .rg-write-actions {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 10px;
+}
+
+#modal-writePost .rg-write-actions .btn {
+  min-height: 52px;
+  border-radius: 999px;
+  font-weight: 900;
+}
+
+#modal-writePost #postDraftBtn {
+  background: rgba(255, 255, 255, .1);
+  color: rgba(255, 255, 255, .82);
+  border: 1px solid rgba(255, 255, 255, .12);
+}
+
+#modal-writePost #postDraftBtn:hover {
+  background: rgba(255, 255, 255, .16);
+}
+
+#modal-writePost #postSubmitBtn {
+  background: var(--three);
+  color: #fff;
+  box-shadow: 0 14px 34px rgba(5, 150, 105, .28);
+}
+
+#modal-writePost #postSubmitBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 18px 44px rgba(5, 150, 105, .34);
+}
+
+#modal-writePost .err {
+  border-color: var(--danger) !important;
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, .16) !important;
+}
+
+@media (max-width: 640px) {
+  #modal-writePost.rg-write-modal {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  #modal-writePost .rg-write-dialog {
+    max-width: 100%;
+    max-height: 92vh;
+    border-radius: 24px 24px 0 0;
+  }
+
+  #modal-writePost .rg-write-headbar {
+    padding: 22px 20px;
+  }
+
+  #modal-writePost .rg-write-title {
+    font-size: 22px;
+  }
+
+  #modal-writePost .rg-write-body {
+    padding: 22px 18px;
+  }
+
+  #modal-writePost .rg-write-textarea {
+    min-height: 190px;
+  }
+
+  #modal-writePost .rg-write-actions {
+    grid-template-columns: 1fr;
+  }
+}
