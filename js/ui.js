@@ -426,26 +426,7 @@ if (!Array.isArray(post.commentList)) {
   post.commentList = [];
 }
 
-(async () => {
-  try {
-    const res = await fetch(
-      `https://backend.di702934.workers.dev/api/comments/${encodeURIComponent(post.id)}`
-    );
 
-    if (res.ok) {
-      const rows = await res.json();
-
-      post.commentList = rows.map(row => ({
-        author: row.author || '익명',
-        content: row.content || ''
-      }));
-
-      post.comments = post.commentList.length;
-    }
-  } catch (err) {
-    console.warn('댓글 불러오기 실패:', err);
-  }
-})();
 
   const title = document.getElementById('pdTitle');
   const boardBadge = document.getElementById('pdBoardBadge');
@@ -630,9 +611,8 @@ if (commentSubmit) {
     post.commentList.unshift(newComment);
     post.comments = (post.comments || 0) + 1;
 
-    commentInput.value = '';
-    openPostDetail(post);
-
+   commentInput.value = '';
+await loadAndRenderComments();
     try {
       const res = await fetch('https://backend.di702934.workers.dev/api/comments', {
         method: 'POST',
@@ -660,7 +640,52 @@ if (commentSubmit) {
     }
   };
 }
+async function loadAndRenderComments() {
+  const commentList = document.getElementById('pdCommentList');
+  const comments = document.getElementById('pdComments');
 
+  if (!commentList || !post.id) return;
+
+  try {
+    const res = await fetch(
+      `https://backend.di702934.workers.dev/api/comments/${encodeURIComponent(post.id)}`
+    );
+
+    const rows = res.ok ? await res.json() : [];
+
+    post.commentList = rows.map(row => ({
+      id: row.id,
+      author: row.author || '익명',
+      content: row.content || '',
+      created_at: row.created_at || ''
+    }));
+
+    post.comments = post.commentList.length;
+
+    if (comments) comments.textContent = `댓글 ${post.comments || 0}`;
+
+    commentList.innerHTML = '';
+
+    if (post.commentList.length === 0) {
+      commentList.innerHTML = '<div class="pd-comment-empty">아직 등록된 댓글이 없습니다.</div>';
+      return;
+    }
+
+    post.commentList.forEach(c => {
+      const item = document.createElement('div');
+      item.className = 'pd-comment-item';
+      item.innerHTML = `
+        <div class="pd-comment-author">${c.author || '익명'}</div>
+        <div class="pd-comment-content">${c.content || ''}</div>
+      `;
+      commentList.appendChild(item);
+    });
+  } catch (err) {
+    console.warn('댓글 불러오기 실패:', err);
+  }
+}
+
+loadAndRenderComments();
 openModal('postDetail');
 
 }
