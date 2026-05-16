@@ -1187,3 +1187,136 @@
   min-height:100px;
   resize:vertical;
 }
+/* ═══ 호환 유지용 추가 스타일 — 댓글/북마크/온라인 상태 ═══ */
+
+/* 북마크 활성 */
+#pdBookmarkBtn.act,
+#pdBookmarkBtn.bm-active,
+#pdPageBmBtn.bm-active {
+  background: var(--three-l) !important;
+  border-color: var(--three) !important;
+  color: var(--three) !important;
+  font-weight: 800;
+}
+
+/* 댓글 영역 */
+.pd-comments-wrap {
+  margin-top: 24px;
+  border-top: 1px solid var(--border);
+  padding-top: 20px;
+}
+
+.pd-comment-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.pd-comment-empty {
+  font-size: 13px;
+  color: var(--text-mute);
+  text-align: center;
+  padding: 24px 0;
+}
+
+.pd-comment-item {
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: #fff;
+}
+
+.pd-comment-author {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.pd-comment-content {
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--text-sub);
+  white-space: pre-wrap;
+  word-break: keep-all;
+}
+
+.pd-comment-write {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+#pdCommentInput {
+  flex: 1;
+  min-height: 76px;
+  resize: vertical;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  font-family: var(--f);
+  font-size: 13px;
+  outline: none;
+}
+
+#pdCommentInput:focus {
+  border-color: var(--three);
+  box-shadow: 0 0 0 3px var(--three-l);
+}
+
+#pdCommentSubmit {
+  min-height: 42px;
+  padding: 0 16px;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--three);
+  color: #fff;
+  font-family: var(--f);
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+#pdCommentSubmit:hover {
+  background: var(--three-d);
+}
+
+/* 셀러 온라인 표시 */
+.sc__online {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--three);
+  background: var(--three-l);
+  padding: 2px 7px;
+  border-radius: 10px;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+.sc__online-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--three);
+  animation: ldPulse 1.4s infinite;
+  flex-shrink: 0;
+}
+
+/* 채팅/웹소켓 상태 */
+.ws-status {
+  font-size: 11px;
+  transition: color .3s;
+  margin-left: 4px;
+}
+
+.ws-status--on {
+  color: var(--three);
+}
+
+.ws-status--off {
+  color: var(--text-mute);
+}

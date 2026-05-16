@@ -174,7 +174,12 @@
         <span>👍 ${post.likes}</span>
         <span>💬 ${post.comments}</span>
         <span>👁 ${post.views}</span>
-        <button class="pc__action-btn" onclick="event.stopPropagation();requireLogin()">북마크</button>
+        <button
+  class="pc__action-btn"
+  onclick="event.stopPropagation();openPostDetail({ ...this.closest('.pc')._postData, id: this.closest('.pc').dataset.postId })"
+>
+  북마크
+</button>
       </div>
     `;
 
@@ -196,7 +201,8 @@
   }
 /* ── BOOKMARK CARD (마이페이지용) ── */
 function renderBookmarkCard(item) {
-  const post = item.post || item;
+  const post = item?.post || item || {};
+  const postId = item?.postId || post.id || post.post_id || post.title || '';
 
   const div = document.createElement('div');
   div.className = 'pc';
@@ -206,8 +212,8 @@ function renderBookmarkCard(item) {
     <div class="pc__hd">
       <div class="pc__av ${post.av || 'av-a'}">${post.em || '📌'}</div>
       <span class="pc__author">${post.author || '익명'}</span>
-      <span class="pc__badge">${post.badge || '커뮤니티'}</span>
-      <span class="pc__time">${post.time || ''}</span>
+      <span class="pc__badge">${post.badge || post.board || '커뮤니티'}</span>
+      <span class="pc__time">${post.time || post.created_at || ''}</span>
     </div>
     <div class="pc__tags">${postTags(post.tags || [])}</div>
     <h3 class="pc__title">${post.title || '제목 없음'}</h3>
@@ -216,7 +222,7 @@ function renderBookmarkCard(item) {
       <span>👍 ${post.likes || 0}</span>
       <span>💬 ${post.comments || 0}</span>
       <span>👁 ${post.views || 0}</span>
-      <button class="pc__action-btn" style="color:var(--three)" onclick="event.stopPropagation();removeBookmark('${post.id || item.postId}')">북마크 해제</button>
+      <button class="pc__action-btn" style="color:var(--three)" onclick="event.stopPropagation();removeBookmark('${postId}')">북마크 해제</button>
     </div>
   `;
 
@@ -224,7 +230,7 @@ function renderBookmarkCard(item) {
     if (e.target.closest('.pc__action-btn')) return;
 
     if (typeof openPostDetail === 'function') {
-      openPostDetail({ ...post, id: post.id || item.postId });
+      openPostDetail({ ...post, id: postId || post.id });
     }
   });
 
