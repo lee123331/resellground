@@ -238,7 +238,7 @@ app.get("/api/posts", async (c) => {
       id: row.id,
       av: "av-a",
       em: "📝",
-      author: row.author || "익명",
+      author: row.author || row.nickname || "익명",
       authorTier: "",
       time: row.created_at || "방금 전",
       badge: row.badge || row.board || "RESELL TALK",
