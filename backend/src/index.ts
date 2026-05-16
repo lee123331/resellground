@@ -186,28 +186,39 @@ app.post("/api/posts", async (c) => {
   try {
     const body = await c.req.json();
 
+    const id = String(body.id || `post_${Date.now()}`);
+    const board = String(body.board || "RESELL TALK");
+    const badge = String(body.badge || board);
     const title = String(body.title || "").trim();
     const content = String(body.content || "").trim();
-    const board = String(body.board || "자유게시판").trim();
-    const userId = body.userId ? Number(body.userId) : null;
+    const preview = String(body.preview || content.slice(0, 90));
+    const author = String(body.author || "익명");
+    const authorEmail = String(body.author_email || "");
+    const tags = JSON.stringify(body.tags || []);
+    const likes = Number(body.likes || 0);
+    const comments = Number(body.comments || 0);
+    const views = Number(body.views || 0);
 
     if (!title || !content) {
       return c.json({ message: "제목과 내용을 입력해주세요." }, 400);
     }
 
-    await c.env.DB.prepare(
-      `INSERT INTO posts (user_id, board, title, content)
-       VALUES (?, ?, ?, ?)`
-    )
-      .bind(userId, board, title, content)
-      .run();
+    await c.env.DB.prepare(`
+      INSERT INTO posts (
+        id, board, badge, title, content, preview,
+        author, author_email, tags, likes, comments, views
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).bind(
+      id, board, badge, title, content, preview,
+      author, authorEmail, tags, likes, comments, views
+    ).run();
 
-    return c.json(
-      {
-        message: "게시글이 등록되었습니다.",
-      },
-      201
-    );
+    return c.json({
+      ok: true,
+      message: "게시글이 등록되었습니다.",
+      post: body
+    }, 201);
   } catch (err) {
     console.error(err);
     return c.json({ message: "게시글 등록 중 서버 오류가 발생했습니다." }, 500);
@@ -216,26 +227,158 @@ app.post("/api/posts", async (c) => {
 
 app.get("/api/posts", async (c) => {
   try {
-    const result = await c.env.DB.prepare(
-      `SELECT 
-        posts.id,
-        posts.user_id,
-        posts.board,
-        posts.title,
-        posts.content,
-        posts.created_at,
-        users.nickname
-       FROM posts
-       LEFT JOIN users ON posts.user_id = users.id
-       ORDER BY posts.id DESC`
-    ).all();
+    const result = await c.env.DB.prepare(`
+      SELECT *
+      FROM posts
+      ORDER BY created_at DESC
+      LIMIT 50
+    `).all();
 
-    return c.json({
-      posts: result.results || [],
-    });
+    const posts = (result.results || []).map((row: any) => ({
+      id: row.id,
+      av: "av-a",
+      em: "📝",
+      author: row.author || "익명",
+      authorTier: "",
+      time: row.created_at || "방금 전",
+      badge: row.badge || row.board || "RESELL TALK",
+      tags: row.tags ? JSON.parse(row.tags) : [],
+      title: row.title,
+      content: row.content,
+      preview: row.preview || String(row.content || "").slice(0, 90),
+      likes: row.likes || 0,
+      comments: row.comments || 0,
+      views: row.views || 0
+    }));
+
+    return c.json(posts);
   } catch (err) {
     console.error(err);
     return c.json({ message: "게시글 목록을 불러오지 못했습니다." }, 500);
   }
 });
+
+app.post("/api/comments", async (c) => {
+  try {
+    const body = await c.req.json();
+
+    const id = String(body.id || `comment_${Date.now()}`);
+    const postId = String(body.post_id || body.postId || "").trim();
+    const author = String(body.author || "익명");
+    const authorEmail = String(body.author_email || "");
+    const content = String(body.content || "").trim();
+
+    if (!postId || !content) {
+      return c.json({ message: "댓글 정보가 부족합니다." }, 400);
+    }
+
+    await c.env.DB.prepare(`
+      INSERT INTO comments (
+        id, post_id, author, author_email, content
+      )
+      VALUES (?, ?, ?, ?, ?)
+    `).bind(id, postId, author, authorEmail, content).run();
+
+    return c.json({
+      ok: true,
+      message: "댓글이 등록되었습니다."
+    }, 201);
+  } catch (err) {
+    console.error(err);
+    return c.json({ message: "댓글 등록 중 오류가 발생했습니다." }, 500);
+  }
+});
+
+app.get("/api/comments/:postId", async (c) => {
+  try {
+    const postId = c.req.param("postId");
+
+    const result = await c.env.DB.prepare(`
+      SELECT *
+      FROM comments
+      WHERE post_id = ?
+      ORDER BY created_at DESC
+    `).bind(postId).all();
+
+    return c.json(result.results || []);
+  } catch (err) {
+    console.error(err);
+    return c.json({ message: "댓글을 불러오지 못했습니다." }, 500);
+  }
+});
+
+app.get("/api/bookmarks/:email", async (c) => {
+  try {
+    const email = c.req.param("email");
+
+    const result = await c.env.DB.prepare(`
+      SELECT bookmarks.post_id, posts.*
+      FROM bookmarks
+      LEFT JOIN posts ON bookmarks.post_id = posts.id
+      WHERE bookmarks.user_email = ?
+      ORDER BY bookmarks.created_at DESC
+    `).bind(email).all();
+
+    return c.json(result.results || []);
+  } catch (err) {
+    console.error(err);
+    return c.json({ message: "북마크를 불러오지 못했습니다." }, 500);
+  }
+});
+
+app.post("/api/bookmarks", async (c) => {
+  try {
+    const body = await c.req.json();
+
+    const id = String(body.id || `bookmark_${Date.now()}`);
+    const userEmail = String(body.user_email || "").trim();
+    const postId = String(body.post_id || "").trim();
+
+    if (!userEmail || !postId) {
+      return c.json({ message: "북마크 정보가 부족합니다." }, 400);
+    }
+
+    await c.env.DB.prepare(`
+      INSERT OR IGNORE INTO bookmarks (
+        id, user_email, post_id
+      )
+      VALUES (?, ?, ?)
+    `).bind(id, userEmail, postId).run();
+
+    return c.json({
+      ok: true,
+      message: "북마크에 저장되었습니다."
+    });
+  } catch (err) {
+    console.error(err);
+    return c.json({ message: "북마크 저장 중 오류가 발생했습니다." }, 500);
+  }
+});
+
+app.delete("/api/bookmarks", async (c) => {
+  try {
+    const body = await c.req.json();
+
+    const userEmail = String(body.user_email || "").trim();
+    const postId = String(body.post_id || "").trim();
+
+    if (!userEmail || !postId) {
+      return c.json({ message: "북마크 정보가 부족합니다." }, 400);
+    }
+
+    await c.env.DB.prepare(`
+      DELETE FROM bookmarks
+      WHERE user_email = ? AND post_id = ?
+    `).bind(userEmail, postId).run();
+
+    return c.json({
+      ok: true,
+      message: "북마크를 해제했습니다."
+    });
+  } catch (err) {
+    console.error(err);
+    return c.json({ message: "북마크 삭제 중 오류가 발생했습니다." }, 500);
+  }
+});
+
 export default app;
