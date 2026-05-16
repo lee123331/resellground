@@ -483,6 +483,19 @@ content.textContent = post.content || post.preview || '게시글 내용이 없�
 
 if (likes) likes.textContent = `👍 ${post.likes || 0}`;
 if (comments) comments.textContent = `댓글 ${post.comments || 0}`;
+if (comments) {
+  comments.style.cursor = 'pointer';
+  comments.onclick = () => {
+    const commentBox = document.getElementById('pdCommentInput');
+    if (commentBox) {
+      commentBox.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      });
+      commentBox.focus();
+    }
+  };
+}
 if (views) views.textContent = `조회 ${post.views || 0}`;
 
 if (bookmarkBtn) {
@@ -648,6 +661,7 @@ if (commentSubmit) {
 }
 
 openModal('postDetail');
+
 }
 /* ── 마이페이지 북마크 렌더링 ── */
 async function refreshMpBookmarks() {
