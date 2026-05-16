@@ -380,5 +380,77 @@ app.delete("/api/bookmarks", async (c) => {
     return c.json({ message: "북마크 삭제 중 오류가 발생했습니다." }, 500);
   }
 });
+app.get("/api/bookmarks/:email", async (c) => {
+  try {
+    const email = c.req.param("email");
 
+    const result = await c.env.DB.prepare(`
+      SELECT bookmarks.post_id, posts.*
+      FROM bookmarks
+      LEFT JOIN posts ON bookmarks.post_id = posts.id
+      WHERE bookmarks.user_email = ?
+      ORDER BY bookmarks.created_at DESC
+    `).bind(email).all();
+
+    return c.json(result.results || []);
+  } catch (err) {
+    console.error(err);
+    return c.json({ message: "북마크를 불러오지 못했습니다." }, 500);
+  }
+});
+
+app.post("/api/bookmarks", async (c) => {
+  try {
+    const body = await c.req.json();
+
+    const id = String(body.id || `bookmark_${Date.now()}`);
+    const userEmail = String(body.user_email || "").trim();
+    const postId = String(body.post_id || "").trim();
+
+    if (!userEmail || !postId) {
+      return c.json({ message: "북마크 정보가 부족합니다." }, 400);
+    }
+
+    await c.env.DB.prepare(`
+      INSERT OR IGNORE INTO bookmarks (
+        id, user_email, post_id
+      )
+      VALUES (?, ?, ?)
+    `).bind(id, userEmail, postId).run();
+
+    return c.json({
+      ok: true,
+      message: "북마크에 저장되었습니다."
+    });
+  } catch (err) {
+    console.error(err);
+    return c.json({ message: "북마크 저장 중 오류가 발생했습니다." }, 500);
+  }
+});
+
+app.delete("/api/bookmarks", async (c) => {
+  try {
+    const body = await c.req.json();
+
+    const userEmail = String(body.user_email || "").trim();
+    const postId = String(body.post_id || "").trim();
+
+    if (!userEmail || !postId) {
+      return c.json({ message: "북마크 정보가 부족합니다." }, 400);
+    }
+
+    await c.env.DB.prepare(`
+      DELETE FROM bookmarks
+      WHERE user_email = ? AND post_id = ?
+    `).bind(userEmail, postId).run();
+
+    return c.json({
+      ok: true,
+      message: "북마크를 해제했습니다."
+    });
+  } catch (err) {
+    console.error(err);
+    return c.json({ message: "북마크 삭제 중 오류가 발생했습니다." }, 500);
+  }
+});
 export default app;
