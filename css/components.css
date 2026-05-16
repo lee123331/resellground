@@ -1320,3 +1320,59 @@
 .ws-status--off {
   color: var(--text-mute);
 }
+/* ═══ 게시글 상세 댓글 UX 개선 ═══ */
+
+.pd-comments-wrap {
+  margin-top: 18px;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--bg-soft);
+}
+
+.pd-comment-list {
+  max-height: 260px;
+  overflow-y: auto;
+  margin-bottom: 14px;
+}
+
+.pd-comment-write {
+  display: grid;
+  grid-template-columns: 1fr 92px;
+  gap: 10px;
+  align-items: stretch;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px;
+}
+
+#pdCommentInput {
+  min-height: 96px;
+  max-height: 180px;
+  resize: vertical;
+  border: none;
+  outline: none;
+  padding: 8px;
+  font-size: 14px;
+  line-height: 1.6;
+  background: transparent;
+}
+
+#pdCommentSubmit {
+  height: 100%;
+  min-height: 96px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+@media (max-width: 640px) {
+  .pd-comment-write {
+    grid-template-columns: 1fr;
+  }
+
+  #pdCommentSubmit {
+    min-height: 44px;
+  }
+}

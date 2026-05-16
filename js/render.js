@@ -174,9 +174,9 @@
         <span>👍 ${post.likes}</span>
         <span>💬 ${post.comments}</span>
         <span>👁 ${post.views}</span>
-        <button
+<button
   class="pc__action-btn"
-  onclick="event.stopPropagation();openPostDetail({ ...this.closest('.pc')._postData, id: this.closest('.pc').dataset.postId })"
+  onclick="event.stopPropagation();togglePostCardBookmark(this)"
 >
   북마크
 </button>

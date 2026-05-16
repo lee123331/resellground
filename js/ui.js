@@ -422,6 +422,31 @@ function renderNotifications() {
 function openPostDetail(post) {
   window._currentPost = post;
 
+if (!Array.isArray(post.commentList)) {
+  post.commentList = [];
+}
+
+(async () => {
+  try {
+    const res = await fetch(
+      `https://backend.di702934.workers.dev/api/comments/${encodeURIComponent(post.id)}`
+    );
+
+    if (res.ok) {
+      const rows = await res.json();
+
+      post.commentList = rows.map(row => ({
+        author: row.author || '익명',
+        content: row.content || ''
+      }));
+
+      post.comments = post.commentList.length;
+    }
+  } catch (err) {
+    console.warn('댓글 불러오기 실패:', err);
+  }
+})();
+
   const title = document.getElementById('pdTitle');
   const boardBadge = document.getElementById('pdBoardBadge');
   const meta = document.getElementById('pdMeta');
@@ -516,11 +541,13 @@ if (bookmarkBtn) {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${localStorage.getItem('rg_token') || ''}`
           },
-          body: JSON.stringify({
-            id: `bookmark_${Date.now()}`,
-            user_email: user?.email || '',
-            post_id: postId
-          })
+         body: JSON.stringify({
+  id: `comment_${Date.now()}`,
+  post_id: post.id,
+  author: user?.nickname || '나',
+  author_email: user?.email || '',
+  content: text
+})
         });
 
         bookmarkBtn.textContent = '북마크 해제';
@@ -623,11 +650,47 @@ if (commentSubmit) {
 openModal('postDetail');
 }
 /* ── 마이페이지 북마크 렌더링 ── */
-function refreshMpBookmarks() {
+async function refreshMpBookmarks() {
   const list = document.getElementById('mpBookmarkList');
   if (!list) return;
 
   if (!Array.isArray(DATA.bookmarks)) DATA.bookmarks = [];
+
+  const user = getAuthUser ? getAuthUser() : null;
+
+  if (user?.email) {
+    try {
+      const res = await fetch(
+        `https://backend.di702934.workers.dev/api/bookmarks/${encodeURIComponent(user.email)}`
+      );
+
+      if (res.ok) {
+        const rows = await res.json();
+
+        DATA.bookmarks = rows.map(row => ({
+          postId: row.id || row.post_id,
+          post: {
+            id: row.id || row.post_id,
+            av: 'av-a',
+            em: '📝',
+            author: row.author || '익명',
+            authorTier: '',
+            time: row.created_at || '',
+            badge: row.badge || row.board || '커뮤니티',
+            tags: row.tags ? JSON.parse(row.tags) : [],
+            title: row.title || '제목 없음',
+            content: row.content || '',
+            preview: row.preview || String(row.content || '').slice(0, 90),
+            likes: row.likes || 0,
+            comments: row.comments || 0,
+            views: row.views || 0
+          }
+        }));
+      }
+    } catch (err) {
+      console.warn('DB 북마크 불러오기 실패:', err);
+    }
+  }
 
   if (DATA.bookmarks.length === 0) {
     list.innerHTML = `
@@ -648,7 +711,6 @@ function refreshMpBookmarks() {
     }
   });
 }
-
 function removeBookmark(postId) {
   if (!Array.isArray(DATA.bookmarks)) DATA.bookmarks = [];
 
@@ -1207,5 +1269,78 @@ function initGuide() {
       detail.style.display = 'none';
       grid.style.display = '';
     });
+  }
+}
+async function togglePostCardBookmark(btn) {
+  if (!requireLogin()) return;
+
+  const card = btn.closest('.pc');
+  if (!card) return;
+
+  const post = card._postData || {};
+  const postId = card.dataset.postId || post.id || post.title;
+  const user = getAuthUser ? getAuthUser() : null;
+
+  if (!user?.email) {
+    showToast('로그인 정보가 없습니다. 다시 로그인해주세요.', 'error');
+    return;
+  }
+
+  if (!Array.isArray(DATA.bookmarks)) DATA.bookmarks = [];
+
+  const idx = DATA.bookmarks.findIndex(item => {
+    const saved = item.post || item;
+    return String(item.postId || saved.id || saved.title) === String(postId);
+  });
+
+  try {
+    if (idx >= 0) {
+      DATA.bookmarks.splice(idx, 1);
+
+      await fetch('https://backend.di702934.workers.dev/api/bookmarks', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('rg_token') || ''}`
+        },
+        body: JSON.stringify({
+          user_email: user.email,
+          post_id: postId
+        })
+      });
+
+      btn.textContent = '북마크';
+      btn.classList.remove('act', 'bm-active');
+      showToast('북마크를 해제했어요.', 'info');
+    } else {
+      DATA.bookmarks.unshift({
+        postId,
+        post: { ...post, id: postId }
+      });
+
+      await fetch('https://backend.di702934.workers.dev/api/bookmarks', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('rg_token') || ''}`
+        },
+        body: JSON.stringify({
+          id: `bookmark_${Date.now()}`,
+          user_email: user.email,
+          post_id: postId
+        })
+      });
+
+      btn.textContent = '북마크 해제';
+      btn.classList.add('act', 'bm-active');
+      showToast('북마크에 저장됐어요.', 'success');
+    }
+
+    if (typeof refreshMpBookmarks === 'function') {
+      refreshMpBookmarks();
+    }
+  } catch (err) {
+    console.error(err);
+    showToast('북마크 처리 중 오류가 발생했습니다.', 'warn');
   }
 }
