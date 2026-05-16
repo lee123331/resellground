@@ -486,12 +486,15 @@ if (comments) comments.textContent = `댓글 ${post.comments || 0}`;
 if (comments) {
   comments.style.cursor = 'pointer';
   comments.onclick = () => {
+    const modalBody = document.querySelector('#modal-postDetail .modal__body');
     const commentBox = document.getElementById('pdCommentInput');
-    if (commentBox) {
-      commentBox.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center'
+
+    if (modalBody && commentBox) {
+      modalBody.scrollTo({
+        top: commentBox.offsetTop - 100,
+        behavior: 'smooth'
       });
+
       commentBox.focus();
     }
   };
@@ -554,12 +557,10 @@ if (bookmarkBtn) {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${localStorage.getItem('rg_token') || ''}`
           },
-         body: JSON.stringify({
-  id: `comment_${Date.now()}`,
-  post_id: post.id,
-  author: user?.nickname || '나',
-  author_email: user?.email || '',
-  content: text
+body: JSON.stringify({
+  id: `bookmark_${Date.now()}`,
+  user_email: user?.email || '',
+  post_id: postId
 })
         });
 
