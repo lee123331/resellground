@@ -1423,4 +1423,365 @@
     padding-bottom: 40px;
   }
 }
+/* ══════════════════════════════════════════
+   WRITE POST MODAL — App Editor Final Override
+══════════════════════════════════════════ */
 
+#modal-writePost.rg-editor-modal {
+  padding: 0 !important;
+  background: rgba(0, 0, 0, .82) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+#modal-writePost.rg-editor-modal.open {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: flex !important;
+}
+
+#modal-writePost .rg-editor-shell {
+  width: min(760px, calc(100vw - 32px)) !important;
+  height: min(88vh, 860px) !important;
+  background: #0d0d0d !important;
+  color: #e8e8e8 !important;
+  border: 1px solid #2a2a2a !important;
+  border-radius: 22px !important;
+  overflow: hidden !important;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, .55) !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+/* 상단 바 */
+#modal-writePost .rg-editor-topbar {
+  height: 54px !important;
+  flex-shrink: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 0 14px !important;
+  background: #141414 !important;
+  border-bottom: 1px solid #2a2a2a !important;
+}
+
+#modal-writePost .rg-editor-close {
+  width: 34px !important;
+  height: 34px !important;
+  border-radius: 8px !important;
+  background: transparent !important;
+  color: #666 !important;
+  border: none !important;
+  font-size: 17px !important;
+  cursor: pointer !important;
+}
+
+#modal-writePost .rg-editor-close:hover {
+  background: #1c1c1c !important;
+  color: #e8e8e8 !important;
+}
+
+#modal-writePost .rg-editor-top-actions {
+  margin-left: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+#modal-writePost .rg-editor-draft-count {
+  height: 30px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  padding: 0 10px !important;
+  border-radius: 5px !important;
+  background: #1c1c1c !important;
+  border: 1px solid #2a2a2a !important;
+  color: #666 !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  white-space: nowrap !important;
+}
+
+#modal-writePost .rg-editor-save,
+#modal-writePost .rg-editor-publish {
+  height: 32px !important;
+  padding: 0 14px !important;
+  border-radius: 6px !important;
+  font-family: var(--f) !important;
+  font-size: 13px !important;
+  font-weight: 900 !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+}
+
+#modal-writePost .rg-editor-save {
+  background: transparent !important;
+  border: 1px solid #333 !important;
+  color: #777 !important;
+}
+
+#modal-writePost .rg-editor-publish {
+  background: #c8f135 !important;
+  border: none !important;
+  color: #0d0d0d !important;
+}
+
+/* 툴바 */
+#modal-writePost .rg-editor-toolbar {
+  height: 48px !important;
+  flex-shrink: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  padding: 0 10px !important;
+  background: #141414 !important;
+  border-bottom: 1px solid #2a2a2a !important;
+  overflow-x: auto !important;
+}
+
+#modal-writePost .rg-editor-tool {
+  min-width: 44px !important;
+  height: 34px !important;
+  padding: 0 10px !important;
+  border-radius: 7px !important;
+  border: none !important;
+  background: transparent !important;
+  color: #666 !important;
+  font-family: var(--f) !important;
+  font-size: 12px !important;
+  font-weight: 900 !important;
+  cursor: pointer !important;
+}
+
+#modal-writePost .rg-editor-tool:hover {
+  background: #1c1c1c !important;
+  color: #e8e8e8 !important;
+}
+
+#modal-writePost .rg-editor-sep {
+  width: 1px !important;
+  height: 20px !important;
+  background: #2a2a2a !important;
+  margin: 0 4px !important;
+  flex-shrink: 0 !important;
+}
+
+/* 본문 */
+#modal-writePost .rg-editor-body {
+  flex: 1 !important;
+  overflow-y: auto !important;
+  padding: 28px 20px 34px !important;
+  background: #0d0d0d !important;
+}
+
+#modal-writePost .rg-editor-title {
+  width: 100% !important;
+  min-height: 42px !important;
+  border: none !important;
+  outline: none !important;
+  background: transparent !important;
+  color: #e8e8e8 !important;
+  font-family: var(--f) !important;
+  font-size: 25px !important;
+  font-weight: 900 !important;
+  line-height: 1.35 !important;
+  letter-spacing: -0.03em !important;
+  caret-color: #c8f135 !important;
+}
+
+#modal-writePost .rg-editor-title::placeholder {
+  color: #3a3a3a !important;
+}
+
+#modal-writePost .rg-editor-divider {
+  height: 1px !important;
+  margin: 14px 0 20px !important;
+  background: linear-gradient(90deg, #333 0%, transparent 82%) !important;
+}
+
+#modal-writePost .rg-editor-content {
+  width: 100% !important;
+  min-height: 330px !important;
+  border: none !important;
+  outline: none !important;
+  resize: none !important;
+  background: transparent !important;
+  color: #999 !important;
+  font-family: var(--f) !important;
+  font-size: 15px !important;
+  line-height: 1.9 !important;
+  caret-color: #c8f135 !important;
+}
+
+#modal-writePost .rg-editor-content::placeholder {
+  color: #3a3a3a !important;
+}
+
+#modal-writePost .rg-editor-title.err,
+#modal-writePost .rg-editor-content.err {
+  background: rgba(239, 68, 68, .08) !important;
+  box-shadow: 0 0 0 1px rgba(239, 68, 68, .35) !important;
+  border-radius: 8px !important;
+}
+
+#modal-writePost .rg-editor-char {
+  margin-top: 12px !important;
+  text-align: right !important;
+  color: #3a3a3a !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+}
+
+/* 하단 게시 설정 */
+#modal-writePost .rg-editor-footer {
+  flex-shrink: 0 !important;
+  background: #141414 !important;
+  border-top: 1px solid #2a2a2a !important;
+}
+
+#modal-writePost .rg-editor-settings-toggle {
+  width: 100% !important;
+  height: 46px !important;
+  border: none !important;
+  background: transparent !important;
+  color: #666 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 0 18px !important;
+  font-family: var(--f) !important;
+  cursor: pointer !important;
+}
+
+#modal-writePost .rg-editor-settings-toggle span {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  font-size: 13px !important;
+  font-weight: 900 !important;
+}
+
+#modal-writePost .rg-editor-settings-toggle i {
+  width: 6px !important;
+  height: 6px !important;
+  border-radius: 999px !important;
+  background: #c8f135 !important;
+  display: inline-block !important;
+}
+
+#modal-writePost .rg-editor-settings-toggle em {
+  font-style: normal !important;
+  transition: transform .22s ease !important;
+}
+
+#modal-writePost .rg-editor-settings-toggle.closed em {
+  transform: rotate(180deg) !important;
+}
+
+#modal-writePost .rg-editor-settings {
+  max-height: 320px !important;
+  overflow-y: auto !important;
+  padding: 18px !important;
+  border-top: 1px solid #2a2a2a !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 18px !important;
+}
+
+#modal-writePost .rg-editor-settings.closed {
+  display: none !important;
+}
+
+#modal-writePost .rg-editor-setting-label {
+  margin-bottom: 8px !important;
+  color: #666 !important;
+  font-size: 11px !important;
+  font-weight: 900 !important;
+  letter-spacing: .14em !important;
+}
+
+#modal-writePost .rg-editor-board-select {
+  width: 100% !important;
+  height: 42px !important;
+  border-radius: 9px !important;
+  border: 1px solid #333 !important;
+  background: #1c1c1c !important;
+  color: #e8e8e8 !important;
+  padding: 0 14px !important;
+  font-family: var(--f) !important;
+  font-size: 14px !important;
+  outline: none !important;
+}
+
+#modal-writePost .rg-editor-board-select option {
+  background: #1c1c1c !important;
+  color: #e8e8e8 !important;
+}
+
+#modal-writePost .rg-editor-tags {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 7px !important;
+}
+
+#modal-writePost .rg-editor-tags .tag-opt {
+  padding: 7px 14px !important;
+  border-radius: 999px !important;
+  background: #1c1c1c !important;
+  border: 1px solid #2a2a2a !important;
+  color: #666 !important;
+  font-size: 12px !important;
+  font-weight: 900 !important;
+  cursor: pointer !important;
+}
+
+#modal-writePost .rg-editor-tags .tag-opt:hover,
+#modal-writePost .rg-editor-tags .tag-opt.sel {
+  background: rgba(200, 241, 53, .12) !important;
+  border-color: #c8f135 !important;
+  color: #c8f135 !important;
+}
+
+#modal-writePost .rg-editor-guide {
+  padding: 13px 14px !important;
+  border-radius: 10px !important;
+  background: rgba(200, 241, 53, .08) !important;
+  border: 1px solid rgba(200, 241, 53, .2) !important;
+  color: #888 !important;
+  font-size: 12px !important;
+  line-height: 1.65 !important;
+}
+
+/* 모바일 */
+@media (max-width: 640px) {
+  #modal-writePost.rg-editor-modal {
+    align-items: stretch !important;
+    justify-content: stretch !important;
+  }
+
+  #modal-writePost .rg-editor-shell {
+    width: 100% !important;
+    height: 100% !important;
+    max-height: none !important;
+    border-radius: 0 !important;
+    border: none !important;
+  }
+
+  #modal-writePost .rg-editor-draft-count {
+    display: none !important;
+  }
+
+  #modal-writePost .rg-editor-body {
+    padding: 24px 16px 28px !important;
+  }
+
+  #modal-writePost .rg-editor-title {
+    font-size: 22px !important;
+  }
+
+  #modal-writePost .rg-editor-content {
+    min-height: 360px !important;
+  }
+}
