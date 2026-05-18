@@ -1135,15 +1135,21 @@
     </div>
 
     <!-- 툴바 -->
-    <div class="rg-editor-toolbar">
-      <button class="rg-editor-tool" type="button" title="이미지">이미지</button>
-      <button class="rg-editor-tool" type="button" title="링크">링크</button>
-      <button class="rg-editor-tool" type="button" title="굵게">굵게</button>
-      <span class="rg-editor-sep"></span>
-      <button class="rg-editor-tool" type="button" title="시세">시세</button>
-      <button class="rg-editor-tool" type="button" title="이모지">이모지</button>
-    </div>
+<div class="rg-editor-toolbar">
+  <input
+    type="file"
+    id="postImageInput"
+    accept="image/jpeg,image/png,image/webp"
+    style="display:none"
+  />
 
+  <button class="rg-editor-tool" type="button" id="postImageBtn" title="이미지">이미지</button>
+  <button class="rg-editor-tool" type="button" id="postLinkBtn" title="링크">링크</button>
+  <button class="rg-editor-tool" type="button" id="postBoldBtn" title="굵게">굵게</button>
+  <span class="rg-editor-sep"></span>
+  <button class="rg-editor-tool" type="button" id="postPriceBtn" title="시세">시세</button>
+  <button class="rg-editor-tool" type="button" id="postEmojiBtn" title="이모지">이모지</button>
+</div>
     <!-- 에디터 영역 -->
     <div class="rg-editor-body">
       <input

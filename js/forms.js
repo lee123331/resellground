@@ -658,7 +658,118 @@ function initDropForm() {
     }, 1200);
   });
 }
+function insertIntoPostContent(text, wrapMode = false) {
+  const contentEl = document.getElementById('postContent');
+  if (!contentEl) return;
 
+  const start = contentEl.selectionStart ?? contentEl.value.length;
+  const end = contentEl.selectionEnd ?? contentEl.value.length;
+  const selected = contentEl.value.slice(start, end);
+
+  let inserted = text;
+
+  if (wrapMode) {
+    inserted = text.replace('{{selected}}', selected || '강조할 문장');
+  }
+
+  contentEl.value =
+    contentEl.value.slice(0, start) +
+    inserted +
+    contentEl.value.slice(end);
+
+  const nextPos = start + inserted.length;
+  contentEl.focus();
+  contentEl.setSelectionRange(nextPos, nextPos);
+
+  contentEl.dispatchEvent(new Event('input', { bubbles: true }));
+  saveDraft(document.getElementById('postFormInner'), 'post');
+}
+
+function initPostEditorTools() {
+  const imageBtn = document.getElementById('postImageBtn');
+  const imageInput = document.getElementById('postImageInput');
+  const linkBtn = document.getElementById('postLinkBtn');
+  const boldBtn = document.getElementById('postBoldBtn');
+  const priceBtn = document.getElementById('postPriceBtn');
+  const emojiBtn = document.getElementById('postEmojiBtn');
+
+  const bindOnce = (el, key, fn) => {
+    if (!el || el.dataset[key] === '1') return;
+    el.dataset[key] = '1';
+    el.addEventListener('click', fn);
+  };
+
+  bindOnce(imageBtn, 'boundImage', () => {
+    if (imageInput) imageInput.click();
+  });
+
+  if (imageInput && imageInput.dataset.boundImageInput !== '1') {
+    imageInput.dataset.boundImageInput = '1';
+
+    imageInput.addEventListener('change', () => {
+      const file = imageInput.files && imageInput.files[0];
+      if (!file) return;
+
+      const okTypes = ['image/jpeg', 'image/png', 'image/webp'];
+
+      if (!okTypes.includes(file.type)) {
+        showToast('JPG, PNG, WebP 이미지만 업로드할 수 있어요.', 'error');
+        imageInput.value = '';
+        return;
+      }
+
+      if (file.size > 3 * 1024 * 1024) {
+        showToast('이미지는 3MB 이하만 임시 첨부할 수 있어요.', 'error');
+        imageInput.value = '';
+        return;
+      }
+
+      const reader = new FileReader();
+
+      reader.onload = e => {
+        const dataUrl = e.target.result;
+        insertIntoPostContent(`\n\n![${file.name}](${dataUrl})\n\n`);
+        showToast('이미지가 본문에 추가되었습니다.', 'success');
+      };
+
+      reader.readAsDataURL(file);
+      imageInput.value = '';
+    });
+  }
+
+  bindOnce(linkBtn, 'boundLink', () => {
+    const url = prompt('삽입할 링크 URL을 입력해주세요.');
+    if (!url) return;
+
+    const text = prompt('링크에 표시할 텍스트를 입력해주세요.') || '링크';
+    insertIntoPostContent(`[${text}](${url})`);
+  });
+
+  bindOnce(boldBtn, 'boundBold', () => {
+    insertIntoPostContent('**{{selected}}**', true);
+  });
+
+  bindOnce(priceBtn, 'boundPrice', () => {
+    insertIntoPostContent(
+      '\n\n[시세 정보]\n상품명: \n현재 시세: ₩\n최근 변동: \n의견: \n'
+    );
+  });
+
+  bindOnce(emojiBtn, 'boundEmoji', () => {
+    const emoji = prompt('넣을 이모지를 입력해주세요. 예: 🔥 💎 👟 📈') || '🔥';
+    insertIntoPostContent(emoji);
+  });
+
+  document.querySelectorAll('#postTagSelect .tag-opt').forEach(tag => {
+    if (tag.dataset.boundTag === '1') return;
+    tag.dataset.boundTag = '1';
+
+    tag.addEventListener('click', () => {
+      tag.classList.toggle('sel');
+      saveDraft(document.getElementById('postFormInner'), 'post');
+    });
+  });
+}
 /* ═══════════════════════════════════════════════════
    WRITE POST FORM — 게시물 등록
 ═══════════════════════════════════════════════════ */
@@ -678,6 +789,7 @@ function initPostForm() {
   initCharCounter('postContent', 'postContentCount', 5000);
   initDraftSave('postFormInner', 'post');
   initCloseGuard('writePost', 'postFormInner', 'post');
+  initPostEditorTools();
 
   const settingsToggle = document.getElementById('postSettingsToggle');
 const settingsPanel = document.getElementById('postSettingsPanel');
