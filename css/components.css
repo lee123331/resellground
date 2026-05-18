@@ -1387,5 +1387,40 @@
   overflow-y: auto;
   scroll-behavior: smooth;
 }
+/* 글쓰기 모달 하단 잘림 방지 */
+#modal-writePost .rg-write-dialog,
+#modal-writePost .rg-editor-shell {
+  max-height: 88vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
 
+#modal-writePost .rg-write-body,
+#modal-writePost .rg-editor-body {
+  overflow-y: auto;
+  max-height: calc(88vh - 130px);
+  padding-bottom: 32px;
+}
+
+#modal-writePost .rg-write-actions,
+#modal-writePost .rg-editor-footer {
+  flex-shrink: 0;
+}
+
+/* 모바일/작은 화면에서 하단 버튼 잘림 방지 */
+@media (max-width: 640px) {
+  #modal-writePost .rg-write-dialog,
+  #modal-writePost .rg-editor-shell {
+    width: 100%;
+    max-height: 92vh;
+    border-radius: 24px 24px 0 0;
+  }
+
+  #modal-writePost .rg-write-body,
+  #modal-writePost .rg-editor-body {
+    max-height: calc(92vh - 120px);
+    padding-bottom: 40px;
+  }
+}
 
