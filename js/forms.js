@@ -679,6 +679,18 @@ function initPostForm() {
   initDraftSave('postFormInner', 'post');
   initCloseGuard('writePost', 'postFormInner', 'post');
 
+  const settingsToggle = document.getElementById('postSettingsToggle');
+const settingsPanel = document.getElementById('postSettingsPanel');
+
+if (settingsToggle && settingsPanel && settingsToggle.dataset.bound !== '1') {
+  settingsToggle.dataset.bound = '1';
+
+  settingsToggle.addEventListener('click', () => {
+    settingsPanel.classList.toggle('closed');
+    settingsToggle.classList.toggle('closed');
+  });
+}
+
   btn.addEventListener('click', () => {
     const title = titleEl.value.trim();
     const content = contentEl.value.trim();

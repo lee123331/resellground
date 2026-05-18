@@ -1118,82 +1118,100 @@
 </div>
 
 <!-- WRITE POST MODAL -->
-<div class="modal-ov rg-write-modal" id="modal-writePost">
-  <div class="modal wide rg-write-dialog">
-    <div class="modal__hd rg-write-headbar">
-      <div>
-        <p class="rg-write-kicker">RESELLGROUND COMMUNITY</p>
-        <h2 class="modal__title rg-write-title">게시물 작성</h2>
-      </div>
-      <button class="modal__close rg-write-close" data-close="writePost" aria-label="닫기">✕</button>
-    </div>
+<div class="modal-ov rg-editor-modal" id="modal-writePost">
+  <div class="rg-editor-shell" id="postFormInner">
 
-    <div class="modal__body rg-write-body" id="postFormInner">
-      <div class="rg-write-field">
-        <label class="form-label" for="postBoard">게시판</label>
-        <select class="form-select rg-write-select" id="postBoard">
-          <option>RESELL TALK</option>
-          <option>자유게시판</option>
-          <option>셀러에게 묻다</option>
-          <option>시세 분석</option>
-          <option>드롭 정보</option>
-          <option>거래 후기 🏷</option>
-        </select>
-      </div>
+    <!-- 상단 바 -->
+    <div class="rg-editor-topbar">
+      <button class="rg-editor-close modal__close" data-close="writePost" aria-label="닫기" type="button">
+        ✕
+      </button>
 
-      <div class="rg-write-field">
-        <label class="form-label" for="postTitle">제목 *</label>
-        <input
-          class="form-input rg-write-input"
-          id="postTitle"
-          placeholder="제목을 입력해주세요"
-          autocomplete="off"
-        />
-        <p class="form-error" id="postTitleErr">제목을 입력해주세요.</p>
-      </div>
-
-      <div class="rg-write-field">
-        <label class="form-label" for="postContent">내용 *</label>
-
-        <div class="post-tools rg-write-tools">
-          <button class="post-tool" type="button">이미지</button>
-          <button class="post-tool" type="button">링크</button>
-          <button class="post-tool" type="button">굵게</button>
-        </div>
-
-        <textarea
-          class="form-textarea rg-write-textarea"
-          id="postContent"
-          placeholder="리셀 정보, 거래 후기, 시세 분석, 질문 등을 자유롭게 작성해주세요."
-          rows="8"
-          maxlength="5000"
-        ></textarea>
-
-        <p class="form-char">
-          <span class="char-count-cur" id="postContentCount">0</span>/5000
-        </p>
-      </div>
-
-      <div class="rg-write-field">
-        <label class="form-label">태그 선택</label>
-        <div class="tag-select rg-write-tags" id="postTagSelect">
-          <div class="tag-opt" data-tag="협업모집">협업모집</div>
-          <div class="tag-opt" data-tag="빠른거래">빠른거래</div>
-          <div class="tag-opt" data-tag="시세정보">시세정보</div>
-          <div class="tag-opt" data-tag="거래후기">거래후기</div>
-        </div>
-      </div>
-
-      <div class="rg-write-guide">
-        <span>TIP</span>
-        <p>욕설, 사기 유도, 개인정보 노출 게시물은 삭제될 수 있어요.</p>
-      </div>
-
-      <div class="post-submit-row rg-write-actions">
-        <button class="btn btn--g" type="button" id="postDraftBtn">임시저장</button>
-        <button class="btn btn--p" type="button" id="postSubmitBtn">게시글 등록</button>
+      <div class="rg-editor-top-actions">
+        <span class="rg-editor-draft-count" id="postDraftCount">임시저장 0</span>
+        <button class="rg-editor-save" type="button" id="postDraftBtn">임시저장</button>
+        <button class="rg-editor-publish" type="button" id="postSubmitBtn">등록</button>
       </div>
     </div>
+
+    <!-- 툴바 -->
+    <div class="rg-editor-toolbar">
+      <button class="rg-editor-tool" type="button" title="이미지">이미지</button>
+      <button class="rg-editor-tool" type="button" title="링크">링크</button>
+      <button class="rg-editor-tool" type="button" title="굵게">굵게</button>
+      <span class="rg-editor-sep"></span>
+      <button class="rg-editor-tool" type="button" title="시세">시세</button>
+      <button class="rg-editor-tool" type="button" title="이모지">이모지</button>
+    </div>
+
+    <!-- 에디터 영역 -->
+    <div class="rg-editor-body">
+      <input
+        class="rg-editor-title"
+        id="postTitle"
+        type="text"
+        placeholder="제목"
+        autocomplete="off"
+        maxlength="100"
+      />
+      <p class="form-error" id="postTitleErr">제목을 입력해주세요.</p>
+
+      <div class="rg-editor-divider"></div>
+
+      <textarea
+        class="rg-editor-content"
+        id="postContent"
+        placeholder="내용을 입력하세요."
+        rows="12"
+        maxlength="5000"
+      ></textarea>
+
+      <div class="rg-editor-char">
+        <span class="char-count-cur" id="postContentCount">0</span> / 5,000
+      </div>
+    </div>
+
+    <!-- 하단 게시 설정 -->
+    <div class="rg-editor-footer">
+      <button class="rg-editor-settings-toggle" type="button" id="postSettingsToggle">
+        <span><i></i>게시 설정</span>
+        <em>⌃</em>
+      </button>
+
+      <div class="rg-editor-settings" id="postSettingsPanel">
+        <div class="rg-editor-setting-group">
+          <p class="rg-editor-setting-label">게시판</p>
+
+          <!-- forms.js가 postBoard.value를 읽으므로 select 유지 -->
+          <select class="rg-editor-board-select" id="postBoard">
+            <option>RESELL TALK</option>
+            <option>자유게시판</option>
+            <option>셀러에게 묻다</option>
+            <option>시세 분석</option>
+            <option>드롭 정보</option>
+            <option>거래 후기 🏷</option>
+          </select>
+        </div>
+
+        <div class="rg-editor-setting-group">
+          <p class="rg-editor-setting-label">태그 선택</p>
+          <div class="tag-select rg-editor-tags" id="postTagSelect">
+            <div class="tag-opt" data-tag="협업모집">협업모집</div>
+            <div class="tag-opt" data-tag="빠른거래">빠른거래</div>
+            <div class="tag-opt" data-tag="시세정보">시세정보</div>
+            <div class="tag-opt" data-tag="거래후기">거래후기</div>
+          </div>
+        </div>
+
+        <div class="rg-editor-setting-group">
+          <p class="rg-editor-setting-label">작성 가이드</p>
+          <div class="rg-editor-guide">
+            욕설, 사기 유도, 개인정보 노출 게시물은 삭제될 수 있어요.
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
