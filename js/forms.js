@@ -899,6 +899,59 @@ window.RG.initProductImageUploader = function () {
     }
   };
 };
+function getCleanPriceValue(inputId) {
+  const el = document.getElementById(inputId);
+  if (!el) return 0;
+
+  const raw = String(el.value || '').replace(/[^\d]/g, '');
+  return raw ? Number(raw) : 0;
+}
+
+function getProductImageMeta() {
+  const uploadedImages = window.RG?._productUploader?.getImages
+    ? window.RG._productUploader.getImages()
+    : [];
+
+  return uploadedImages.map((img, index) => ({
+    name: img.file?.name || `image_${index + 1}`,
+    type: img.file?.type || '',
+    size: img.file?.size || 0,
+    order: index,
+    is_main: index === 0
+  }));
+}
+
+function getDropFormData() {
+  const user = getAuthUser ? getAuthUser() : null;
+
+  const checkedTrade = [...document.querySelectorAll('input[name="product-trade"]:checked')]
+    .map(el => el.value);
+
+  let tradeMethod = document.getElementById('dropTrade')?.value || '전국 안전결제';
+
+  if (checkedTrade.includes('전국 안전결제') && checkedTrade.includes('근거리 직거래')) {
+    tradeMethod = '전국+직거래 모두';
+  } else if (checkedTrade.includes('근거리 직거래')) {
+    tradeMethod = '근거리 직거래';
+  } else if (checkedTrade.includes('전국 안전결제')) {
+    tradeMethod = '전국 안전결제';
+  }
+
+  return {
+    id: `product_${Date.now()}`,
+    seller_email: user?.email || '',
+    seller_name: user?.nickname || user?.email || '나',
+    name: document.getElementById('dropName')?.value.trim() || '',
+    brand: document.getElementById('dropBrand')?.value.trim() || '',
+    category: document.getElementById('dropCat')?.value || '',
+    price: getCleanPriceValue('dropPrice'),
+    condition: document.getElementById('dropCond')?.value || '',
+    trade_method: tradeMethod,
+    description: document.getElementById('dropDesc')?.value.trim() || '',
+    images: getProductImageMeta(),
+    status: '판매중'
+  };
+}
 /* ═══════════════════════════════════════════════════
    ADD DROP FORM
 ═══════════════════════════════════════════════════ */
@@ -908,15 +961,12 @@ function initDropForm() {
   initDraftSave('dropFormInner', 'drop');
   initCloseGuard('addDrop', 'dropFormInner', 'drop');
 
-  // 새 상품 이미지 업로더 초기화
   if (window.RG && typeof window.RG.initProductImageUploader === 'function') {
     window.RG._productUploader = window.RG.initProductImageUploader();
   }
 
-  // 실시간 검증
   initRealTimeValidation('dropName', 'dropNameErr', V.required, '상품명을 입력해주세요.');
 
-  // 가격 입력 시 기존 가격 표시 + 실수령액 계산
   const priceInp = document.getElementById('dropPrice');
   const netEl = document.getElementById('product-net-price');
 
@@ -924,10 +974,10 @@ function initDropForm() {
     priceInp.dataset.boundNetPrice = '1';
 
     priceInp.addEventListener('input', () => {
-      const price = Number(priceInp.value || 0);
+      const price = getCleanPriceValue('dropPrice');
       const net = Math.floor(price * 0.975);
 
-      if (priceInp.value) setOk('dropPrice', 'dropPriceErr');
+      if (price > 0) setOk('dropPrice', 'dropPriceErr');
       else clearField('dropPrice', 'dropPriceErr');
 
       if (netEl) {
@@ -938,7 +988,6 @@ function initDropForm() {
     });
   }
 
-  // 상태 라디오 버튼 → 기존 dropCond hidden select에 값 반영
   document.querySelectorAll('input[name="product-condition"]').forEach(radio => {
     if (radio.dataset.boundCond === '1') return;
     radio.dataset.boundCond = '1';
@@ -952,7 +1001,6 @@ function initDropForm() {
     });
   });
 
-  // 거래 방식 체크박스 → 기존 dropTrade hidden select에 값 반영
   document.querySelectorAll('input[name="product-trade"]').forEach(chk => {
     if (chk.dataset.boundTrade === '1') return;
     chk.dataset.boundTrade = '1';
@@ -980,47 +1028,40 @@ function initDropForm() {
   if (!submitBtn || submitBtn.dataset.boundDropSubmit === '1') return;
   submitBtn.dataset.boundDropSubmit = '1';
 
-  submitBtn.addEventListener('click', () => {
-    const name = document.getElementById('dropName').value.trim();
-    const price = document.getElementById('dropPrice').value;
-    const cat = document.getElementById('dropCat').value;
-    const cond = document.getElementById('dropCond').value;
-
-    const uploadedImages = window.RG?._productUploader?.getImages
-      ? window.RG._productUploader.getImages()
-      : [];
+  submitBtn.addEventListener('click', async () => {
+    const product = getDropFormData();
 
     let ok = true;
 
-    if (!V.required(name)) {
+    if (!V.required(product.name)) {
       setErr('dropName', 'dropNameErr', '상품명을 입력해주세요.');
       ok = false;
     } else {
       setOk('dropName', 'dropNameErr');
     }
 
-    if (!price) {
+    if (!product.price) {
       setErr('dropPrice', 'dropPriceErr', '가격을 입력해주세요.');
       ok = false;
     } else {
       setOk('dropPrice', 'dropPriceErr');
     }
 
-    if (!cat) {
+    if (!product.category) {
       setErr('dropCat', 'dropCatErr', '카테고리를 선택해주세요.');
       ok = false;
     } else {
       setOk('dropCat', 'dropCatErr');
     }
 
-    if (!cond) {
+    if (!product.condition) {
       setErr('dropCond', 'dropCondErr', '상태를 선택해주세요.');
       ok = false;
     } else {
       setOk('dropCond', 'dropCondErr');
     }
 
-    if (uploadedImages.length === 0) {
+    if (!product.images.length) {
       showToast('상품 이미지를 최소 1장 등록해주세요.', 'error');
       ok = false;
     }
@@ -1029,8 +1070,22 @@ function initDropForm() {
 
     btnLoad(submitBtn, '등록 중...');
 
-    setTimeout(() => {
-      btnReset(submitBtn);
+    try {
+      const res = await fetch('https://backend.di702934.workers.dev/api/products', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('rg_token') || ''}`
+        },
+        body: JSON.stringify(product)
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        throw new Error(data.message || '상품 DB 저장에 실패했습니다.');
+      }
+
       clearDraft('drop');
 
       const formEl = document.getElementById('dropFormInner');
@@ -1044,12 +1099,17 @@ function initDropForm() {
 
       closeModal('addDrop');
 
-if (typeof refreshProductsFromDB === 'function') {
-  refreshProductsFromDB();
-}
+      if (typeof refreshProductsFromDB === 'function') {
+        refreshProductsFromDB();
+      }
 
-showToast('상품이 DB에 등록되었습니다! 🎉', 'success');
-    }, 1200);
+      showToast('상품이 DB에 등록되었습니다! 🎉', 'success');
+    } catch (err) {
+      console.error(err);
+      showToast(err.message || '상품 등록 중 오류가 발생했습니다.', 'error');
+    } finally {
+      btnReset(submitBtn);
+    }
   });
 }
 function compressPostImage(file, options = {}) {
