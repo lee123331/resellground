@@ -996,7 +996,9 @@ if (settingsToggle && settingsPanel && settingsToggle.dataset.bound !== '1') {
       tags: selectedTags,
       title,
       content,
-      preview: content.length > 90 ? content.slice(0, 90) + '…' : content,
+      preview: typeof getPostPreview === 'function'
+  ? getPostPreview({ content })
+  : (content.length > 90 ? content.slice(0, 90) + '…' : content),
       likes: 0,
       comments: 0,
       views: 0,

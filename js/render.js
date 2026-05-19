@@ -154,6 +154,28 @@
     return div;
   }
 
+  function stripPostMarkdown(raw = '') {
+  return String(raw)
+    // 이미지 마크다운 제거
+    .replace(/!\[[^\]]*\]\((data:image\/(?:png|jpe?g|webp|gif);base64,[^)]+|https?:\/\/[^)\s]+)\)/gi, '[이미지]')
+    // 링크 마크다운은 텍스트만 남김
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, '$1')
+    // 굵게 제거
+    .replace(/\*\*([^*]+)\*\*/g, '$1')
+    // 시세 템플릿 줄 정리
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
+function getPostPreview(post) {
+  const source = post.content || post.preview || '';
+  const clean = stripPostMarkdown(source);
+
+  if (!clean) return '이미지가 첨부된 게시글입니다.';
+
+  return clean.length > 90 ? clean.slice(0, 90) + '…' : clean;
+}
+
   /* ── POST CARD (태그 포함) ── */
   function renderPostCard(post) {
     const tierIcon = post.authorTier==='verified' ? '✓' : post.authorTier==='trusted' ? '★' : '';
@@ -169,7 +191,7 @@
       </div>
       <div class="pc__tags">${postTags(post.tags)}</div>
       <h3 class="pc__title">${post.title}</h3>
-      <p class="pc__preview">${post.preview}</p>
+      <p class="pc__preview">${getPostPreview(post)}</p>
       <div class="pc__foot">
         <span>👍 ${post.likes}</span>
         <span>💬 ${post.comments}</span>
