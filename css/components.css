@@ -1785,3 +1785,26 @@
     min-height: 360px !important;
   }
 }
+/* 게시글 상세 본문 마크다운 렌더링 */
+.dc-post__content .post-content-img {
+  display: block;
+  max-width: 100%;
+  max-height: 520px;
+  margin: 14px 0;
+  border-radius: 10px;
+  object-fit: contain;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+}
+
+.dc-post__content .post-content-link {
+  color: var(--three);
+  font-weight: 800;
+  text-decoration: underline;
+  word-break: break-all;
+}
+
+.dc-post__content strong {
+  font-weight: 900;
+  color: #111827;
+}

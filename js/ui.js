@@ -418,6 +418,45 @@ function renderNotifications() {
     </div>
   `).join('');
 }
+function escapePostHtml(str = '') {
+  return String(str)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+}
+
+function renderPostContent(raw = '') {
+  let html = escapePostHtml(raw);
+
+  // 이미지: ![파일명](data:image... 또는 https://...)
+  html = html.replace(
+    /!\[([^\]]*)\]\((data:image\/(?:png|jpe?g|webp|gif);base64,[^)]+|https?:\/\/[^)\s]+)\)/gi,
+    (_, alt, src) => {
+      return `<img class="post-content-img" src="${src}" alt="${escapePostHtml(alt)}" loading="lazy">`;
+    }
+  );
+
+  // 링크: [텍스트](https://...)
+  html = html.replace(
+    /\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,
+    (_, text, url) => {
+      return `<a class="post-content-link" href="${url}" target="_blank" rel="noopener noreferrer">${escapePostHtml(text)}</a>`;
+    }
+  );
+
+  // 굵게: **텍스트**
+  html = html.replace(
+    /\*\*([^*]+)\*\*/g,
+    '<strong>$1</strong>'
+  );
+
+  // 줄바꿈
+  html = html.replace(/\n/g, '<br>');
+
+  return html;
+}
 /* ── 게시글 상세보기 ── */
 function openPostDetail(post) {
   window._currentPost = post;
@@ -460,7 +499,9 @@ if (tags) {
   tags.innerHTML = postTags(post.tags || []);
 }
 
-content.textContent = post.content || post.preview || '게시글 내용이 없습니다.';
+content.innerHTML = renderPostContent(
+  post.content || post.preview || '게시글 내용이 없습니다.'
+);
 
 if (likes) likes.textContent = `👍 ${post.likes || 0}`;
 if (comments) comments.textContent = `댓글 ${post.comments || 0}`;
