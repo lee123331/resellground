@@ -500,6 +500,41 @@ function syncPostCommentCount(postId, count) {
     });
   }
 }
+async function refreshCommunityPostsFromDB() {
+  const postList = document.getElementById('postList');
+
+  if (!postList || typeof renderPostCard !== 'function') return;
+
+  try {
+    const res = await fetch('https://backend.di702934.workers.dev/api/posts', {
+      cache: 'no-store'
+    });
+
+    if (!res.ok) {
+      throw new Error('게시글 목록 불러오기 실패');
+    }
+
+    const rows = await res.json();
+
+    if (!Array.isArray(rows)) return;
+
+    DATA.posts = rows.map(post => ({
+      ...post,
+      tags: Array.isArray(post.tags) ? post.tags : [],
+      comments: Number(post.comments || 0),
+      likes: Number(post.likes || 0),
+      views: Number(post.views || 0)
+    }));
+
+    postList.innerHTML = '';
+
+    DATA.posts.forEach(post => {
+      postList.appendChild(renderPostCard(post));
+    });
+  } catch (err) {
+    console.warn('DB 게시글 목록 동기화 실패:', err);
+  }
+}
 /* ── 게시글 상세보기 ── */
 function openPostDetail(post) {
   window._currentPost = post;
@@ -1110,7 +1145,7 @@ const GUIDE_DATA = {
       { step: '01', title: '브랜드명 포함', desc: '나이키, 조던, 구찌, 롤렉스처럼 검색될 가능성이 높은 브랜드명을 넣습니다.' },
       { step: '02', title: '모델명 정확히 작성', desc: '정확한 모델명과 제품명을 입력하면 검색 노출이 좋아집니다.' },
       { step: '03', title: '사이즈와 상태 추가', desc: '예: “나이키 덩크 로우 팬더 270 새상품”처럼 핵심 정보를 넣습니다.' },
-      { step: '04', title: '과한 문구 지양', desc: '급처, 초특가, 무조건 정품 같은 과한 표현은 신뢰도를 낮출 수 있습니다.' },
+      { step: '04', title: '과한 문구 지양', desc: '급처, 특가, 무조건 정품 같은 과한 표현은 신뢰도를 낮출 수 있습니다.' },
     ],
     tip: '💡 좋은 제목은 검색에 잘 걸리고, 구매자가 빠르게 판단할 수 있게 해줍니다.'
   },
@@ -1517,5 +1552,34 @@ async function togglePostCardBookmark(btn) {
   } catch (err) {
     console.error(err);
     showToast('북마크 처리 중 오류가 발생했습니다.', 'warn');
+    
   }
+}
+function initCommunityPostSync() {
+  let tries = 0;
+
+  const run = () => {
+    if (
+      typeof DATA === 'undefined' ||
+      typeof renderPostCard !== 'function' ||
+      !document.getElementById('postList')
+    ) {
+      if (tries < 20) {
+        tries++;
+        setTimeout(run, 100);
+      }
+
+      return;
+    }
+
+    refreshCommunityPostsFromDB();
+  };
+
+  run();
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initCommunityPostSync);
+} else {
+  initCommunityPostSync();
 }
