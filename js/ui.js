@@ -647,13 +647,52 @@ if (commentSubmit) {
       created_at: '방금 전'
     };
 
-    if (!Array.isArray(post.commentList)) post.commentList = [];
+    if (!Array.isArray(post.commentList)) {
+      post.commentList = [];
+    }
 
+    // 1) 먼저 화면 데이터에 즉시 반영
     post.commentList.unshift(newComment);
-    post.comments = (post.comments || 0) + 1;
+    post.comments = post.commentList.length;
 
-   commentInput.value = '';
-await loadAndRenderComments();
+    if (comments) {
+      comments.textContent = `댓글 ${post.comments || 0}`;
+    }
+
+    // 2) 댓글 목록 즉시 다시 그림
+    if (commentList) {
+      commentList.innerHTML = '';
+
+      post.commentList.forEach(c => {
+        const item = document.createElement('div');
+        item.className = 'pd-comment-item';
+        item.innerHTML = `
+          <div class="pd-comment-author">${c.author || '익명'}</div>
+          <div class="pd-comment-content">${c.content || ''}</div>
+        `;
+        commentList.appendChild(item);
+      });
+    }
+
+    // 3) 입력창 비우기
+    commentInput.value = '';
+
+    // 4) 게시글 카드 쪽 댓글 수치도 즉시 갱신
+    const targetPost = DATA.posts?.find(p => String(p.id) === String(post.id));
+    if (targetPost) {
+      targetPost.comments = post.comments;
+      targetPost.commentList = post.commentList;
+    }
+
+    const postList = document.getElementById('postList');
+    if (postList && typeof renderPostCard === 'function' && Array.isArray(DATA.posts)) {
+      postList.innerHTML = '';
+      DATA.posts.forEach(p => {
+        postList.appendChild(renderPostCard(p));
+      });
+    }
+
+    // 5) DB 저장
     try {
       const res = await fetch('https://backend.di702934.workers.dev/api/comments', {
         method: 'POST',
@@ -675,6 +714,9 @@ await loadAndRenderComments();
       }
 
       console.log('댓글 DB 저장 완료');
+
+      // 6) DB 기준으로 한 번 더 동기화
+      await loadAndRenderComments();
     } catch (err) {
       console.error(err);
       showToast('화면에는 등록됐지만 댓글 DB 저장에 실패했어요.', 'warn');
@@ -713,14 +755,20 @@ async function loadAndRenderComments() {
     }
 
     post.commentList.forEach(c => {
-      const item = document.createElement('div');
-      item.className = 'pd-comment-item';
-      item.innerHTML = `
-        <div class="pd-comment-author">${c.author || '익명'}</div>
-        <div class="pd-comment-content">${c.content || ''}</div>
-      `;
-      commentList.appendChild(item);
-    });
+  const item = document.createElement('div');
+  item.className = 'pd-comment-item';
+
+  const author = document.createElement('div');
+  author.className = 'pd-comment-author';
+  author.textContent = c.author || '익명';
+
+  const content = document.createElement('div');
+  content.className = 'pd-comment-content';
+  content.textContent = c.content || '';
+
+  item.append(author, content);
+  commentList.appendChild(item);
+});
   } catch (err) {
     console.warn('댓글 불러오기 실패:', err);
   }
