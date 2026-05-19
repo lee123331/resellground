@@ -697,52 +697,351 @@ const agree = document.getElementById('preregAgree').checked;
   }, 1500);
 });
 }
+/* ═══════════════════════════════════════════════════
+   PRODUCT IMAGE UPLOADER — 상품 등록 이미지 프리뷰
+═══════════════════════════════════════════════════ */
+window.RG = window.RG || {};
 
+window.RG.initProductImageUploader = function () {
+  const modal = document.getElementById('modal-addDrop');
+  if (!modal) return null;
+
+  const dropzone = modal.querySelector('.rg-dropzone');
+  const previewGrid = modal.querySelector('.rg-preview-grid');
+  const countEl = modal.querySelector('.rg-img-section__count');
+  const fileInput = modal.querySelector('.rg-dropzone input[type="file"]');
+
+  if (!dropzone || !previewGrid || !fileInput) return null;
+
+  if (dropzone.dataset.boundUploader === '1') {
+    return window.RG._productUploader || null;
+  }
+
+  dropzone.dataset.boundUploader = '1';
+
+  const MAX_IMAGES = 5;
+  const MAX_MB = 10;
+
+  let images = [];
+
+  function updateCount() {
+    if (countEl) countEl.textContent = `${images.length} / ${MAX_IMAGES}`;
+    fileInput.disabled = images.length >= MAX_IMAGES;
+  }
+
+  function render() {
+    if (images.length === 0) {
+      dropzone.style.display = 'flex';
+      previewGrid.style.display = 'none';
+      previewGrid.innerHTML = '';
+      updateCount();
+      return;
+    }
+
+    dropzone.style.display = 'none';
+    previewGrid.style.display = 'grid';
+    previewGrid.innerHTML = '';
+
+    images.forEach((img, i) => {
+      previewGrid.appendChild(createThumb(img, i));
+    });
+
+    if (images.length < MAX_IMAGES) {
+      previewGrid.appendChild(createAddSlot());
+    }
+
+    updateCount();
+  }
+
+  function createThumb(img, i) {
+    const wrap = document.createElement('div');
+    wrap.className = 'rg-thumb';
+    wrap.draggable = true;
+    wrap.dataset.index = i;
+
+    const el = document.createElement('img');
+    el.src = img.url;
+    el.alt = `상품 이미지 ${i + 1}`;
+    wrap.appendChild(el);
+
+    const del = document.createElement('button');
+    del.className = 'rg-thumb__del';
+    del.type = 'button';
+    del.textContent = '✕';
+    del.setAttribute('aria-label', `이미지 ${i + 1} 삭제`);
+
+    del.addEventListener('click', e => {
+      e.stopPropagation();
+      URL.revokeObjectURL(img.url);
+      images.splice(i, 1);
+      render();
+    });
+
+    wrap.appendChild(del);
+
+    if (i === 0) {
+      const badge = document.createElement('div');
+      badge.className = 'rg-thumb__main-badge';
+      badge.textContent = '대표';
+      wrap.appendChild(badge);
+    }
+
+    wrap.addEventListener('dragstart', e => {
+      e.dataTransfer.setData('text/plain', String(i));
+      setTimeout(() => wrap.classList.add('is-dragging'), 0);
+    });
+
+    wrap.addEventListener('dragend', () => {
+      wrap.classList.remove('is-dragging');
+    });
+
+    wrap.addEventListener('dragover', e => {
+      e.preventDefault();
+      wrap.classList.add('is-dragover');
+    });
+
+    wrap.addEventListener('dragleave', () => {
+      wrap.classList.remove('is-dragover');
+    });
+
+    wrap.addEventListener('drop', e => {
+      e.preventDefault();
+      wrap.classList.remove('is-dragover');
+
+      const fromIdx = parseInt(e.dataTransfer.getData('text/plain'), 10);
+      if (Number.isNaN(fromIdx) || fromIdx === i) return;
+
+      const [moved] = images.splice(fromIdx, 1);
+      images.splice(i, 0, moved);
+      render();
+    });
+
+    return wrap;
+  }
+
+  function createAddSlot() {
+    const label = document.createElement('label');
+    label.className = 'rg-thumb-add';
+    label.innerHTML = `
+      <span class="rg-thumb-add__plus">+</span>
+      <span>추가</span>
+    `;
+
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.multiple = true;
+    input.accept = 'image/*';
+    input.style.display = 'none';
+
+    input.addEventListener('change', e => {
+      handleFiles(e.target.files);
+      input.value = '';
+    });
+
+    label.appendChild(input);
+    return label;
+  }
+
+  function handleFiles(files) {
+    Array.from(files).forEach(file => {
+      if (images.length >= MAX_IMAGES) {
+        showToast(`이미지는 최대 ${MAX_IMAGES}장까지 등록할 수 있어요.`, 'error');
+        return;
+      }
+
+      if (!file.type.startsWith('image/')) {
+        showToast('이미지 파일만 업로드할 수 있어요.', 'error');
+        return;
+      }
+
+      if (file.size > MAX_MB * 1024 * 1024) {
+        showToast(`${file.name}은 ${MAX_MB}MB를 초과해요.`, 'error');
+        return;
+      }
+
+      images.push({
+        file,
+        url: URL.createObjectURL(file)
+      });
+    });
+
+    render();
+  }
+
+  fileInput.addEventListener('change', e => {
+    handleFiles(e.target.files);
+    fileInput.value = '';
+  });
+
+  dropzone.addEventListener('dragover', e => {
+    e.preventDefault();
+    dropzone.classList.add('is-dragover');
+  });
+
+  dropzone.addEventListener('dragleave', () => {
+    dropzone.classList.remove('is-dragover');
+  });
+
+  dropzone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropzone.classList.remove('is-dragover');
+    handleFiles(e.dataTransfer.files);
+  });
+
+  render();
+
+  return {
+    getImages: () => images,
+    reset() {
+      images.forEach(img => URL.revokeObjectURL(img.url));
+      images = [];
+      render();
+    }
+  };
+};
 /* ═══════════════════════════════════════════════════
    ADD DROP FORM
 ═══════════════════════════════════════════════════ */
 function initDropForm() {
   initCharCounter('dropDesc', 'dropDescCount', 1000);
-  initFileUpload('uploadArea', 'fileInput', 'imagePreview');
   initPriceFormat('dropPrice', 'dropPriceDisplay');
   initDraftSave('dropFormInner', 'drop');
   initCloseGuard('addDrop', 'dropFormInner', 'drop');
 
-  // 실시간 검증
-  initRealTimeValidation('dropName','dropNameErr', V.required, '상품명을 입력해주세요.');
+  // 새 상품 이미지 업로더 초기화
+  if (window.RG && typeof window.RG.initProductImageUploader === 'function') {
+    window.RG._productUploader = window.RG.initProductImageUploader();
+  }
 
-  // 가격 실시간
+  // 실시간 검증
+  initRealTimeValidation('dropName', 'dropNameErr', V.required, '상품명을 입력해주세요.');
+
+  // 가격 입력 시 기존 가격 표시 + 실수령액 계산
   const priceInp = document.getElementById('dropPrice');
-  if (priceInp) {
+  const netEl = document.getElementById('product-net-price');
+
+  if (priceInp && priceInp.dataset.boundNetPrice !== '1') {
+    priceInp.dataset.boundNetPrice = '1';
+
     priceInp.addEventListener('input', () => {
-      if (priceInp.value) setOk('dropPrice','dropPriceErr');
-      else clearField('dropPrice','dropPriceErr');
+      const price = Number(priceInp.value || 0);
+      const net = Math.floor(price * 0.975);
+
+      if (priceInp.value) setOk('dropPrice', 'dropPriceErr');
+      else clearField('dropPrice', 'dropPriceErr');
+
+      if (netEl) {
+        netEl.textContent = price > 0
+          ? `${net.toLocaleString('ko-KR')}원`
+          : '—';
+      }
     });
   }
 
-  document.getElementById('dropSubmitBtn').addEventListener('click', () => {
+  // 상태 라디오 버튼 → 기존 dropCond hidden select에 값 반영
+  document.querySelectorAll('input[name="product-condition"]').forEach(radio => {
+    if (radio.dataset.boundCond === '1') return;
+    radio.dataset.boundCond = '1';
+
+    radio.addEventListener('change', () => {
+      const condEl = document.getElementById('dropCond');
+      if (condEl) {
+        condEl.value = radio.value;
+        setOk('dropCond', 'dropCondErr');
+      }
+    });
+  });
+
+  // 거래 방식 체크박스 → 기존 dropTrade hidden select에 값 반영
+  document.querySelectorAll('input[name="product-trade"]').forEach(chk => {
+    if (chk.dataset.boundTrade === '1') return;
+    chk.dataset.boundTrade = '1';
+
+    chk.addEventListener('change', () => {
+      const checked = [...document.querySelectorAll('input[name="product-trade"]:checked')]
+        .map(el => el.value);
+
+      const tradeEl = document.getElementById('dropTrade');
+
+      if (tradeEl) {
+        if (checked.includes('전국 안전결제') && checked.includes('근거리 직거래')) {
+          tradeEl.value = '전국+직거래 모두';
+        } else if (checked.includes('근거리 직거래')) {
+          tradeEl.value = '근거리 직거래';
+        } else {
+          tradeEl.value = '전국 안전결제';
+        }
+      }
+    });
+  });
+
+  const submitBtn = document.getElementById('dropSubmitBtn');
+
+  if (!submitBtn || submitBtn.dataset.boundDropSubmit === '1') return;
+  submitBtn.dataset.boundDropSubmit = '1';
+
+  submitBtn.addEventListener('click', () => {
     const name = document.getElementById('dropName').value.trim();
     const price = document.getElementById('dropPrice').value;
     const cat = document.getElementById('dropCat').value;
     const cond = document.getElementById('dropCond').value;
+
+    const uploadedImages = window.RG?._productUploader?.getImages
+      ? window.RG._productUploader.getImages()
+      : [];
+
     let ok = true;
 
-    if (!V.required(name)) { setErr('dropName','dropNameErr','상품명을 입력해주세요.'); ok=false; }
-    else setOk('dropName','dropNameErr');
-    if (!price) { setErr('dropPrice','dropPriceErr','가격을 입력해주세요.'); ok=false; }
-    else setOk('dropPrice','dropPriceErr');
-    if (!cat) { setErr('dropCat','dropCatErr','카테고리를 선택해주세요.'); ok=false; }
-    else setOk('dropCat','dropCatErr');
-    if (!cond) { setErr('dropCond','dropCondErr','상태를 선택해주세요.'); ok=false; }
-    else setOk('dropCond','dropCondErr');
+    if (!V.required(name)) {
+      setErr('dropName', 'dropNameErr', '상품명을 입력해주세요.');
+      ok = false;
+    } else {
+      setOk('dropName', 'dropNameErr');
+    }
+
+    if (!price) {
+      setErr('dropPrice', 'dropPriceErr', '가격을 입력해주세요.');
+      ok = false;
+    } else {
+      setOk('dropPrice', 'dropPriceErr');
+    }
+
+    if (!cat) {
+      setErr('dropCat', 'dropCatErr', '카테고리를 선택해주세요.');
+      ok = false;
+    } else {
+      setOk('dropCat', 'dropCatErr');
+    }
+
+    if (!cond) {
+      setErr('dropCond', 'dropCondErr', '상태를 선택해주세요.');
+      ok = false;
+    } else {
+      setOk('dropCond', 'dropCondErr');
+    }
+
+    if (uploadedImages.length === 0) {
+      showToast('상품 이미지를 최소 1장 등록해주세요.', 'error');
+      ok = false;
+    }
+
     if (!ok) return;
 
-    const btn = document.getElementById('dropSubmitBtn');
-    btnLoad(btn, '등록 중...');
+    btnLoad(submitBtn, '등록 중...');
+
     setTimeout(() => {
-      btnReset(btn);
+      btnReset(submitBtn);
       clearDraft('drop');
-      resetForm(document.getElementById('dropFormInner'));
+
+      const formEl = document.getElementById('dropFormInner');
+      if (formEl) resetForm(formEl);
+
+      if (window.RG?._productUploader?.reset) {
+        window.RG._productUploader.reset();
+      }
+
+      if (netEl) netEl.textContent = '—';
+
       closeModal('addDrop');
       showToast('상품이 성공적으로 등록되었습니다! 🎉', 'success');
     }, 1200);

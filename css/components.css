@@ -1808,3 +1808,483 @@
   font-weight: 900;
   color: #111827;
 }
+/* ══════════════════════════════════════════
+   ADD DROP MODAL — Product Register New Design
+══════════════════════════════════════════ */
+
+#modal-addDrop.rg-modal-overlay {
+  background: rgba(0, 0, 0, 0.62) !important;
+  backdrop-filter: blur(6px) !important;
+  -webkit-backdrop-filter: blur(6px) !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 16px !important;
+}
+
+#modal-addDrop.rg-modal-overlay.open {
+  display: flex !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+#modal-addDrop .rg-modal-product {
+  width: 580px;
+  max-width: 100%;
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.22);
+  font-family: var(--f);
+  transform: translateY(10px);
+  transition: transform var(--base);
+}
+
+#modal-addDrop.open .rg-modal-product {
+  transform: translateY(0);
+}
+
+/* 헤더 */
+#modal-addDrop .rg-modal-product__header {
+  background: #0f0f0f;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+#modal-addDrop .rg-modal-product__logo {
+  font-size: 14px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.3px;
+}
+
+#modal-addDrop .rg-modal-product__logo em {
+  color: #ff3b30;
+  font-style: normal;
+}
+
+#modal-addDrop .rg-modal-product__sub {
+  font-size: 11px;
+  color: #777;
+  margin-top: 2px;
+  font-weight: 500;
+}
+
+#modal-addDrop .rg-modal-product__close {
+  width: 30px;
+  height: 30px;
+  background: #222;
+  border: none;
+  border-radius: 50%;
+  color: #888;
+  font-size: 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#modal-addDrop .rg-modal-product__close:hover {
+  background: #333;
+  color: #fff;
+}
+
+/* 탭 */
+#modal-addDrop .rg-modal-product__tabs {
+  border-bottom: 1px solid #ebebeb;
+  display: flex;
+  padding: 0 20px;
+}
+
+#modal-addDrop .rg-modal-product__tab {
+  font-size: 12px;
+  font-weight: 700;
+  color: #b0b0ac;
+  padding: 11px 10px 9px;
+  border-bottom: 2px solid transparent;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  user-select: none;
+}
+
+#modal-addDrop .rg-modal-product__tab.is-active {
+  color: #0f0f0f;
+  border-bottom-color: #0f0f0f;
+}
+
+#modal-addDrop .rg-modal-product__tab-num {
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background: #ebebeb;
+  color: #999;
+  font-size: 9px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#modal-addDrop .rg-modal-product__tab.is-active .rg-modal-product__tab-num {
+  background: #0f0f0f;
+  color: #fff;
+}
+
+/* 바디 */
+#modal-addDrop .rg-modal-product__body {
+  padding: 20px;
+  overflow-y: auto;
+  max-height: 520px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* 공통 input */
+#modal-addDrop .rg-product-input {
+  font-size: 13px;
+  color: #0f0f0f;
+  background: #f9f9f7;
+  border: 1.5px solid #e8e8e6;
+  border-radius: 8px;
+  padding: 9px 12px;
+  width: 100%;
+  outline: none;
+  box-sizing: border-box;
+  font-family: var(--f);
+}
+
+#modal-addDrop .rg-product-input:focus {
+  border-color: #0f0f0f;
+  background: #fff;
+}
+
+#modal-addDrop textarea.rg-product-input {
+  min-height: 80px;
+}
+
+/* 이미지 섹션 */
+#modal-addDrop .rg-img-section__label {
+  font-size: 11px;
+  font-weight: 900;
+  color: #0f0f0f;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+#modal-addDrop .rg-img-section__label .req {
+  color: #ff3b30;
+}
+
+#modal-addDrop .rg-img-section__count {
+  font-size: 11px;
+  color: #999;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* 드롭존 */
+#modal-addDrop .rg-dropzone {
+  border: 1.5px dashed #ddd;
+  border-radius: 10px;
+  background: #f9f9f7;
+  min-height: 128px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  gap: 7px;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+#modal-addDrop .rg-dropzone:hover,
+#modal-addDrop .rg-dropzone.is-dragover {
+  border-color: #0f0f0f;
+  background: #f2f2f0;
+}
+
+#modal-addDrop .rg-dropzone input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+#modal-addDrop .rg-dropzone__icon {
+  width: 38px;
+  height: 38px;
+  background: #e8e8e6;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  color: #888;
+  pointer-events: none;
+}
+
+#modal-addDrop .rg-dropzone__text {
+  font-size: 13px;
+  font-weight: 800;
+  color: #0f0f0f;
+  pointer-events: none;
+}
+
+#modal-addDrop .rg-dropzone__hint {
+  font-size: 11px;
+  color: #b0b0ac;
+  pointer-events: none;
+}
+
+/* 이미지 프리뷰 */
+#modal-addDrop .rg-preview-grid {
+  display: none;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+
+#modal-addDrop .rg-thumb {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #f2f2f0;
+  cursor: grab;
+  border: 1.5px solid #e8e8e6;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+#modal-addDrop .rg-thumb:hover {
+  border-color: #0f0f0f;
+}
+
+#modal-addDrop .rg-thumb:active {
+  cursor: grabbing;
+}
+
+#modal-addDrop .rg-thumb.is-dragging {
+  opacity: 0.3;
+}
+
+#modal-addDrop .rg-thumb.is-dragover {
+  border-color: #0f0f0f;
+  box-shadow: 0 0 0 2px #0f0f0f;
+}
+
+#modal-addDrop .rg-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+}
+
+#modal-addDrop .rg-thumb__del {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 20px;
+  height: 20px;
+  background: rgba(0, 0, 0, 0.72);
+  border: none;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+#modal-addDrop .rg-thumb:hover .rg-thumb__del {
+  opacity: 1;
+}
+
+#modal-addDrop .rg-thumb__main-badge {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.65));
+  color: #fff;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.4px;
+  text-align: center;
+  padding: 12px 4px 4px;
+  pointer-events: none;
+}
+
+#modal-addDrop .rg-thumb-add {
+  aspect-ratio: 1 / 1;
+  border-radius: 10px;
+  border: 1.5px dashed #ddd;
+  background: #f9f9f7;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  gap: 2px;
+  transition: all 0.15s;
+  color: #b0b0ac;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+#modal-addDrop .rg-thumb-add:hover {
+  border-color: #0f0f0f;
+  background: #f0f0ee;
+  color: #0f0f0f;
+}
+
+#modal-addDrop .rg-thumb-add input {
+  display: none;
+}
+
+#modal-addDrop .rg-thumb-add__plus {
+  font-size: 22px;
+  font-weight: 300;
+  line-height: 1;
+}
+
+#modal-addDrop .rg-img-tips {
+  display: flex;
+  gap: 14px;
+  font-size: 11px;
+  color: #b0b0ac;
+  margin-top: 4px;
+}
+
+#modal-addDrop .rg-img-tips span::before {
+  content: "·";
+  margin-right: 4px;
+}
+
+/* 상태 / 거래 토글 */
+#modal-addDrop .rg-cond-btn,
+#modal-addDrop .rg-trade-btn {
+  display: inline-flex;
+  align-items: center;
+  font-size: 12px;
+  color: #555;
+  border: 1.5px solid #e8e8e6;
+  border-radius: 20px;
+  padding: 5px 12px;
+  background: #f9f9f7;
+  transition: all 0.15s;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+#modal-addDrop input[name="product-condition"]:checked + .rg-cond-btn,
+#modal-addDrop input[name="product-trade"]:checked + .rg-trade-btn {
+  background: #0f0f0f;
+  color: #fff;
+  border-color: #0f0f0f;
+}
+
+/* 푸터 */
+#modal-addDrop .rg-modal-product__footer {
+  padding: 14px 20px;
+  border-top: 1px solid #ebebeb;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+}
+
+#modal-addDrop .rg-modal-product__fee-note {
+  font-size: 11px;
+  color: #b0b0ac;
+}
+
+#modal-addDrop .rg-modal-product__fee-note b {
+  color: #0f0f0f;
+  font-weight: 900;
+}
+
+#modal-addDrop .rg-modal-product__btn-row {
+  display: flex;
+  gap: 8px;
+}
+
+#modal-addDrop .btn-rg-save {
+  font-size: 13px;
+  font-weight: 800;
+  padding: 10px 18px;
+  background: #fff;
+  border: 1.5px solid #e8e8e6;
+  border-radius: 8px;
+  color: #555;
+  cursor: pointer;
+  font-family: var(--f);
+}
+
+#modal-addDrop .btn-rg-save:hover {
+  border-color: #0f0f0f;
+  color: #0f0f0f;
+}
+
+#modal-addDrop .btn-rg-submit {
+  font-size: 13px;
+  font-weight: 900;
+  padding: 10px 24px;
+  background: #0f0f0f;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  letter-spacing: 0.2px;
+  font-family: var(--f);
+}
+
+#modal-addDrop .btn-rg-submit:hover {
+  background: #2a2a2a;
+}
+
+/* 모바일 대응 */
+@media (max-width: 620px) {
+  #modal-addDrop.rg-modal-overlay {
+    align-items: flex-end !important;
+    padding: 0 !important;
+  }
+
+  #modal-addDrop .rg-modal-product {
+    width: 100%;
+    max-height: 92vh;
+    border-radius: 16px 16px 0 0;
+  }
+
+  #modal-addDrop .rg-modal-product__body {
+    padding: 16px;
+    max-height: 62vh;
+  }
+
+  #modal-addDrop .rg-preview-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  #modal-addDrop .rg-modal-product__footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  #modal-addDrop .rg-modal-product__btn-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}

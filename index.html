@@ -1046,74 +1046,172 @@
 </div>
 
 <!-- ADD DROP MODAL -->
-<div class="modal-ov" id="modal-addDrop">
-  <div class="modal wide">
-    <div class="modal__hd"><h2 class="modal__title">상품 등록</h2><button class="modal__close" data-close="addDrop" aria-label="닫기">✕</button></div>
-    <div class="modal__body" id="dropFormInner">
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label" for="dropName">상품명 <span class="required">*</span></label>
-          <input class="form-input" id="dropName" type="text" placeholder="상품명을 입력해주세요"/>
-          <p class="form-error" id="dropNameErr"></p>
+<div class="modal-ov rg-modal-overlay" id="modal-addDrop" aria-modal="true" role="dialog" aria-label="상품 등록">
+
+  <div class="rg-modal-product">
+
+    <div class="rg-modal-product__header">
+      <div>
+        <div class="rg-modal-product__logo">리셀<em>그라운드</em></div>
+        <div class="rg-modal-product__sub">상품 등록</div>
+      </div>
+      <button class="rg-modal-product__close" data-close="addDrop" aria-label="모달 닫기" type="button">✕</button>
+    </div>
+
+    <div class="rg-modal-product__tabs">
+      <div class="rg-modal-product__tab is-active">
+        <span class="rg-modal-product__tab-num">1</span>사진
+      </div>
+      <div class="rg-modal-product__tab">
+        <span class="rg-modal-product__tab-num">2</span>상품 정보
+      </div>
+      <div class="rg-modal-product__tab">
+        <span class="rg-modal-product__tab-num">3</span>가격 · 배송
+      </div>
+    </div>
+
+    <div class="rg-modal-product__body" id="dropFormInner">
+
+      <div>
+        <div class="rg-img-section__label">
+          사진 등록 <span class="req">*</span>
+          <span class="rg-img-section__count">0 / 5</span>
         </div>
-        <div class="form-group">
-          <label class="form-label" for="dropBrand">브랜드 <span class="required">*</span></label>
-          <input class="form-input" id="dropBrand" type="text" placeholder="브랜드명"/>
+
+        <div class="rg-dropzone">
+          <div class="rg-dropzone__icon">↑</div>
+          <p class="rg-dropzone__text">클릭하거나 파일을 여기에 끌어다 놓으세요</p>
+          <p class="rg-dropzone__hint">JPG · PNG · WEBP · 최대 5장 · 장당 10MB</p>
+          <input type="file" multiple accept="image/*" aria-label="이미지 파일 선택">
         </div>
-        <div class="form-group">
-          <label class="form-label" for="dropCat">카테고리 <span class="required">*</span></label>
-          <select class="form-select" id="dropCat"><option value="">선택해주세요</option><option>스니커즈</option><option>명품 백</option><option>시계</option><option>의류/아우터</option><option>테크/가전</option><option>기타</option></select>
+
+        <div class="rg-preview-grid"></div>
+
+        <div class="rg-img-tips">
+          <span>첫 번째 사진이 대표 이미지</span>
+          <span>드래그로 순서 변경 가능</span>
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+
+        <div style="display:flex; flex-direction:column; gap:5px;">
+          <label style="font-size:11px; font-weight:700; color:#0f0f0f;">카테고리 <em style="color:#ff3b30; font-style:normal;">*</em></label>
+          <select id="dropCat" class="rg-product-input">
+            <option value="">선택</option>
+            <option>스니커즈</option>
+            <option>명품 백</option>
+            <option>시계</option>
+            <option>의류/아우터</option>
+            <option>테크/가전</option>
+            <option>기타</option>
+          </select>
           <p class="form-error" id="dropCatErr"></p>
         </div>
-        <div class="form-group">
-          <label class="form-label" for="dropSize">사이즈 <span class="optional">(선택)</span></label>
-          <input class="form-input" id="dropSize" type="text" placeholder="예: 270, FREE, 44"/>
+
+        <div style="display:flex; flex-direction:column; gap:5px;">
+          <label style="font-size:11px; font-weight:700; color:#0f0f0f;">브랜드 <em style="color:#ff3b30; font-style:normal;">*</em></label>
+          <input id="dropBrand" class="rg-product-input" type="text" placeholder="Nike, Rolex, Chanel …">
         </div>
-        <div class="form-group">
-          <label class="form-label" for="dropPrice">가격 <span class="required">*</span></label>
-          <input class="form-input" id="dropPrice" type="number" placeholder="숫자만 입력" inputmode="numeric" min="0"/>
+
+        <div style="display:flex; flex-direction:column; gap:5px; grid-column:1/-1;">
+          <label style="font-size:11px; font-weight:700; color:#0f0f0f;">상품명 <em style="color:#ff3b30; font-style:normal;">*</em></label>
+          <input id="dropName" class="rg-product-input" type="text" placeholder="예) Nike Air Jordan 1 Retro High OG Chicago 2022">
+          <p class="form-error" id="dropNameErr"></p>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:5px; grid-column:1/-1;">
+          <label style="font-size:11px; font-weight:700; color:#0f0f0f;">상태 <em style="color:#ff3b30; font-style:normal;">*</em></label>
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <label style="cursor:pointer;">
+              <input type="radio" name="product-condition" value="미사용 (새상품)" style="display:none;">
+              <span class="rg-cond-btn">S급 미착용</span>
+            </label>
+            <label style="cursor:pointer;">
+              <input type="radio" name="product-condition" value="거의 새것" style="display:none;">
+              <span class="rg-cond-btn">A급 거의 새것</span>
+            </label>
+            <label style="cursor:pointer;">
+              <input type="radio" name="product-condition" value="상태 좋음" style="display:none;">
+              <span class="rg-cond-btn">B급 상태 좋음</span>
+            </label>
+            <label style="cursor:pointer;">
+              <input type="radio" name="product-condition" value="사용감 있음" style="display:none;">
+              <span class="rg-cond-btn">C급 사용감 있음</span>
+            </label>
+          </div>
+
+          <select id="dropCond" style="display:none;">
+            <option value="">선택해주세요</option>
+            <option>미사용 (새상품)</option>
+            <option>거의 새것</option>
+            <option>상태 좋음</option>
+            <option>사용감 있음</option>
+          </select>
+          <p class="form-error" id="dropCondErr"></p>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:5px; grid-column:1/-1;">
+          <label style="font-size:11px; font-weight:700; color:#0f0f0f;">판매가 <em style="color:#ff3b30; font-style:normal;">*</em></label>
+          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+            <input id="dropPrice" class="rg-product-input" type="number" placeholder="0" min="0" inputmode="numeric" style="width:160px;">
+            <span style="font-size:13px; color:#555; font-weight:500;">원</span>
+            <span style="font-size:12px; color:#999;">수수료 후 실수령 <b id="product-net-price" style="color:#0f0f0f;">—</b></span>
+          </div>
           <p class="form-price-display" id="dropPriceDisplay"></p>
           <p class="form-error" id="dropPriceErr"></p>
         </div>
-        <div class="form-group">
-          <label class="form-label" for="dropCond">상태 <span class="required">*</span></label>
-          <select class="form-select" id="dropCond"><option value="">선택해주세요</option><option>미사용 (새상품)</option><option>거의 새것</option><option>상태 좋음</option><option>사용감 있음</option></select>
-          <p class="form-error" id="dropCondErr"></p>
+
+        <div style="display:flex; flex-direction:column; gap:5px; grid-column:1/-1;">
+          <label style="font-size:11px; font-weight:700; color:#0f0f0f;">상품 설명</label>
+          <textarea id="dropDesc" class="rg-product-input" placeholder="사이즈, 구성품, 구매처, 구매시기 등 상세 정보를 입력해주세요." rows="4" maxlength="1000" style="min-height:80px; resize:vertical; line-height:1.55;"></textarea>
+          <p class="form-char"><span class="char-count-cur" id="dropDescCount">0</span>/1000</p>
         </div>
+
+        <div style="display:flex; flex-direction:column; gap:5px; grid-column:1/-1;">
+          <label style="font-size:11px; font-weight:700; color:#0f0f0f;">거래 방식</label>
+          <div style="display:flex; gap:8px;">
+            <label style="cursor:pointer;">
+              <input type="checkbox" name="product-trade" value="전국 안전결제" style="display:none;">
+              <span class="rg-trade-btn">📦 택배 거래</span>
+            </label>
+            <label style="cursor:pointer;">
+              <input type="checkbox" name="product-trade" value="근거리 직거래" style="display:none;">
+              <span class="rg-trade-btn">🤝 직거래</span>
+            </label>
+          </div>
+
+          <select id="dropTrade" style="display:none;">
+            <option>전국 안전결제</option>
+            <option>근거리 직거래</option>
+            <option>전국+직거래 모두</option>
+          </select>
+        </div>
+
+        <select id="dropVerify" style="display:none;">
+          <option>검수 없이 등록</option>
+          <option disabled>검수 서비스 준비중</option>
+        </select>
+
+        <input id="dropSize" type="hidden" value="">
+
       </div>
 
-      <!-- 파일 업로드 -->
-      <div class="form-group">
-        <label class="form-label">상품 이미지 <span class="optional">(선택, 최대 10장)</span></label>
-        <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp" multiple style="display:none" aria-label="이미지 파일 선택"/>
-        <div class="upload-area" id="uploadArea" role="button" tabindex="0" aria-label="이미지 업로드 — 클릭하거나 드래그">
-          <p class="upload-area__icon">📷</p>
-          <p class="upload-area__text">클릭하거나 드래그하여 이미지 업로드</p>
-          <p class="upload-area__hint">JPG / PNG / WebP · 장당 5MB 이하 · <span class="upload-count">0/10장 선택됨</span></p>
-        </div>
-        <div class="upload-preview" id="imagePreview"></div>
+      <div style="background:#fff8f6; border:1.5px solid #ffd5d0; border-radius:8px; padding:10px 14px; font-size:11px; color:#c0392b; line-height:1.6; display:flex; gap:8px; align-items:flex-start;">
+        <span style="font-size:14px; flex-shrink:0; margin-top:1px;">⚠</span>
+        <span>허위 매물 · 가품 등록 시 영구 이용 정지 및 법적 조치가 취해질 수 있습니다.</span>
       </div>
 
-      <div class="form-group">
-        <label class="form-label" for="dropDesc">상품 설명 <span class="optional">(선택)</span></label>
-        <textarea class="form-textarea" id="dropDesc" placeholder="상품 상태, 구매 경로, 특이사항 등을 입력해주세요." rows="4"></textarea>
-        <p class="form-char"><span class="char-count-cur" id="dropDescCount">0</span>/1000</p>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label" for="dropTrade">거래 방식</label>
-          <select class="form-select" id="dropTrade"><option>전국 안전결제</option><option>근거리 직거래</option><option>전국+직거래 모두</option></select>
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="dropVerify">검수 희망</label>
-          <select class="form-select" id="dropVerify">
-  <option>검수 없이 등록</option>
-  <option disabled>검수 서비스 준비중</option>
-</select>
-        </div>
-      </div>
-      <button class="btn btn--p btn--full" id="dropSubmitBtn">상품 등록하기</button>
     </div>
+
+    <div class="rg-modal-product__footer">
+      <div class="rg-modal-product__fee-note">수수료 <b>2.5%</b> 고정 · 업계 최저</div>
+      <div class="rg-modal-product__btn-row">
+        <button class="btn-rg-save" id="btn-product-save" type="button">임시저장</button>
+        <button class="btn-rg-submit" id="dropSubmitBtn" type="button">등록하기 →</button>
+      </div>
+    </div>
+
   </div>
 </div>
 
