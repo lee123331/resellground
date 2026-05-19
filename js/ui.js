@@ -457,6 +457,49 @@ function renderPostContent(raw = '') {
 
   return html;
 }
+function syncPostCommentCount(postId, count) {
+  if (!postId) return;
+
+  // 현재 열린 상세 데이터 갱신
+  if (window._currentPost && String(window._currentPost.id) === String(postId)) {
+    window._currentPost.comments = count;
+  }
+
+  // DATA.posts 내부 데이터 갱신
+  if (Array.isArray(DATA.posts)) {
+    const target = DATA.posts.find(p => String(p.id) === String(postId));
+
+    if (target) {
+      target.comments = count;
+    }
+  }
+
+  // DATA.userPosts 내부 데이터도 있으면 갱신
+  if (Array.isArray(DATA.userPosts)) {
+    const target = DATA.userPosts.find(p => String(p.id) === String(postId));
+
+    if (target) {
+      target.comments = count;
+    }
+  }
+
+  // 상세 모달 댓글 숫자 갱신
+  const detailCount = document.getElementById('pdComments');
+  if (detailCount) {
+    detailCount.textContent = `댓글 ${count || 0}`;
+  }
+
+  // 게시글 카드 전체 다시 렌더링
+  const postList = document.getElementById('postList');
+
+  if (postList && typeof renderPostCard === 'function' && Array.isArray(DATA.posts)) {
+    postList.innerHTML = '';
+
+    DATA.posts.forEach(p => {
+      postList.appendChild(renderPostCard(p));
+    });
+  }
+}
 /* ── 게시글 상세보기 ── */
 function openPostDetail(post) {
   window._currentPost = post;
@@ -505,6 +548,7 @@ content.innerHTML = renderPostContent(
 
 if (likes) likes.textContent = `👍 ${post.likes || 0}`;
 if (comments) comments.textContent = `댓글 ${post.comments || 0}`;
+
 if (comments) {
   comments.style.cursor = 'pointer';
   comments.onclick = () => {
@@ -743,11 +787,13 @@ async function loadAndRenderComments() {
       created_at: row.created_at || ''
     }));
 
-    post.comments = post.commentList.length;
+  post.comments = post.commentList.length;
 
-    if (comments) comments.textContent = `댓글 ${post.comments || 0}`;
+if (comments) comments.textContent = `댓글 ${post.comments || 0}`;
 
-    commentList.innerHTML = '';
+syncPostCommentCount(post.id, post.comments);
+
+commentList.innerHTML = '';
 
     if (post.commentList.length === 0) {
       commentList.innerHTML = '<div class="pd-comment-empty">아직 등록된 댓글이 없습니다.</div>';
