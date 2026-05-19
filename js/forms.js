@@ -1043,7 +1043,12 @@ function initDropForm() {
       if (netEl) netEl.textContent = '—';
 
       closeModal('addDrop');
-      showToast('상품이 성공적으로 등록되었습니다! 🎉', 'success');
+
+if (typeof refreshProductsFromDB === 'function') {
+  refreshProductsFromDB();
+}
+
+showToast('상품이 DB에 등록되었습니다! 🎉', 'success');
     }, 1200);
   });
 }

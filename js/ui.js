@@ -560,6 +560,84 @@ DATA.posts = await Promise.all(
     console.warn('DB 게시글 목록 동기화 실패:', err);
   }
 }
+function normalizeProductToDrop(product) {
+  return {
+    id: product.id,
+    em: '📦',
+    badgeCls: '',
+    badgeTxt: product.status || '판매중',
+    status: product.status || '판매중',
+    tag: '',
+    cat: product.category || '기타',
+    brand: product.brand || '',
+    name: product.name || '상품명 없음',
+    seller: product.seller_name || '익명',
+    price: `${Number(product.price || 0).toLocaleString('ko-KR')}원`,
+    rawPrice: Number(product.price || 0),
+    condition: product.condition || '',
+    trade: product.trade_method || '',
+    desc: product.description || '',
+    images: Array.isArray(product.images) ? product.images : [],
+    interest: 0,
+    postedAt: product.created_at || ''
+  };
+}
+
+async function refreshProductsFromDB() {
+  try {
+    const res = await fetch('https://backend.di702934.workers.dev/api/products', {
+      cache: 'no-store'
+    });
+
+    if (!res.ok) {
+      throw new Error('상품 목록을 불러오지 못했습니다.');
+    }
+
+    const products = await res.json();
+
+    if (!Array.isArray(products)) return;
+
+    const drops = products.map(normalizeProductToDrop);
+
+    if (typeof DATA !== 'undefined') {
+      DATA.drops = drops;
+    }
+
+    const dropsPageGrid = document.getElementById('dropsPageGrid');
+
+    if (dropsPageGrid && typeof renderDropCard === 'function') {
+      dropsPageGrid.innerHTML = '';
+
+      drops.forEach(drop => {
+        dropsPageGrid.appendChild(renderDropCard(drop));
+      });
+    }
+
+    const popularGrid = document.getElementById('popularGrid');
+
+    if (popularGrid && typeof renderPopularCard === 'function') {
+      popularGrid.innerHTML = '';
+
+      drops.forEach((drop, i) => {
+        popularGrid.appendChild(renderPopularCard(drop, i));
+      });
+    }
+
+    const homePopularGrid = document.getElementById('homePopularGrid');
+
+    if (homePopularGrid && typeof renderPopularCard === 'function') {
+      homePopularGrid.innerHTML = '';
+
+      drops.slice(0, 4).forEach((drop, i) => {
+        homePopularGrid.appendChild(renderPopularCard(drop, i));
+      });
+    }
+
+    console.log('상품 목록 DB 동기화 완료:', drops.length);
+  } catch (err) {
+    console.warn('상품 목록 DB 동기화 실패:', err);
+  }
+}
 /* ── 게시글 상세보기 ── */
 function openPostDetail(post) {
   window._currentPost = post;
@@ -1603,8 +1681,35 @@ function initCommunityPostSync() {
   run();
 }
 
+function initProductListSync() {
+  let tries = 0;
+
+  const run = () => {
+    const hasData = typeof DATA !== 'undefined';
+    const hasRenderer = typeof renderDropCard === 'function';
+    const hasGrid = document.getElementById('dropsPageGrid');
+
+    if (!hasData || !hasRenderer || !hasGrid) {
+      if (tries < 20) {
+        tries++;
+        setTimeout(run, 100);
+      }
+
+      return;
+    }
+
+    refreshProductsFromDB();
+  };
+
+  run();
+}
+
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initCommunityPostSync);
+  document.addEventListener('DOMContentLoaded', () => {
+    initCommunityPostSync();
+    initProductListSync();
+  });
 } else {
   initCommunityPostSync();
+  initProductListSync();
 }
