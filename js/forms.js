@@ -360,7 +360,97 @@ function saveDraft(form, key) {
 function clearDraft(key) {
   try { localStorage.removeItem(`draft_${key}`); } catch(e) {}
 }
+function updatePostDraftCount() {
+  const countEl = document.getElementById('postDraftCount');
+  if (!countEl) return;
 
+  let hasDraft = false;
+
+  try {
+    const saved = localStorage.getItem('draft_post');
+    if (saved) {
+      const data = JSON.parse(saved);
+
+      hasDraft = Object.entries(data).some(([key, value]) => {
+        if (key === '__tags') {
+          return Array.isArray(value) && value.length > 0;
+        }
+
+        return String(value || '').trim().length > 0;
+      });
+    }
+  } catch (e) {
+    hasDraft = false;
+  }
+
+  countEl.textContent = `임시저장 ${hasDraft ? 1 : 0}`;
+}
+
+function savePostDraftAndCount() {
+  const formEl = document.getElementById('postFormInner');
+  if (!formEl) return;
+
+  saveDraft(formEl, 'post');
+
+  try {
+    const raw = localStorage.getItem('draft_post');
+    const data = raw ? JSON.parse(raw) : {};
+
+    data.__tags = [...document.querySelectorAll('#postTagSelect .tag-opt.sel')]
+      .map(tag => tag.dataset.tag || tag.textContent.trim());
+
+    localStorage.setItem('draft_post', JSON.stringify(data));
+  } catch (e) {}
+
+  updatePostDraftCount();
+}
+
+function restorePostDraftTags() {
+  try {
+    const raw = localStorage.getItem('draft_post');
+    if (!raw) {
+      updatePostDraftCount();
+      return;
+    }
+
+    const data = JSON.parse(raw);
+    const savedTags = Array.isArray(data.__tags) ? data.__tags : [];
+
+    document.querySelectorAll('#postTagSelect .tag-opt').forEach(tag => {
+      const tagName = tag.dataset.tag || tag.textContent.trim();
+      tag.classList.toggle('sel', savedTags.includes(tagName));
+    });
+  } catch (e) {}
+
+  updatePostDraftCount();
+}
+
+function initPostDraftControls() {
+  const draftBtn = document.getElementById('postDraftBtn');
+  const formEl = document.getElementById('postFormInner');
+
+  if (draftBtn && draftBtn.dataset.boundDraftBtn !== '1') {
+    draftBtn.dataset.boundDraftBtn = '1';
+
+    draftBtn.addEventListener('click', () => {
+      savePostDraftAndCount();
+      showToast('임시저장되었습니다.', 'success');
+    });
+  }
+
+  if (formEl && formEl.dataset.boundDraftCount !== '1') {
+    formEl.dataset.boundDraftCount = '1';
+
+    formEl
+      .querySelectorAll('input:not([type=password]):not([type=checkbox]), textarea, select')
+      .forEach(el => {
+        el.addEventListener('input', updatePostDraftCount);
+        el.addEventListener('change', updatePostDraftCount);
+      });
+  }
+
+  restorePostDraftTags();
+}
 /* ─── CLOSE GUARD (닫기 전 확인) ─── */
 function initCloseGuard(modalId, formId, draftKey) {
   const modal = document.getElementById(`modal-${modalId}`);
@@ -658,6 +748,62 @@ function initDropForm() {
     }, 1200);
   });
 }
+function compressPostImage(file, options = {}) {
+  const maxWidth = options.maxWidth || 1600;
+  const maxHeight = options.maxHeight || 1600;
+  const startQuality = options.quality || 0.82;
+  const maxOutputBytes = options.maxOutputBytes || 900 * 1024;
+
+  return new Promise((resolve, reject) => {
+    if (!file || !file.type.startsWith('image/')) {
+      reject(new Error('이미지 파일만 첨부할 수 있어요.'));
+      return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = e => {
+      const img = new Image();
+
+      img.onload = () => {
+        let width = img.width;
+        let height = img.height;
+
+        const ratio = Math.min(1, maxWidth / width, maxHeight / height);
+        width = Math.round(width * ratio);
+        height = Math.round(height * ratio);
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        let quality = startQuality;
+        let dataUrl = canvas.toDataURL('image/jpeg', quality);
+
+        while ((dataUrl.length * 0.75) > maxOutputBytes && quality > 0.45) {
+          quality -= 0.08;
+          dataUrl = canvas.toDataURL('image/jpeg', quality);
+        }
+
+        resolve({
+          dataUrl,
+          width,
+          height,
+          outputKB: Math.round((dataUrl.length * 0.75) / 1024)
+        });
+      };
+
+      img.onerror = () => reject(new Error('이미지를 처리하지 못했어요.'));
+      img.src = e.target.result;
+    };
+
+    reader.onerror = () => reject(new Error('이미지를 읽지 못했어요.'));
+    reader.readAsDataURL(file);
+  });
+}
 function insertIntoPostContent(text, wrapMode = false) {
   const contentEl = document.getElementById('postContent');
   if (!contentEl) return;
@@ -681,8 +827,8 @@ function insertIntoPostContent(text, wrapMode = false) {
   contentEl.focus();
   contentEl.setSelectionRange(nextPos, nextPos);
 
-  contentEl.dispatchEvent(new Event('input', { bubbles: true }));
-  saveDraft(document.getElementById('postFormInner'), 'post');
+contentEl.dispatchEvent(new Event('input', { bubbles: true }));
+savePostDraftAndCount();
 }
 
 function initPostEditorTools() {
@@ -718,22 +864,23 @@ function initPostEditorTools() {
         return;
       }
 
-      if (file.size > 3 * 1024 * 1024) {
-        showToast('이미지는 3MB 이하만 임시 첨부할 수 있어요.', 'error');
-        imageInput.value = '';
-        return;
-      }
+      if (file.size > 15 * 1024 * 1024) {
+  showToast('이미지는 15MB 이하 파일만 첨부할 수 있어요.', 'error');
+  imageInput.value = '';
+  return;
+}
 
-      const reader = new FileReader();
-
-      reader.onload = e => {
-        const dataUrl = e.target.result;
-        insertIntoPostContent(`\n\n![${file.name}](${dataUrl})\n\n`);
-        showToast('이미지가 본문에 추가되었습니다.', 'success');
-      };
-
-      reader.readAsDataURL(file);
-      imageInput.value = '';
+compressPostImage(file)
+  .then(({ dataUrl, outputKB }) => {
+    insertIntoPostContent(`\n\n![${file.name}](${dataUrl})\n\n`);
+    showToast(`이미지가 압축되어 추가되었습니다. (${outputKB}KB)`, 'success');
+  })
+  .catch(err => {
+    showToast(err.message || '이미지 첨부에 실패했어요.', 'error');
+  })
+  .finally(() => {
+    imageInput.value = '';
+  });
     });
   }
 
@@ -764,10 +911,10 @@ function initPostEditorTools() {
     if (tag.dataset.boundTag === '1') return;
     tag.dataset.boundTag = '1';
 
-    tag.addEventListener('click', () => {
-      tag.classList.toggle('sel');
-      saveDraft(document.getElementById('postFormInner'), 'post');
-    });
+   tag.addEventListener('click', () => {
+  tag.classList.toggle('sel');
+  savePostDraftAndCount();
+});
   });
 }
 /* ═══════════════════════════════════════════════════
@@ -790,6 +937,7 @@ function initPostForm() {
   initDraftSave('postFormInner', 'post');
   initCloseGuard('writePost', 'postFormInner', 'post');
   initPostEditorTools();
+  initPostDraftControls();
 
   const settingsToggle = document.getElementById('postSettingsToggle');
 const settingsPanel = document.getElementById('postSettingsPanel');
@@ -880,6 +1028,7 @@ if (settingsToggle && settingsPanel && settingsToggle.dataset.bound !== '1') {
 
       document.querySelectorAll('#postTagSelect .tag-opt.sel')
         .forEach(tag => tag.classList.remove('sel'));
+        updatePostDraftCount();
 
       closeModal('writePost');
       showToast('게시글이 등록되었습니다! 🎉', 'success');
