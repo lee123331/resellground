@@ -500,6 +500,25 @@ function syncPostCommentCount(postId, count) {
     });
   }
 }
+async function getCommentCountFromDB(postId) {
+  if (!postId) return 0;
+
+  try {
+    const res = await fetch(
+      `https://backend.di702934.workers.dev/api/comments/${encodeURIComponent(postId)}`,
+      { cache: 'no-store' }
+    );
+
+    if (!res.ok) return 0;
+
+    const rows = await res.json();
+
+    return Array.isArray(rows) ? rows.length : 0;
+  } catch (err) {
+    console.warn('댓글 수 조회 실패:', err);
+    return 0;
+  }
+}
 async function refreshCommunityPostsFromDB() {
   const postList = document.getElementById('postList');
 
@@ -518,13 +537,19 @@ async function refreshCommunityPostsFromDB() {
 
     if (!Array.isArray(rows)) return;
 
-    DATA.posts = rows.map(post => ({
+DATA.posts = await Promise.all(
+  rows.map(async post => {
+    const dbCommentCount = await getCommentCountFromDB(post.id);
+
+    return {
       ...post,
       tags: Array.isArray(post.tags) ? post.tags : [],
-      comments: Number(post.comments || 0),
+      comments: dbCommentCount,
       likes: Number(post.likes || 0),
       views: Number(post.views || 0)
-    }));
+    };
+  })
+);
 
     postList.innerHTML = '';
 
