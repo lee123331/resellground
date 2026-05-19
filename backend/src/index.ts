@@ -306,7 +306,119 @@ app.get("/api/comments/:postId", async (c) => {
     return c.json({ message: "댓글을 불러오지 못했습니다." }, 500);
   }
 });
+app.post("/api/products", async (c) => {
+  try {
+    const body = await c.req.json();
 
+    const id = String(body.id || `product_${Date.now()}`);
+    const sellerEmail = String(body.seller_email || "");
+    const sellerName = String(body.seller_name || "익명");
+    const name = String(body.name || "").trim();
+    const brand = String(body.brand || "").trim();
+    const category = String(body.category || "").trim();
+    const price = Number(body.price || 0);
+    const condition = String(body.condition || "");
+    const tradeMethod = String(body.trade_method || "");
+    const description = String(body.description || "");
+    const images = JSON.stringify(body.images || []);
+    const status = String(body.status || "판매중");
+
+    if (!name || !category || !price) {
+      return c.json({
+        ok: false,
+        message: "상품명, 카테고리, 가격은 필수입니다."
+      }, 400);
+    }
+
+    await c.env.DB.prepare(`
+      INSERT INTO products (
+        id, seller_email, seller_name, name, brand, category, price,
+        condition, trade_method, description, images, status
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).bind(
+      id,
+      sellerEmail,
+      sellerName,
+      name,
+      brand,
+      category,
+      price,
+      condition,
+      tradeMethod,
+      description,
+      images,
+      status
+    ).run();
+
+    return c.json({
+      ok: true,
+      message: "상품이 등록되었습니다.",
+      product: {
+        id,
+        seller_email: sellerEmail,
+        seller_name: sellerName,
+        name,
+        brand,
+        category,
+        price,
+        condition,
+        trade_method: tradeMethod,
+        description,
+        images: body.images || [],
+        status
+      }
+    }, 201);
+  } catch (err) {
+    console.error(err);
+    return c.json({
+      ok: false,
+      message: "상품 등록 중 오류가 발생했습니다."
+    }, 500);
+  }
+});
+
+app.get("/api/products", async (c) => {
+  try {
+    const result = await c.env.DB.prepare(`
+      SELECT *
+      FROM products
+      ORDER BY created_at DESC
+      LIMIT 50
+    `).all();
+
+    const rows = result.results || [];
+
+    return c.json(rows.map(row => {
+      let images = [];
+
+      try {
+        images = row.images ? JSON.parse(row.images) : [];
+      } catch (e) {
+        images = [];
+      }
+
+      return {
+        id: row.id,
+        seller_email: row.seller_email,
+        seller_name: row.seller_name,
+        name: row.name,
+        brand: row.brand,
+        category: row.category,
+        price: row.price,
+        condition: row.condition,
+        trade_method: row.trade_method,
+        description: row.description,
+        images,
+        status: row.status,
+        created_at: row.created_at
+      };
+    }));
+  } catch (err) {
+    console.error(err);
+    return c.json([], 500);
+  }
+});
 app.get("/api/bookmarks/:email", async (c) => {
   try {
     const email = c.req.param("email");
