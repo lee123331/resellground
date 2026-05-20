@@ -306,6 +306,7 @@ app.get("/api/comments/:postId", async (c) => {
     return c.json({ message: "댓글을 불러오지 못했습니다." }, 500);
   }
 });
+
 app.post("/api/products", async (c) => {
   try {
     const body = await c.req.json();
@@ -316,14 +317,17 @@ app.post("/api/products", async (c) => {
     const name = String(body.name || "").trim();
     const brand = String(body.brand || "").trim();
     const category = String(body.category || "").trim();
-    const price = Number(body.price || 0);
+
+    const priceRaw = String(body.price || "").replace(/[^\d]/g, "");
+    const price = priceRaw ? Number(priceRaw) : 0;
+
     const condition = String(body.condition || "");
     const tradeMethod = String(body.trade_method || "");
     const description = String(body.description || "");
-    const images = JSON.stringify(body.images || []);
+    const images = JSON.stringify(Array.isArray(body.images) ? body.images : []);
     const status = String(body.status || "판매중");
 
-    if (!name || !category || !price) {
+    if (!name || !category || !Number.isFinite(price) || price <= 0) {
       return c.json({
         ok: false,
         message: "상품명, 카테고리, 가격은 필수입니다."
@@ -365,12 +369,13 @@ app.post("/api/products", async (c) => {
         condition,
         trade_method: tradeMethod,
         description,
-        images: body.images || [],
+        images: Array.isArray(body.images) ? body.images : [],
         status
       }
     }, 201);
   } catch (err) {
     console.error(err);
+
     return c.json({
       ok: false,
       message: "상품 등록 중 오류가 발생했습니다."
@@ -380,20 +385,58 @@ app.post("/api/products", async (c) => {
 
 app.get("/api/products", async (c) => {
   try {
+    const pageRaw = Number(c.req.query("page") || 1);
+    const limitRaw = Number(c.req.query("limit") || 12);
+    const category = String(c.req.query("category") || "").trim();
+    const status = String(c.req.query("status") || "").trim();
+
+    const page = Number.isFinite(pageRaw) && pageRaw > 0 ? Math.floor(pageRaw) : 1;
+    const limit = Number.isFinite(limitRaw) && limitRaw > 0
+      ? Math.min(Math.floor(limitRaw), 50)
+      : 12;
+
+    const offset = (page - 1) * limit;
+
+    const where: string[] = [];
+    const binds: unknown[] = [];
+
+    if (category && category !== "전체") {
+      where.push("category = ?");
+      binds.push(category);
+    }
+
+    if (status && status !== "전체") {
+      where.push("status = ?");
+      binds.push(status);
+    }
+
+    const whereSql = where.length ? `WHERE ${where.join(" AND ")}` : "";
+
+    const countResult = await c.env.DB.prepare(`
+      SELECT COUNT(*) AS total
+      FROM products
+      ${whereSql}
+    `).bind(...binds).first();
+
+    const total = Number(countResult?.total || 0);
+    const totalPages = Math.max(1, Math.ceil(total / limit));
+
     const result = await c.env.DB.prepare(`
       SELECT *
       FROM products
+      ${whereSql}
       ORDER BY created_at DESC
-      LIMIT 50
-    `).all();
+      LIMIT ?
+      OFFSET ?
+    `).bind(...binds, limit, offset).all();
 
     const rows = result.results || [];
 
-    return c.json(rows.map(row => {
+    const products = rows.map(row => {
       let images = [];
 
       try {
-        images = row.images ? JSON.parse(row.images) : [];
+        images = row.images ? JSON.parse(String(row.images)) : [];
       } catch (e) {
         images = [];
       }
@@ -413,10 +456,28 @@ app.get("/api/products", async (c) => {
         status: row.status,
         created_at: row.created_at
       };
-    }));
+    });
+
+    return c.json({
+      ok: true,
+      page,
+      limit,
+      total,
+      totalPages,
+      products
+    });
   } catch (err) {
     console.error(err);
-    return c.json([], 500);
+
+    return c.json({
+      ok: false,
+      message: "상품 목록을 불러오지 못했습니다.",
+      page: 1,
+      limit: 12,
+      total: 0,
+      totalPages: 1,
+      products: []
+    }, 500);
   }
 });
 app.get("/api/bookmarks/:email", async (c) => {
@@ -492,77 +553,7 @@ app.delete("/api/bookmarks", async (c) => {
     return c.json({ message: "북마크 삭제 중 오류가 발생했습니다." }, 500);
   }
 });
-app.get("/api/bookmarks/:email", async (c) => {
-  try {
-    const email = c.req.param("email");
 
-    const result = await c.env.DB.prepare(`
-      SELECT bookmarks.post_id, posts.*
-      FROM bookmarks
-      LEFT JOIN posts ON bookmarks.post_id = posts.id
-      WHERE bookmarks.user_email = ?
-      ORDER BY bookmarks.created_at DESC
-    `).bind(email).all();
 
-    return c.json(result.results || []);
-  } catch (err) {
-    console.error(err);
-    return c.json({ message: "북마크를 불러오지 못했습니다." }, 500);
-  }
-});
 
-app.post("/api/bookmarks", async (c) => {
-  try {
-    const body = await c.req.json();
-
-    const id = String(body.id || `bookmark_${Date.now()}`);
-    const userEmail = String(body.user_email || "").trim();
-    const postId = String(body.post_id || "").trim();
-
-    if (!userEmail || !postId) {
-      return c.json({ message: "북마크 정보가 부족합니다." }, 400);
-    }
-
-    await c.env.DB.prepare(`
-      INSERT OR IGNORE INTO bookmarks (
-        id, user_email, post_id
-      )
-      VALUES (?, ?, ?)
-    `).bind(id, userEmail, postId).run();
-
-    return c.json({
-      ok: true,
-      message: "북마크에 저장되었습니다."
-    });
-  } catch (err) {
-    console.error(err);
-    return c.json({ message: "북마크 저장 중 오류가 발생했습니다." }, 500);
-  }
-});
-
-app.delete("/api/bookmarks", async (c) => {
-  try {
-    const body = await c.req.json();
-
-    const userEmail = String(body.user_email || "").trim();
-    const postId = String(body.post_id || "").trim();
-
-    if (!userEmail || !postId) {
-      return c.json({ message: "북마크 정보가 부족합니다." }, 400);
-    }
-
-    await c.env.DB.prepare(`
-      DELETE FROM bookmarks
-      WHERE user_email = ? AND post_id = ?
-    `).bind(userEmail, postId).run();
-
-    return c.json({
-      ok: true,
-      message: "북마크를 해제했습니다."
-    });
-  } catch (err) {
-    console.error(err);
-    return c.json({ message: "북마크 삭제 중 오류가 발생했습니다." }, 500);
-  }
-});
 export default app;

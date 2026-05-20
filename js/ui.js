@@ -366,14 +366,26 @@ document.querySelectorAll('[data-tier]').forEach(btn => {
 });
 document.querySelectorAll('[data-df]').forEach(btn => {
   btn.addEventListener('click', function() {
-    document.querySelectorAll('[data-df]').forEach(b=>b.classList.remove('act'));
+    document.querySelectorAll('[data-df]').forEach(b => b.classList.remove('act'));
     this.classList.add('act');
-    const val = this.dataset.df;
-    const grid = document.getElementById('dropsPageGrid');
-    grid.innerHTML = '';
-    const filterMap = {스니커즈:'스니커즈',명품:'명품',시계:'시계',의류:'의류'};
-    const filtered = val==='전체' ? DATA.drops : DATA.drops.filter(d=>d.cat.includes(filterMap[val]||val));
-    filtered.forEach(d=>grid.appendChild(renderDropCard(d)));
+
+    const val = this.dataset.df || '전체';
+    const filterMap = {
+      스니커즈: '스니커즈',
+      명품: '명품',
+      시계: '시계',
+      의류: '의류'
+    };
+
+    const category = val === '전체' ? '' : (filterMap[val] || val);
+
+    if (typeof refreshProductsFromDB === 'function') {
+      refreshProductsFromDB({
+        page: 1,
+        limit: 12,
+        category
+      });
+    }
   });
 });
 
@@ -572,8 +584,8 @@ function normalizeProductToDrop(product) {
     brand: product.brand || '',
     name: product.name || '상품명 없음',
     seller: product.seller_name || '익명',
-    price: `${Number(product.price || 0).toLocaleString('ko-KR')}원`,
-    rawPrice: Number(product.price || 0),
+    price: `${Number(String(product.price || '0').replace(/[^\d]/g, '') || 0).toLocaleString('ko-KR')}원`,
+rawPrice: Number(String(product.price || '0').replace(/[^\d]/g, '') || 0),
     condition: product.condition || '',
     trade: product.trade_method || '',
     desc: product.description || '',
@@ -583,9 +595,27 @@ function normalizeProductToDrop(product) {
   };
 }
 
-async function refreshProductsFromDB() {
+async function refreshProductsFromDB(options = {}) {
   try {
-    const res = await fetch('https://backend.di702934.workers.dev/api/products', {
+    const page = Number(options.page || 1);
+    const limit = Number(options.limit || 12);
+    const category = String(options.category || '').trim();
+    const status = String(options.status || '').trim();
+
+    const params = new URLSearchParams();
+
+    params.set('page', String(page));
+    params.set('limit', String(limit));
+
+    if (category && category !== '전체') {
+      params.set('category', category);
+    }
+
+    if (status && status !== '전체') {
+      params.set('status', status);
+    }
+
+    const res = await fetch(`https://backend.di702934.workers.dev/api/products?${params.toString()}`, {
       cache: 'no-store'
     });
 
@@ -593,14 +623,31 @@ async function refreshProductsFromDB() {
       throw new Error('상품 목록을 불러오지 못했습니다.');
     }
 
-    const products = await res.json();
+    const data = await res.json();
 
-    if (!Array.isArray(products)) return;
+    const products = Array.isArray(data)
+      ? data
+      : Array.isArray(data.products)
+        ? data.products
+        : [];
 
     const drops = products.map(normalizeProductToDrop);
 
     if (typeof DATA !== 'undefined') {
       DATA.drops = drops;
+      DATA.productsMeta = Array.isArray(data)
+        ? {
+            page: 1,
+            limit: drops.length,
+            total: drops.length,
+            totalPages: 1
+          }
+        : {
+            page: data.page || page,
+            limit: data.limit || limit,
+            total: data.total || drops.length,
+            totalPages: data.totalPages || 1
+          };
     }
 
     const dropsPageGrid = document.getElementById('dropsPageGrid');
@@ -608,9 +655,19 @@ async function refreshProductsFromDB() {
     if (dropsPageGrid && typeof renderDropCard === 'function') {
       dropsPageGrid.innerHTML = '';
 
-      drops.forEach(drop => {
-        dropsPageGrid.appendChild(renderDropCard(drop));
-      });
+      if (drops.length === 0) {
+        dropsPageGrid.innerHTML = `
+          <div class="empty-state">
+            <p class="empty-state__icon">📦</p>
+            <p class="empty-state__title">등록된 상품이 없어요</p>
+            <p class="empty-state__desc">선택한 조건에 맞는 상품이 없습니다.</p>
+          </div>
+        `;
+      } else {
+        drops.forEach(drop => {
+          dropsPageGrid.appendChild(renderDropCard(drop));
+        });
+      }
     }
 
     const popularGrid = document.getElementById('popularGrid');
@@ -633,7 +690,10 @@ async function refreshProductsFromDB() {
       });
     }
 
-    console.log('상품 목록 DB 동기화 완료:', drops.length);
+    console.log('상품 목록 DB 동기화 완료:', {
+      count: drops.length,
+      meta: DATA?.productsMeta
+    });
   } catch (err) {
     console.warn('상품 목록 DB 동기화 실패:', err);
   }
