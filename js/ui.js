@@ -370,6 +370,7 @@ document.querySelectorAll('[data-df]').forEach(btn => {
     this.classList.add('act');
 
     const val = this.dataset.df || '전체';
+
     const filterMap = {
       스니커즈: '스니커즈',
       명품: '명품',
@@ -382,13 +383,12 @@ document.querySelectorAll('[data-df]').forEach(btn => {
     if (typeof refreshProductsFromDB === 'function') {
       refreshProductsFromDB({
         page: 1,
-        limit: 12,
+        limit: PRODUCT_PAGE_STATE.limit || 12,
         category
       });
     }
   });
 });
-
 /* ── 커뮤니티 게시판 ── */
 document.querySelectorAll('[data-board]').forEach(link => {
   link.addEventListener('click', function() {
@@ -594,25 +594,36 @@ rawPrice: Number(String(product.price || '0').replace(/[^\d]/g, '') || 0),
     postedAt: product.created_at || ''
   };
 }
-
+const PRODUCT_PAGE_STATE = {
+  page: 1,
+  limit: 12,
+  category: '',
+  status: ''
+};
 async function refreshProductsFromDB(options = {}) {
   try {
-    const page = Number(options.page || 1);
-    const limit = Number(options.limit || 12);
-    const category = String(options.category || '').trim();
-    const status = String(options.status || '').trim();
+    PRODUCT_PAGE_STATE.page = Number(options.page || PRODUCT_PAGE_STATE.page || 1);
+    PRODUCT_PAGE_STATE.limit = Number(options.limit || PRODUCT_PAGE_STATE.limit || 12);
+
+    if (Object.prototype.hasOwnProperty.call(options, 'category')) {
+      PRODUCT_PAGE_STATE.category = String(options.category || '').trim();
+    }
+
+    if (Object.prototype.hasOwnProperty.call(options, 'status')) {
+      PRODUCT_PAGE_STATE.status = String(options.status || '').trim();
+    }
 
     const params = new URLSearchParams();
 
-    params.set('page', String(page));
-    params.set('limit', String(limit));
+    params.set('page', String(PRODUCT_PAGE_STATE.page));
+    params.set('limit', String(PRODUCT_PAGE_STATE.limit));
 
-    if (category && category !== '전체') {
-      params.set('category', category);
+    if (PRODUCT_PAGE_STATE.category && PRODUCT_PAGE_STATE.category !== '전체') {
+      params.set('category', PRODUCT_PAGE_STATE.category);
     }
 
-    if (status && status !== '전체') {
-      params.set('status', status);
+    if (PRODUCT_PAGE_STATE.status && PRODUCT_PAGE_STATE.status !== '전체') {
+      params.set('status', PRODUCT_PAGE_STATE.status);
     }
 
     const res = await fetch(`https://backend.di702934.workers.dev/api/products?${params.toString()}`, {
@@ -637,16 +648,16 @@ async function refreshProductsFromDB(options = {}) {
       DATA.drops = drops;
       DATA.productsMeta = Array.isArray(data)
         ? {
-            page: 1,
-            limit: drops.length,
+            page: PRODUCT_PAGE_STATE.page,
+            limit: PRODUCT_PAGE_STATE.limit,
             total: drops.length,
             totalPages: 1
           }
         : {
-            page: data.page || page,
-            limit: data.limit || limit,
-            total: data.total || drops.length,
-            totalPages: data.totalPages || 1
+            page: Number(data.page || PRODUCT_PAGE_STATE.page),
+            limit: Number(data.limit || PRODUCT_PAGE_STATE.limit),
+            total: Number(data.total || drops.length),
+            totalPages: Number(data.totalPages || 1)
           };
     }
 
@@ -690,6 +701,8 @@ async function refreshProductsFromDB(options = {}) {
       });
     }
 
+    renderProductPagination();
+
     console.log('상품 목록 DB 동기화 완료:', {
       count: drops.length,
       meta: DATA?.productsMeta
@@ -697,6 +710,66 @@ async function refreshProductsFromDB(options = {}) {
   } catch (err) {
     console.warn('상품 목록 DB 동기화 실패:', err);
   }
+}
+function renderProductPagination() {
+  const grid = document.getElementById('dropsPageGrid');
+  if (!grid || typeof DATA === 'undefined') return;
+
+  const meta = DATA.productsMeta || {
+    page: 1,
+    limit: 12,
+    total: 0,
+    totalPages: 1
+  };
+
+  let pager = document.getElementById('productPagination');
+
+  if (!pager) {
+    pager = document.createElement('div');
+    pager.id = 'productPagination';
+    pager.className = 'product-pagination';
+    grid.insertAdjacentElement('afterend', pager);
+  }
+
+  const page = Number(meta.page || 1);
+  const totalPages = Number(meta.totalPages || 1);
+  const total = Number(meta.total || 0);
+
+  if (totalPages <= 1) {
+    pager.innerHTML = '';
+    pager.style.display = 'none';
+    return;
+  }
+
+  pager.style.display = 'flex';
+
+  pager.innerHTML = `
+    <button class="product-pagination__btn" type="button" data-page="prev" ${page <= 1 ? 'disabled' : ''}>
+      이전
+    </button>
+
+    <span class="product-pagination__info">
+      ${page} / ${totalPages} 페이지 · 총 ${total.toLocaleString('ko-KR')}개
+    </span>
+
+    <button class="product-pagination__btn" type="button" data-page="next" ${page >= totalPages ? 'disabled' : ''}>
+      다음
+    </button>
+  `;
+
+  pager.querySelectorAll('[data-page]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const type = btn.dataset.page;
+
+      if (type === 'prev' && page > 1) {
+        refreshProductsFromDB({ page: page - 1 });
+      }
+
+      if (type === 'next' && page < totalPages) {
+        refreshProductsFromDB({ page: page + 1 });
+      }
+    });
+  });
 }
 /* ── 게시글 상세보기 ── */
 function openPostDetail(post) {
