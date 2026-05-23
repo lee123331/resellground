@@ -1957,3 +1957,4 @@ async function openProductDetailFromDB(productId) {
     showToast('상품 상세 정보를 불러오지 못했습니다.', 'error');
   }
 }
+window.openProductDetailFromDB = openProductDetailFromDB;
