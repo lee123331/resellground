@@ -135,11 +135,21 @@
         </div>
       </div>
     `;
-    div.style.cursor = 'pointer';
-    div.addEventListener('click', () => {
-      if (typeof openProductModal === 'function') openProductModal(drop);
-    });
-    return div;
+  div.style.cursor = 'pointer';
+div.dataset.productId = drop.id || '';
+
+div.addEventListener('click', () => {
+  if (typeof openProductDetailFromDB === 'function') {
+    openProductDetailFromDB(drop.id);
+    return;
+  }
+
+  if (typeof openProductModal === 'function') {
+    openProductModal(drop);
+  }
+});
+
+return div;
   }
 
   /* ── RANK ITEM ── */

@@ -1,31 +1,31 @@
 HEAD
 'use strict';
-/* ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═??
-   리�?그라?�드 ??버튼 ?�결 + 부??
-?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═??*/
+/* ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═??
+   리�?그라?�드 ??버튼 ?�결 + 부??
+?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═??*/
 
 function openLoginModal() { openModal('login'); }
 
-/* ?�로???�태 ?�데?�트 ??로그??비로그인???�라 ?�단 버튼 변�?*/
+/* ?�로???�태 ?�데?�트 ??로그??비로그인???�라 ?�단 버튼 변�?*/
 function updateDrawerState() {
   const actions = document.querySelector('.drawer__actions');
   if (!actions) return;
 
  if (S.loggedIn) {
-  // 로그???�태: 마이?�이지 + 로그?�웃
+  // 로그???�태: 마이?�이지 + 로그?�웃
   const userName = document.querySelector('.mp-name')?.textContent || '??계정';
 
   actions.innerHTML = `
     <button class="btn btn--g btn--full" id="loginBtnM" style="text-align:left;justify-content:flex-start;gap:8px">
-      <span style="font-size:20px">?��</span>
+      <span style="font-size:20px">?��</span>
       <span>
         <span style="display:block;font-size:13px;font-weight:800;color:var(--text)">${userName}</span>
-        <span style="display:block;font-size:11px;color:var(--text-mute)">마이?�이지 ??/span>
+        <span style="display:block;font-size:11px;color:var(--text-mute)">마이?�이지 ??/span>
       </span>
     </button>
 
     <button class="btn btn--outline-brand btn--full" id="logoutBtnM">
-      로그?�웃
+      로그?�웃
     </button>
   `;
 
@@ -40,10 +40,10 @@ function updateDrawerState() {
     if (typeof updateDrawerState === 'function') updateDrawerState();
   });
 } else {
-    // 비로그인 ?�태: 로그??+ ?�트???�청
+    // 비로그인 ?�태: 로그??+ ?�트???�청
     actions.innerHTML = `
       <button class="btn btn--g" id="loginBtnM">로그??/button>
-      <button class="btn btn--p" id="preregBtnM">?�트???�청</button>
+      <button class="btn btn--p" id="preregBtnM">?�트???�청</button>
     `;
     document.getElementById('loginBtnM').addEventListener('click', () => {
       closeMobileDrawer();
@@ -97,7 +97,7 @@ if (preregBtnM) {
 const ctaBtn = document.getElementById('ctaBtn');
 if (ctaBtn) ctaBtn.addEventListener('click', () => openModal('prereg'));
 
-/* 로그???�요 버튼??*/
+/* 로그???�요 버튼??*/
 const profileBtn = document.getElementById('profileBtn');
 
 if (profileBtn) {
@@ -125,21 +125,21 @@ if (addDropBtn) {
   });
 }
 
-/* 마이?�이지 ?�??*/
+/* 마이?�이지 ?�??*/
 const mpSaveBtn = document.getElementById('mpSaveBtn');
 if (mpSaveBtn) mpSaveBtn.addEventListener('click', function() {
-  this.classList.add('btn--load'); this.textContent = '?�??�?..';
-  setTimeout(()=>{ this.classList.remove('btn--load'); this.textContent='?�?�하�?; showToast('?�로?�이 ?�?�됐?�요.','success'); }, 800);
+  this.classList.add('btn--load'); this.textContent = '?�??�?..';
+  setTimeout(()=>{ this.classList.remove('btn--load'); this.textContent='?�?�하�?; showToast('?�로?�이 ?�?�됐?�요.','success'); }, 800);
 });
 
-/* 고객?�터 문의 */
+/* 고객?�터 문의 */
 const supportBtn = document.getElementById('supportBtn');
 if (supportBtn) supportBtn.addEventListener('click', function() {
-  this.classList.add('btn--load'); this.textContent='?�송 �?..';
-  setTimeout(()=>{ this.classList.remove('btn--load'); this.textContent='문의 보내�?; showToast('문의가 ?�수?�어?? 빠르�??��??�릴게요.','success'); }, 1000);
+  this.classList.add('btn--load'); this.textContent='?�송 �?..';
+  setTimeout(()=>{ this.classList.remove('btn--load'); this.textContent='문의 보내�?; showToast('문의가 ?�수?�어?? 빠르�??��??�릴게요.','success'); }, 1000);
 });
 
-/* ?�� ?�시�?거래 로그 ?�동 갱신 */
+/* ?�� ?�시�?거래 로그 ?�동 갱신 */
 function startTradeLogRotation() {
   let idx = 0;
   setInterval(() => {
@@ -153,7 +153,7 @@ function startTradeLogRotation() {
   }, 5000);
 }
 
-/* ?�� ?�림 카운???�데?�트 */
+/* ?�� ?�림 카운???�데?�트 */
 function updateNotifBadge() {
   const unread = DATA.notifications.filter(n => !n.read).length;
   const badge = document.getElementById('notifBadge');
@@ -164,7 +164,7 @@ function updateNotifBadge() {
 }
 
 
-/* ??KPI 카운?�업 ?�니메이??*/
+/* ??KPI 카운?�업 ?�니메이??*/
 function animateCountUp(el, target, duration=1200, suffix='') {
   const start = 0;
   const startTime = performance.now();
@@ -189,7 +189,7 @@ function animateCountUp(el, target, duration=1200, suffix='') {
 function initKpiAnimation() {
   const kpiMap = [
     { selector: '.kpi-card:nth-child(2) .kpi-card__value', target: 1248, suffix: '' },
-    { selector: '.kpi-card:nth-child(3) .kpi-card__value', target: 247,  suffix: '�? },
+    { selector: '.kpi-card:nth-child(3) .kpi-card__value', target: 247,  suffix: '�? },
   ];
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
@@ -212,7 +212,7 @@ function initKpiAnimation() {
   if (kpiSection) observer.observe(kpiSection);
 }
 
-/* ?�시�?거래 ?�황 ?�자 카운?�업 (trade-bar) */
+/* ?�시�?거래 ?�황 ?�자 카운?�업 (trade-bar) */
 function initTradeBarAnimation() {
   const bars = document.querySelectorAll('.trade-bar__num');
   const observer = new IntersectionObserver(entries => {
@@ -223,7 +223,7 @@ function initTradeBarAnimation() {
         if (el.dataset.animated) return;
         el.dataset.animated = '1';
 
-       // ?�수�?2.5%???�자 카운?�업 ?�?�에???�외
+       // ?�수�?2.5%???�자 카운?�업 ?�?�에???�외
 if (el.classList.contains('brand')) {
   el.dataset.animated = '1';
   el.textContent = '2.5%';
@@ -250,7 +250,7 @@ async function loadPostsFromDB() {
     const res = await fetch('https://resellground.di702934.workers.dev/api/posts');
 
     if (!res.ok) {
-      throw new Error('게시글??불러?��? 못했?�니??');
+      throw new Error('게시글??불러?��? 못했?�니??');
     }
 
     const posts = await res.json();
@@ -271,9 +271,9 @@ async function loadPostsFromDB() {
       });
     }
 
-    console.log('DB 게시글 불러?�기 ?�료');
+    console.log('DB 게시글 불러?�기 ?�료');
   } catch (err) {
-    console.warn('DB 게시글 불러?�기 ?�패:', err);
+    console.warn('DB 게시글 불러?�기 ?�패:', err);
   }
 }
 /* BOOT */
@@ -300,7 +300,7 @@ if (typeof initTypingEvent === 'function') initTypingEvent();
 if (typeof renderWeeklyTop === 'function') renderWeeklyTop();
 if (typeof _hookPostDetail === 'function') _hookPostDetail();
 
-/* 주간 TOP ?�??그리??*/
+/* 주간 TOP ?�??그리??*/
 function renderWeeklyTop() {
   const grid = document.getElementById('weeklyTopGrid');
   if (!grid) return;
@@ -312,7 +312,7 @@ function renderWeeklyTop() {
         <p class="weekly-seller-name">${s.name}</p>
         <p class="weekly-seller-spec">${s.cat} · ${s.loc}</p>
       </div>
-      <span class="weekly-seller-count">${s.sales}�?/span>
+      <span class="weekly-seller-count">${s.sales}�?/span>
     </div>
   `).join('');
 }
