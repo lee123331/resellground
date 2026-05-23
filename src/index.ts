@@ -443,21 +443,22 @@ app.get("/api/products", async (c) => {
         images = [];
       }
 
-      return {
-        id: row.id,
-        seller_email: row.seller_email,
-        seller_name: row.seller_name,
-        name: row.name,
-        brand: row.brand,
-        category: row.category,
-        price: row.price,
-        condition: row.condition,
-        trade_method: row.trade_method,
-        description: row.description,
-        images,
-        status: row.status,
-        created_at: row.created_at
-      };
+     return {
+  id: row.id,
+  seller_email: row.seller_email,
+  seller_name: row.seller_name,
+  name: row.name,
+  brand: row.brand,
+  category: row.category,
+  price: row.price,
+  condition: row.condition,
+  trade_method: row.trade_method,
+  description: row.description,
+  images,
+  status: row.status,
+  views: Number(row.views || 0),
+  created_at: row.created_at
+};
     });
 
     return c.json({
@@ -476,6 +477,158 @@ app.get("/api/products", async (c) => {
       message: "상품 목록을 불러오지 못했습니다.",
       page: 1,
       limit: 12,
+      total: 0,
+      totalPages: 1,
+      products: []
+    }, 500);
+  }
+});
+function normalizeProductRow(row: any) {
+  let images = [];
+
+  try {
+    images = row.images ? JSON.parse(String(row.images)) : [];
+  } catch (e) {
+    images = [];
+  }
+
+  return {
+    id: row.id,
+    seller_email: row.seller_email,
+    seller_name: row.seller_name,
+    name: row.name,
+    brand: row.brand,
+    category: row.category,
+    price: row.price,
+    condition: row.condition,
+    trade_method: row.trade_method,
+    description: row.description,
+    images,
+    status: row.status,
+    views: Number(row.views || 0),
+    created_at: row.created_at
+  };
+}
+
+app.get("/api/products/:id", async (c) => {
+  try {
+    const id = String(c.req.param("id") || "").trim();
+
+    if (!id) {
+      return c.json({
+        ok: false,
+        message: "상품 ID가 필요합니다."
+      }, 400);
+    }
+
+    const exists = await c.env.DB.prepare(`
+      SELECT id
+      FROM products
+      WHERE id = ?
+      LIMIT 1
+    `).bind(id).first();
+
+    if (!exists) {
+      return c.json({
+        ok: false,
+        message: "상품을 찾을 수 없습니다."
+      }, 404);
+    }
+
+    await c.env.DB.prepare(`
+      UPDATE products
+      SET views = COALESCE(views, 0) + 1
+      WHERE id = ?
+    `).bind(id).run();
+
+    const row = await c.env.DB.prepare(`
+      SELECT *
+      FROM products
+      WHERE id = ?
+      LIMIT 1
+    `).bind(id).first();
+
+    return c.json({
+      ok: true,
+      product: normalizeProductRow(row)
+    });
+  } catch (err) {
+    console.error(err);
+
+    return c.json({
+      ok: false,
+      message: "상품 상세 정보를 불러오지 못했습니다."
+    }, 500);
+  }
+});
+
+app.get("/api/user/products", async (c) => {
+  try {
+    const email = String(
+      c.req.query("email") ||
+      c.req.query("seller_email") ||
+      ""
+    ).trim();
+
+    const pageRaw = Number(c.req.query("page") || 1);
+    const limitRaw = Number(c.req.query("limit") || 20);
+
+    const page = Number.isFinite(pageRaw) && pageRaw > 0 ? Math.floor(pageRaw) : 1;
+
+    const limit = Number.isFinite(limitRaw) && limitRaw > 0
+      ? Math.min(Math.floor(limitRaw), 50)
+      : 20;
+
+    const offset = (page - 1) * limit;
+
+    if (!email) {
+      return c.json({
+        ok: false,
+        message: "이메일이 필요합니다.",
+        page,
+        limit,
+        total: 0,
+        totalPages: 1,
+        products: []
+      }, 400);
+    }
+
+    const countResult = await c.env.DB.prepare(`
+      SELECT COUNT(*) AS total
+      FROM products
+      WHERE seller_email = ?
+    `).bind(email).first();
+
+    const total = Number(countResult?.total || 0);
+    const totalPages = Math.max(1, Math.ceil(total / limit));
+
+    const result = await c.env.DB.prepare(`
+      SELECT *
+      FROM products
+      WHERE seller_email = ?
+      ORDER BY created_at DESC
+      LIMIT ?
+      OFFSET ?
+    `).bind(email, limit, offset).all();
+
+    const rows = result.results || [];
+
+    return c.json({
+      ok: true,
+      page,
+      limit,
+      total,
+      totalPages,
+      products: rows.map(normalizeProductRow)
+    });
+  } catch (err) {
+    console.error(err);
+
+    return c.json({
+      ok: false,
+      message: "내 상품 목록을 불러오지 못했습니다.",
+      page: 1,
+      limit: 20,
       total: 0,
       totalPages: 1,
       products: []
