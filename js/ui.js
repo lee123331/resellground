@@ -1917,3 +1917,43 @@ if (popularLoadMoreBtn) {
     }
   });
 }
+async function openProductDetailFromDB(productId) {
+  if (!productId) {
+    showToast('상품 ID가 없습니다.', 'error');
+    return;
+  }
+
+  try {
+    const res = await fetch(
+      `https://resellground.di702934.workers.dev/api/products/${encodeURIComponent(productId)}`,
+      { cache: 'no-store' }
+    );
+
+    if (!res.ok) {
+      throw new Error('상품 상세 정보를 불러오지 못했습니다.');
+    }
+
+    const data = await res.json();
+    const product = data.product;
+
+    if (!product) {
+      throw new Error('상품 데이터가 없습니다.');
+    }
+
+    const drop = typeof normalizeProductToDrop === 'function'
+      ? normalizeProductToDrop(product)
+      : product;
+
+    console.log('상품 상세 조회 성공:', product);
+
+    if (typeof openProductModal === 'function') {
+      openProductModal(drop);
+      return;
+    }
+
+    showToast(`${product.name || '상품'} 조회 완료 · 조회수 ${product.views || 0}`, 'success');
+  } catch (err) {
+    console.error(err);
+    showToast('상품 상세 정보를 불러오지 못했습니다.', 'error');
+  }
+}
