@@ -1187,6 +1187,173 @@
   min-height:100px;
   resize:vertical;
 }
+
+/* ── 스켈레톤 애니메이션 ── */
+.skel-box,.skel-line{
+  background:#e5e7eb;
+  animation:skelPulse 1.3s ease-in-out infinite;
+}
+.skel-box{
+  width:100%;
+  aspect-ratio:1;
+  border-radius:var(--radius,8px);
+}
+@keyframes skelPulse{
+  0%,100%{opacity:1}
+  50%{opacity:.45}
+}
+
+/* ── 상품 상세 모달 (modal-product) ── */
+.modal--product{
+  max-width:500px;
+}
+.pd-modal-body{
+  display:flex;
+  flex-direction:column;
+  gap:var(--s4,16px);
+}
+.pd-product-img-wrap{
+  position:relative;
+  width:100%;
+  max-height:220px;
+  aspect-ratio:1;
+  border-radius:var(--radius,8px);
+  background:linear-gradient(135deg,#f3f4f6,#e5e7eb);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:80px;
+  overflow:hidden;
+}
+.pd-product-badge{
+  position:absolute;
+  top:10px;
+  left:10px;
+  font-size:11px;
+  font-weight:800;
+  padding:2px 8px;
+  border-radius:4px;
+  letter-spacing:.5px;
+  text-transform:uppercase;
+}
+.pd-product-badge.hot{background:#dc2626;color:#fff}
+.pd-product-badge.new{background:#2563eb;color:#fff}
+.pd-product-badge.rare{background:#7c3aed;color:#fff}
+.pd-product-info{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.pd-product-cat{
+  font-size:12px;
+  color:var(--text-mute,#9ca3af);
+  font-weight:600;
+  text-transform:uppercase;
+  letter-spacing:.5px;
+}
+.pd-product-name{
+  font-size:17px;
+  font-weight:800;
+  color:var(--text,#111827);
+  line-height:1.35;
+}
+.pd-product-seller{
+  font-size:13px;
+  color:var(--text-sub,#4b5563);
+}
+.pd-product-price{
+  font-size:22px;
+  font-weight:800;
+  color:var(--brand,#111827);
+}
+.pd-product-tags{
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+}
+.pd-product-actions{
+  display:flex;
+  gap:var(--s3,12px);
+}
+.pd-product-actions .btn{
+  flex:1;
+}
+
+/* ── 내 상품 아이템 (mpi) ── */
+.mpi{
+  display:flex;
+  align-items:center;
+  gap:var(--s4,16px);
+  padding:var(--s4,16px);
+  background:var(--bg-soft,#f9fafb);
+  border-radius:var(--radius,8px);
+  border:1px solid var(--border,#e5e7eb);
+  cursor:pointer;
+  transition:box-shadow var(--fast,.15s);
+  margin-bottom:var(--s3,12px);
+}
+.mpi:hover{
+  box-shadow:var(--shadow,0 2px 8px rgba(0,0,0,.08));
+}
+.mpi__em{
+  font-size:28px;
+  width:48px;
+  height:48px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#fff;
+  border-radius:var(--radius,8px);
+  border:1px solid var(--border,#e5e7eb);
+  flex-shrink:0;
+}
+.mpi__info{
+  flex:1;
+  min-width:0;
+}
+.mpi__name{
+  font-size:14px;
+  font-weight:700;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.mpi__meta{
+  font-size:12px;
+  color:var(--text-sub,#4b5563);
+  margin-top:2px;
+}
+.mpi__status{
+  display:inline-block;
+  font-size:11px;
+  font-weight:700;
+  padding:2px 8px;
+  border-radius:20px;
+  margin-top:4px;
+}
+.mpi__status--active  {background:#d1fae5;color:#065f46}
+.mpi__status--reserved{background:#fef3c7;color:#92400e}
+.mpi__status--sold    {background:#f3f4f6;color:#6b7280}
+.mpi__actions{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  flex-shrink:0;
+}
+.mpi__btn{
+  font-size:11px;
+  font-weight:700;
+  padding:5px 10px;
+  border-radius:6px;
+  border:1px solid var(--border,#e5e7eb);
+  cursor:pointer;
+  background:#fff;
+  transition:background var(--fast,.15s);
+  white-space:nowrap;
+}
+.mpi__btn:hover{background:var(--bg-soft,#f9fafb)}
+.mpi__btn--delete{color:#dc2626;border-color:#fecaca}
+.mpi__btn--delete:hover{background:#fef2f2}
 /* ═══ 호환 유지용 추가 스타일 — 댓글/북마크/온라인 상태 ═══ */
 
 /* 북마크 활성 */

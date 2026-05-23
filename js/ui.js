@@ -13,8 +13,17 @@ function navigateTo(pageId) {
   window.scrollTo({top:0,behavior:'smooth'});
   closeMobileDrawer();
   if (pageId === 'mypage' && typeof refreshMpBookmarks === 'function') {
-  refreshMpBookmarks();
-}
+    refreshMpBookmarks();
+  }
+  if (pageId === 'popular-products') {
+    S.popularPage = 1;
+    S.popularCategory = '전체';
+    S.popularHasMore = true;
+    document.querySelectorAll('[data-pop-cat]').forEach(b =>
+      b.classList.toggle('act', b.dataset.popCat === '전체')
+    );
+    if (typeof loadPopularProducts === 'function') loadPopularProducts(false);
+  }
   /* 하단 네비 활성 표시 */
   document.querySelectorAll('.bottom-nav__item').forEach(item => {
     item.classList.toggle('act', item.dataset.goto === pageId);
@@ -398,10 +407,15 @@ document.querySelectorAll('[data-board]').forEach(link => {
 });
 
 /* ── 마이페이지 네비 ── */
-document.querySelectorAll('.mp-nav-link').forEach(link => {
+document.querySelectorAll('[data-mp-tab]').forEach(link => {
   link.addEventListener('click', function() {
-    document.querySelectorAll('.mp-nav-link').forEach(l=>l.classList.remove('act'));
+    document.querySelectorAll('.mp-nav-link').forEach(l => l.classList.remove('act'));
     this.classList.add('act');
+    const tab = this.dataset.mpTab;
+    document.querySelectorAll('.mp-panel').forEach(p => { p.style.display = 'none'; });
+    const panel = document.getElementById(`mp-panel-${tab}`);
+    if (panel) panel.style.display = '';
+    if (tab === 'myproducts' && typeof loadMyProducts === 'function') loadMyProducts();
   });
 });
 
@@ -1845,4 +1859,61 @@ if (document.readyState === 'loading') {
 } else {
   initCommunityPostSync();
   initProductListSync();
+}
+
+/* ── 상품 상세 모달 열기 ── */
+function openProductModal(product) {
+  if (!product) return;
+  const title  = document.getElementById('pdProductTitle');
+  const img    = document.getElementById('pdProductImg');
+  const badge  = document.getElementById('pdProductBadge');
+  const cat    = document.getElementById('pdProductCat');
+  const name   = document.getElementById('pdProductName');
+  const seller = document.getElementById('pdProductSeller');
+  const price  = document.getElementById('pdProductPrice');
+  const tags   = document.getElementById('pdProductTags');
+
+  if (title)  title.textContent  = product.name || '상품 상세';
+  if (img)    img.textContent    = product.em   || '📦';
+  if (badge) {
+    badge.textContent  = product.badgeTxt || '';
+    badge.className    = `pd-product-badge ${product.badgeCls || ''}`.trim();
+  }
+  if (cat)    cat.textContent    = product.cat  || '';
+  if (name)   name.textContent   = product.name || '';
+  if (seller) seller.textContent = `by ${product.seller || ''}`;
+  if (price)  price.textContent  = product.price || '';
+  if (tags) {
+    let html = '';
+    if (product.status === '판매완료') html += `<span class="drop-tag sold">판매완료</span>`;
+    else if (product.status === '예약중') html += `<span class="drop-tag reserved">예약중</span>`;
+    if (product.tag === '빠른거래') html += `<span class="drop-tag fast">빠른거래</span>`;
+    if (product.tag === '인증셀러') html += `<span class="drop-tag cert">인증셀러</span>`;
+    if (product.tag === '협업모집') html += `<span class="drop-tag collab">협업모집</span>`;
+    tags.innerHTML = html;
+  }
+  openModal('product');
+}
+
+/* ── 인기상품 카테고리 탭 ── */
+document.querySelectorAll('[data-pop-cat]').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('[data-pop-cat]').forEach(b => b.classList.remove('act'));
+    this.classList.add('act');
+    S.popularCategory = this.dataset.popCat || '전체';
+    S.popularPage = 1;
+    S.popularHasMore = true;
+    if (typeof loadPopularProducts === 'function') loadPopularProducts(false);
+  });
+});
+
+/* ── 인기상품 더보기 버튼 ── */
+const popularLoadMoreBtn = document.getElementById('popularLoadMoreBtn');
+if (popularLoadMoreBtn) {
+  popularLoadMoreBtn.addEventListener('click', () => {
+    if (S.popularHasMore && !S.popularLoading) {
+      S.popularPage++;
+      if (typeof loadPopularProducts === 'function') loadPopularProducts(true);
+    }
+  });
 }

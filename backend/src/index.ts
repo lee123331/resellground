@@ -10,16 +10,63 @@ const app = new Hono<{ Bindings: Bindings }>();
 app.use(
   "*",
   cors({
-    origin: "https://resellground.pages.dev",
+    origin: (origin) => {
+      const allowed = [
+        "https://resellground.pages.dev",
+        "http://localhost:8787",
+        "http://127.0.0.1:5500",
+        "http://localhost:5500",
+        "http://127.0.0.1:3000",
+        "http://localhost:3000",
+      ];
+      return allowed.includes(origin) ? origin : "https://resellground.pages.dev";
+    },
     allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowHeaders: ["Content-Type", "Authorization"],
   })
 );
 
 app.get("/", (c) => {
-  return c.json({
-    message: "ResellGround API running",
-  });
+  return c.json({ message: "ResellGround API running" });
+});
+
+app.get("/api/products", async (c) => {
+  try {
+    const category = c.req.query("category") || "전체";
+    const page = Math.max(1, parseInt(c.req.query("page") || "1"));
+    const limit = Math.min(20, Math.max(1, parseInt(c.req.query("limit") || "8")));
+    const sort = c.req.query("sort") || "popular";
+    const offset = (page - 1) * limit;
+
+    const params: (string | number)[] = [];
+    let whereClause = "";
+    if (category !== "전체") {
+      whereClause = "WHERE cat = ?";
+      params.push(category);
+    }
+
+    const orderMap: Record<string, string> = {
+      popular: "interest DESC, view_count DESC",
+      new: "created_at DESC",
+      price_asc: "price_num ASC",
+      price_desc: "price_num DESC",
+    };
+    const orderClause = `ORDER BY ${orderMap[sort] ?? orderMap.popular}`;
+
+    const countResult = await c.env.DB.prepare(
+      `SELECT COUNT(*) as total FROM products ${whereClause}`
+    ).bind(...params).first<{ total: number }>();
+    const total = countResult?.total ?? 0;
+
+    const rows = await c.env.DB.prepare(
+      `SELECT * FROM products ${whereClause} ${orderClause} LIMIT ? OFFSET ?`
+    ).bind(...params, limit, offset).all();
+
+    return c.json({ items: rows.results, total, page, limit, hasMore: offset + limit < total });
+  } catch (err) {
+    console.error(err);
+    return c.json({ message: "서버 오류가 발생했습니다." }, 500);
+  }
 });
 
 app.post("/api/auth/signup", async (c) => {

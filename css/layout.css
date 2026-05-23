@@ -292,7 +292,7 @@
 
 /* ── MARQUEE ── */
 .mq{border-top:1px solid var(--border);border-bottom:1px solid var(--border);overflow:hidden;padding:6px 0;background:#fff}
-.mq__track{display:flex;animation:mqS 26s linear infinite;width:max-content}
+.mq__track{display:flex;animation:mqS 60s linear infinite;width:max-content}
 @keyframes mqS{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 .mq__item{font-size:12px;font-weight:600;color:var(--text-mute);padding:0 var(--s5);white-space:nowrap}
 .mq__item.hi{color:var(--three)}

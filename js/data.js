@@ -3,6 +3,13 @@
    리셀그라운드 — 상태 + 데이터
 ═══════════════════════════════════════════ */
 
+/* 배포 후 실제 Workers URL로 교체 */
+const API_BASE = (() => {
+  const h = window.location.hostname;
+  if (h === 'resellground.pages.dev') return 'https://backend.resellground.workers.dev';
+  return 'http://localhost:8787';
+})();
+
 const S = {
   page: 'home',
   loggedIn: false,
@@ -12,6 +19,10 @@ const S = {
   openModals: new Set(),
   feedTimer: null,
   feedIdx: 0,
+  popularPage: 1,
+  popularCategory: '전체',
+  popularHasMore: true,
+  popularLoading: false,
 };
 
 const DATA = {
@@ -171,3 +182,23 @@ const DATA = {
     {type:'follow',msg:'techwear.s님이 팔로우했습니다.',time:'어제',read:true},
   ],
 };
+
+/* ── API 클라이언트 ── */
+function mapProduct(raw) {
+  return {
+    id: raw.id, em: raw.em, bg: raw.bg,
+    badgeCls: raw.badge_cls, badgeTxt: raw.badge_txt,
+    cat: raw.cat, name: raw.name, seller: raw.seller,
+    price: raw.price, interest: raw.interest,
+    status: raw.status, tag: raw.tag,
+  };
+}
+
+async function fetchProducts({ category = '전체', page = 1, limit = 8, sort = 'popular' } = {}) {
+  const params = new URLSearchParams({ page, limit, sort });
+  if (category !== '전체') params.set('category', category);
+  const res = await fetch(`${API_BASE}/api/products?${params}`);
+  if (!res.ok) throw new Error(`API ${res.status}`);
+  const data = await res.json();
+  return { items: (data.items || []).map(mapProduct), total: data.total, page: data.page, hasMore: data.hasMore };
+}

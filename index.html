@@ -626,13 +626,18 @@
     </div>
     <!-- 카테고리 필터 -->
     <div style="display:flex;gap:var(--s2,8px);flex-wrap:wrap;margin-bottom:var(--s5,20px)">
-      <button class="drops-flt-btn act" style="border-radius:20px" data-df="전체">전체</button>
-      <button class="drops-flt-btn" style="border-radius:20px" data-df="스니커즈">스니커즈</button>
-      <button class="drops-flt-btn" style="border-radius:20px" data-df="명품">명품</button>
-      <button class="drops-flt-btn" style="border-radius:20px" data-df="시계">시계</button>
-      <button class="drops-flt-btn" style="border-radius:20px" data-df="의류">의류</button>
+      <button class="drops-flt-btn act" style="border-radius:20px" data-pop-cat="전체">전체</button>
+      <button class="drops-flt-btn" style="border-radius:20px" data-pop-cat="스니커즈">스니커즈</button>
+      <button class="drops-flt-btn" style="border-radius:20px" data-pop-cat="명품">명품</button>
+      <button class="drops-flt-btn" style="border-radius:20px" data-pop-cat="시계">시계</button>
+      <button class="drops-flt-btn" style="border-radius:20px" data-pop-cat="의류">의류</button>
     </div>
     <div class="g-popular" id="popularGrid"></div>
+    <div style="display:flex;justify-content:center;margin-top:var(--s6,24px)">
+      <button id="popularLoadMoreBtn" class="btn btn--o" style="display:none;gap:6px;align-items:center">
+        더 보기 ↓
+      </button>
+    </div>
   </div>
 </main>
 
@@ -878,53 +883,100 @@
   <div class="mp-layout">
     <aside class="mp-side">
       <div class="mp-profile"><div class="mp-av av-a">🔥</div><p class="mp-name">sneaker.kang</p><p class="mp-tier">큐레이션 셀러</p></div>
-      <div class="mp-nav-link act">프로필 관리</div>
-      <div class="mp-nav-link">내 상품</div>
-      <div class="mp-nav-link">내 게시글</div>
-      <div class="mp-nav-link">거래 내역</div>
-      <div class="mp-nav-link">리뷰 관리</div>
+      <div class="mp-nav-link act" data-mp-tab="profile">프로필 관리</div>
+      <div class="mp-nav-link" data-mp-tab="myproducts">내 상품</div>
+      <div class="mp-nav-link" data-mp-tab="posts">내 게시글</div>
+      <div class="mp-nav-link" data-mp-tab="history">거래 내역</div>
+      <div class="mp-nav-link" data-mp-tab="reviews">리뷰 관리</div>
 
       <div class="mp-nav-link mp-logout-link" id="logoutBtnPc" data-logout>로그아웃</div>
     </aside>
     <div class="mp-main">
-      <div class="mp-stats"><div class="mp-stat"><p class="mp-stat__val">847</p><p class="mp-stat__label">판매 완료</p></div><div class="mp-stat"><p class="mp-stat__val">4.98</p><p class="mp-stat__label">평점</p></div><div class="mp-stat"><p class="mp-stat__val">3.2K</p><p class="mp-stat__label">팔로워</p></div><div class="mp-stat"><p class="mp-stat__val">₩1.2B</p><p class="mp-stat__label">총 거래액</p></div></div>
-      <p class="mp-sec-title">프로필 정보</p>
-      <div class="form-row" style="margin-bottom:var(--sp-4)">
-        <div class="form-group"><label class="form-label">닉네임</label><input class="form-input" value="sneaker.kang"/></div>
-        <div class="form-group"><label class="form-label">이메일</label><input class="form-input" type="email" value="kang@example.com"/></div>
-        <div class="form-group"><label class="form-label">연락처</label><input class="form-input" id="mpTel" type="tel" value="010-****-****" autocomplete="tel" inputmode="numeric"/></div>
-        <div class="form-group"><label class="form-label">지역</label><input class="form-input" value="서울"/></div>
-        <div class="form-group" style="grid-column:1/-1"><label class="form-label">소개글</label><textarea class="form-textarea" id="mpBio" maxlength="200">스니커즈 전문 셀러입니다. Jordan 브랜드 중심으로 거래합니다.</textarea>
-      <p class="form-char"><span class="char-count-cur" id="mpBioCount">0</span>/200</p></div>
-        <div class="form-group"><label class="form-label">인스타그램</label><input class="form-input" id="mpInstagram" placeholder="@아이디"/></div>
-        <div class="form-group"><label class="form-label">틱톡</label><input class="form-input" placeholder="@아이디"/></div>
-      </div>
-      <p class="mp-sec-title">관심 카테고리</p>
-      <div class="tag-select" style="margin-bottom:var(--sp-6)"><div class="tag-opt sel">스니커즈</div><div class="tag-opt sel">Jordan</div><div class="tag-opt sel">Nike SB</div><div class="tag-opt">명품</div><div class="tag-opt">시계</div><div class="tag-opt">아우터</div></div>
-      <button class="btn btn--p" id="mpSaveBtn">저장하기</button>
 
-      <p class="mp-sec-title" style="margin-top:var(--s6)">🔖 북마크</p>
-<div id="mpBookmarkList" style="margin-bottom:var(--s5)">
-  <div class="empty-state">
-    <p class="empty-state__icon">🔖</p>
-    <p class="empty-state__title">저장한 북마크가 없어요</p>
-    <p class="empty-state__desc">관심 있는 게시글을 북마크하면 이곳에서 다시 볼 수 있어요.</p>
-  </div>
-</div>
+      <!-- 패널: 프로필 관리 -->
+      <div class="mp-panel" id="mp-panel-profile">
+        <div class="mp-stats"><div class="mp-stat"><p class="mp-stat__val">847</p><p class="mp-stat__label">판매 완료</p></div><div class="mp-stat"><p class="mp-stat__val">4.98</p><p class="mp-stat__label">평점</p></div><div class="mp-stat"><p class="mp-stat__val">3.2K</p><p class="mp-stat__label">팔로워</p></div><div class="mp-stat"><p class="mp-stat__val">₩1.2B</p><p class="mp-stat__label">총 거래액</p></div></div>
+        <p class="mp-sec-title">프로필 정보</p>
+        <div class="form-row" style="margin-bottom:var(--sp-4)">
+          <div class="form-group"><label class="form-label">닉네임</label><input class="form-input" value="sneaker.kang"/></div>
+          <div class="form-group"><label class="form-label">이메일</label><input class="form-input" type="email" value="kang@example.com"/></div>
+          <div class="form-group"><label class="form-label">연락처</label><input class="form-input" id="mpTel" type="tel" value="010-****-****" autocomplete="tel" inputmode="numeric"/></div>
+          <div class="form-group"><label class="form-label">지역</label><input class="form-input" value="서울"/></div>
+          <div class="form-group" style="grid-column:1/-1"><label class="form-label">소개글</label><textarea class="form-textarea" id="mpBio" maxlength="200">스니커즈 전문 셀러입니다. Jordan 브랜드 중심으로 거래합니다.</textarea>
+        <p class="form-char"><span class="char-count-cur" id="mpBioCount">0</span>/200</p></div>
+          <div class="form-group"><label class="form-label">인스타그램</label><input class="form-input" id="mpInstagram" placeholder="@아이디"/></div>
+          <div class="form-group"><label class="form-label">틱톡</label><input class="form-input" placeholder="@아이디"/></div>
+        </div>
+        <p class="mp-sec-title">관심 카테고리</p>
+        <div class="tag-select" style="margin-bottom:var(--sp-6)"><div class="tag-opt sel">스니커즈</div><div class="tag-opt sel">Jordan</div><div class="tag-opt sel">Nike SB</div><div class="tag-opt">명품</div><div class="tag-opt">시계</div><div class="tag-opt">아우터</div></div>
+        <button class="btn btn--p" id="mpSaveBtn">저장하기</button>
 
-      <p class="mp-sec-title" style="margin-top:var(--s6)">최근 본 상품</p>
-      <div class="recent-viewed" id="recentViewed">
-        <div class="recent-item"><div class="recent-item__img">👟</div><p class="recent-item__name">Air Jordan 1</p><p class="recent-item__price">₩680,000</p></div>
-        <div class="recent-item"><div class="recent-item__img">⌚</div><p class="recent-item__name">Rolex Sub 41mm</p><p class="recent-item__price">₩12,800,000</p></div>
-        <div class="recent-item"><div class="recent-item__img">👜</div><p class="recent-item__name">Gucci Ophidia</p><p class="recent-item__price">₩1,240,000</p></div>
-      </div>
+        <p class="mp-sec-title" style="margin-top:var(--s6)">🔖 북마크</p>
+        <div id="mpBookmarkList" style="margin-bottom:var(--s5)">
+          <div class="empty-state">
+            <p class="empty-state__icon">🔖</p>
+            <p class="empty-state__title">저장한 북마크가 없어요</p>
+            <p class="empty-state__desc">관심 있는 게시글을 북마크하면 이곳에서 다시 볼 수 있어요.</p>
+          </div>
+        </div>
 
-      <p class="mp-sec-title" style="margin-top:var(--s5)">알림 설정</p>
-      <div style="background:var(--bg-soft);border-radius:var(--radius);padding:var(--s4)">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--s3)"><span style="font-size:13px;font-weight:600">시세 변동 알림</span><input type="checkbox" checked style="accent-color:var(--three);width:16px;height:16px"/></div>
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--s3)"><span style="font-size:13px;font-weight:600">새 드롭 알림</span><input type="checkbox" checked style="accent-color:var(--three);width:16px;height:16px"/></div>
-        <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;font-weight:600">채팅 알림</span><input type="checkbox" checked style="accent-color:var(--three);width:16px;height:16px"/></div>
-      </div>
+        <p class="mp-sec-title" style="margin-top:var(--s6)">최근 본 상품</p>
+        <div class="recent-viewed" id="recentViewed">
+          <div class="recent-item"><div class="recent-item__img">👟</div><p class="recent-item__name">Air Jordan 1</p><p class="recent-item__price">₩680,000</p></div>
+          <div class="recent-item"><div class="recent-item__img">⌚</div><p class="recent-item__name">Rolex Sub 41mm</p><p class="recent-item__price">₩12,800,000</p></div>
+          <div class="recent-item"><div class="recent-item__img">👜</div><p class="recent-item__name">Gucci Ophidia</p><p class="recent-item__price">₩1,240,000</p></div>
+        </div>
+
+        <p class="mp-sec-title" style="margin-top:var(--s5)">알림 설정</p>
+        <div style="background:var(--bg-soft);border-radius:var(--radius);padding:var(--s4)">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--s3)"><span style="font-size:13px;font-weight:600">시세 변동 알림</span><input type="checkbox" checked style="accent-color:var(--three);width:16px;height:16px"/></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--s3)"><span style="font-size:13px;font-weight:600">새 드롭 알림</span><input type="checkbox" checked style="accent-color:var(--three);width:16px;height:16px"/></div>
+          <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;font-weight:600">채팅 알림</span><input type="checkbox" checked style="accent-color:var(--three);width:16px;height:16px"/></div>
+        </div>
+      </div><!-- /mp-panel-profile -->
+
+      <!-- 패널: 내 상품 -->
+      <div class="mp-panel" id="mp-panel-myproducts" style="display:none">
+        <p class="mp-sec-title">📦 내 상품</p>
+        <div id="myProductList">
+          <div class="empty-state">
+            <p class="empty-state__icon">📦</p>
+            <p class="empty-state__title">등록한 상품이 없어요</p>
+            <p class="empty-state__desc">드롭스 페이지에서 상품을 등록해보세요.</p>
+          </div>
+        </div>
+      </div><!-- /mp-panel-myproducts -->
+
+      <!-- 패널: 내 게시글 -->
+      <div class="mp-panel" id="mp-panel-posts" style="display:none">
+        <p class="mp-sec-title">✍ 내 게시글</p>
+        <div class="empty-state">
+          <p class="empty-state__icon">✍</p>
+          <p class="empty-state__title">작성한 게시글이 없어요</p>
+          <p class="empty-state__desc">커뮤니티에서 첫 글을 작성해보세요.</p>
+        </div>
+      </div><!-- /mp-panel-posts -->
+
+      <!-- 패널: 거래 내역 -->
+      <div class="mp-panel" id="mp-panel-history" style="display:none">
+        <p class="mp-sec-title">📋 거래 내역</p>
+        <div class="empty-state">
+          <p class="empty-state__icon">📋</p>
+          <p class="empty-state__title">거래 내역이 없어요</p>
+          <p class="empty-state__desc">첫 거래를 완료하면 이곳에 기록됩니다.</p>
+        </div>
+      </div><!-- /mp-panel-history -->
+
+      <!-- 패널: 리뷰 관리 -->
+      <div class="mp-panel" id="mp-panel-reviews" style="display:none">
+        <p class="mp-sec-title">⭐ 리뷰 관리</p>
+        <div class="empty-state">
+          <p class="empty-state__icon">⭐</p>
+          <p class="empty-state__title">리뷰가 없어요</p>
+          <p class="empty-state__desc">거래 완료 후 받은 리뷰가 이곳에 표시됩니다.</p>
+        </div>
+      </div><!-- /mp-panel-reviews -->
+
     </div>
   </div>
 </main>
@@ -1432,6 +1484,33 @@
     <div class="modal__hd"><h2 class="modal__title">🔔 알림</h2><button class="modal__close" data-close="notifications">✕</button></div>
     <div class="modal__body" style="padding:0">
       <div id="notifList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 상품 상세 모달 -->
+<div class="modal-ov" id="modal-product">
+  <div class="modal modal--product">
+    <div class="modal__hd">
+      <h2 class="modal__title" id="pdProductTitle">상품 상세</h2>
+      <button class="modal__close" data-close="product" aria-label="닫기">✕</button>
+    </div>
+    <div class="modal__body pd-modal-body">
+      <div class="pd-product-img-wrap">
+        <div class="pd-product-img" id="pdProductImg">📦</div>
+        <span class="pd-product-badge" id="pdProductBadge"></span>
+      </div>
+      <div class="pd-product-info">
+        <p class="pd-product-cat" id="pdProductCat"></p>
+        <h3 class="pd-product-name" id="pdProductName"></h3>
+        <p class="pd-product-seller" id="pdProductSeller"></p>
+        <p class="pd-product-price" id="pdProductPrice"></p>
+        <div class="pd-product-tags" id="pdProductTags"></div>
+      </div>
+      <div class="pd-product-actions">
+        <button class="btn btn--p" onclick="event.stopPropagation();requireLogin()">거래하기</button>
+        <button class="btn btn--o" onclick="event.stopPropagation();toggleBookmark(this)">🔖 북마크</button>
+      </div>
     </div>
   </div>
 </div>

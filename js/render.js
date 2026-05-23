@@ -135,6 +135,10 @@
         </div>
       </div>
     `;
+    div.style.cursor = 'pointer';
+    div.addEventListener('click', () => {
+      if (typeof openProductModal === 'function') openProductModal(drop);
+    });
     return div;
   }
 
@@ -292,6 +296,10 @@ function renderBookmarkCard(item) {
         </div>
       </div>
     `;
+    div.style.cursor = 'pointer';
+    div.addEventListener('click', () => {
+      if (typeof openProductModal === 'function') openProductModal(drop);
+    });
     return div;
   }
 
@@ -418,4 +426,160 @@ function renderBookmarkCard(item) {
     btn.classList.toggle('bm-active');
     btn.textContent = btn.classList.contains('bm-active') ? '🔖' : '🔖';
     showToast(btn.classList.contains('bm-active') ? '북마크에 저장됐어요.' : '북마크를 해제했어요.', 'info');
+  }
+
+  /* ── 인기상품 스켈레톤 ── */
+  function renderPopularSkeleton(count = 8) {
+    const grid = document.getElementById('popularGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    for (let i = 0; i < count; i++) {
+      const sk = document.createElement('div');
+      sk.className = 'pop pop--skel';
+      sk.innerHTML = `
+        <div class="pop__img skel-box"></div>
+        <div class="pop__body">
+          <div class="skel-line" style="width:60%;height:12px;margin-bottom:6px"></div>
+          <div class="skel-line" style="width:90%;height:14px;margin-bottom:6px"></div>
+          <div class="skel-line" style="width:40%;height:12px"></div>
+        </div>`;
+      grid.appendChild(sk);
+    }
+  }
+
+  /* ── 인기상품 API 로드 ── */
+  async function loadPopularProducts(append = false) {
+    if (S.popularLoading) return;
+    S.popularLoading = true;
+    const grid = document.getElementById('popularGrid');
+    const btn  = document.getElementById('popularLoadMoreBtn');
+    if (!grid) { S.popularLoading = false; return; }
+
+    if (!append) {
+      renderPopularSkeleton(8);
+      if (btn) btn.style.display = 'none';
+    }
+
+    try {
+      const result = await fetchProducts({
+        category: S.popularCategory,
+        page: S.popularPage,
+        limit: 8,
+        sort: 'popular',
+      });
+
+      if (!append) grid.innerHTML = '';
+      result.items.forEach((drop, i) => {
+        const idx = append ? (S.popularPage - 1) * 8 + i : i;
+        grid.appendChild(renderPopularCard(drop, idx));
+      });
+
+      S.popularHasMore = result.hasMore;
+      if (btn) btn.style.display = S.popularHasMore ? 'flex' : 'none';
+    } catch (err) {
+      console.warn('인기상품 API 실패, 목업 사용:', err);
+      if (!append) {
+        grid.innerHTML = '';
+        DATA.drops.forEach((d, i) => grid.appendChild(renderPopularCard(d, i)));
+      }
+      if (btn) btn.style.display = 'none';
+    } finally {
+      S.popularLoading = false;
+    }
+  }
+
+  /* ── 홈 인기상품 미리보기 (4개) ── */
+  async function loadHomePopular() {
+    const hpg = document.getElementById('homePopularGrid');
+    if (!hpg) return;
+    try {
+      const result = await fetchProducts({ category: '전체', page: 1, limit: 4, sort: 'popular' });
+      hpg.innerHTML = '';
+      result.items.forEach((d, i) => hpg.appendChild(renderPopularCard(d, i)));
+    } catch {
+      hpg.innerHTML = '';
+      DATA.drops.slice(0, 4).forEach((d, i) => hpg.appendChild(renderPopularCard(d, i)));
+    }
+  }
+
+  /* ── 내 상품 목록 렌더링 ── */
+  function renderMyProducts(products) {
+    const list = document.getElementById('myProductList');
+    if (!list) return;
+
+    if (!products || products.length === 0) {
+      list.innerHTML = `
+        <div class="empty-state">
+          <p class="empty-state__icon">📦</p>
+          <p class="empty-state__title">등록한 상품이 없어요</p>
+          <p class="empty-state__desc">드롭스 페이지에서 상품을 등록해보세요.</p>
+        </div>`;
+      return;
+    }
+
+    list.innerHTML = '';
+    products.forEach(p => {
+      const item = document.createElement('div');
+      item.className = 'mpi';
+      item.innerHTML = `
+        <div class="mpi__em">${p.em || '📦'}</div>
+        <div class="mpi__info">
+          <p class="mpi__name">${p.name}</p>
+          <p class="mpi__meta">${p.cat} · ${p.price}</p>
+          <span class="mpi__status mpi__status--${p.status === '판매완료' ? 'sold' : p.status === '예약중' ? 'reserved' : 'active'}">${p.status}</span>
+        </div>
+        <div class="mpi__actions">
+          <button class="mpi__btn mpi__btn--status" data-product-id="${p.id}" data-status="${p.status}">상태 변경</button>
+          <button class="mpi__btn mpi__btn--delete" data-product-id="${p.id}">삭제</button>
+        </div>`;
+
+      item.querySelector('.mpi__btn--status').addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const id = e.target.dataset.productId;
+        const cur = e.target.dataset.status;
+        const next = cur === '판매중' ? '판매완료' : '판매중';
+        try {
+          await fetch(`${API_BASE}/api/products/${id}/status`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: next }),
+          });
+          showToast(`"${next}"으로 상태를 변경했어요.`, 'success');
+          if (typeof loadMyProducts === 'function') loadMyProducts();
+        } catch { showToast('상태 변경에 실패했어요.', 'error'); }
+      });
+
+      item.querySelector('.mpi__btn--delete').addEventListener('click', async (e) => {
+        e.stopPropagation();
+        if (!confirm('정말 삭제할까요?')) return;
+        const id = e.target.dataset.productId;
+        try {
+          await fetch(`${API_BASE}/api/products/${id}`, { method: 'DELETE' });
+          showToast('상품을 삭제했어요.', 'success');
+          if (typeof loadMyProducts === 'function') loadMyProducts();
+        } catch { showToast('삭제에 실패했어요.', 'error'); }
+      });
+
+      item.addEventListener('click', () => {
+        if (typeof openProductModal === 'function') openProductModal(p);
+      });
+
+      list.appendChild(item);
+    });
+  }
+
+  async function loadMyProducts() {
+    const user = typeof getAuthUser === 'function' ? getAuthUser() : null;
+    if (!user) {
+      renderMyProducts([]);
+      return;
+    }
+    try {
+      const params = new URLSearchParams({ seller: user.nickname || user.email, limit: 50 });
+      const res = await fetch(`${API_BASE}/api/products?${params}`);
+      const data = await res.json();
+      renderMyProducts((data.items || data || []).map(mapProduct));
+    } catch {
+      renderMyProducts(DATA.drops);
+    }
   }
