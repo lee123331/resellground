@@ -1,3 +1,4 @@
+HEAD
 'use strict';
 
 /* ═══════════════════════════════════════════════════
@@ -1482,3 +1483,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
   applyLoginState();
 });
+'38cb74f (update product ui work)'

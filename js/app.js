@@ -1,3 +1,4 @@
+HEAD
 'use strict';
 /* ═══════════════════════════════════════════
    리셀그라운드 — 버튼 연결 + 부트
@@ -316,3 +317,5 @@ function renderWeeklyTop() {
   `).join('');
 }
 
+
+'38cb74f (update product ui work)'
