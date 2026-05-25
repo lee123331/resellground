@@ -1864,34 +1864,75 @@ if (document.readyState === 'loading') {
 /* ── 상품 상세 모달 열기 ── */
 function openProductModal(product) {
   if (!product) return;
-  const title  = document.getElementById('pdProductTitle');
-  const img    = document.getElementById('pdProductImg');
-  const badge  = document.getElementById('pdProductBadge');
-  const cat    = document.getElementById('pdProductCat');
-  const name   = document.getElementById('pdProductName');
-  const seller = document.getElementById('pdProductSeller');
-  const price  = document.getElementById('pdProductPrice');
-  const tags   = document.getElementById('pdProductTags');
 
-  if (title)  title.textContent  = product.name || '상품 상세';
-  if (img)    img.textContent    = product.em   || '📦';
+  const $ = id => document.getElementById(id);
+
+  /* 이미지 */
+  const img = $('pdProductImg');
+  if (img) img.textContent = product.em || '📦';
+
+  /* 배지 */
+  const badge = $('pdProductBadge');
   if (badge) {
-    badge.textContent  = product.badgeTxt || '';
-    badge.className    = `pd-product-badge ${product.badgeCls || ''}`.trim();
+    badge.textContent = product.badgeTxt || '';
+    badge.className = `pd-badge ${product.badgeCls || ''}`.trim();
   }
-  if (cat)    cat.textContent    = product.cat  || '';
-  if (name)   name.textContent   = product.name || '';
-  if (seller) seller.textContent = `by ${product.seller || ''}`;
-  if (price)  price.textContent  = product.price || '';
+
+  /* 조회·관심 */
+  const vc = $('pdViewCount');
+  const it = $('pdInterest');
+  if (vc) vc.textContent = product.view_count ?? product.viewCount ?? 0;
+  if (it) it.textContent = product.interest ?? 0;
+
+  /* 카테고리 */
+  const cat = $('pdProductCat');
+  if (cat) cat.textContent = product.cat || product.category || '';
+
+  /* 상품명 */
+  const name = $('pdProductName');
+  if (name) name.textContent = product.name || '';
+
+  /* 판매 상태 chip */
+  const statusChip = $('pdProductStatus');
+  if (statusChip) {
+    const s = product.status || '판매중';
+    statusChip.textContent = s;
+    statusChip.className = `pd-status-chip ${s === '판매완료' ? 'sold' : s === '예약중' ? 'reserved' : 'selling'}`;
+  }
+
+  /* 가격 */
+  const price = $('pdProductPrice');
+  if (price) price.textContent = product.price || '';
+
+  /* 태그 */
+  const tags = $('pdProductTags');
   if (tags) {
     let html = '';
-    if (product.status === '판매완료') html += `<span class="drop-tag sold">판매완료</span>`;
-    else if (product.status === '예약중') html += `<span class="drop-tag reserved">예약중</span>`;
     if (product.tag === '빠른거래') html += `<span class="drop-tag fast">빠른거래</span>`;
     if (product.tag === '인증셀러') html += `<span class="drop-tag cert">인증셀러</span>`;
     if (product.tag === '협업모집') html += `<span class="drop-tag collab">협업모집</span>`;
     tags.innerHTML = html;
   }
+
+  /* 셀러 */
+  const sellerName = $('pdProductSeller');
+  const sellerAv   = $('pdSellerAv');
+  const sellerGrade = $('pdSellerGrade');
+  if (sellerName) sellerName.textContent = product.seller || product.seller_name || '';
+  if (sellerAv)   sellerAv.textContent   = product.em || '🔥';
+  if (sellerGrade) {
+    const tag = product.tag || '';
+    sellerGrade.textContent = tag === '인증셀러' ? '✓ 인증 셀러' : '일반 셀러';
+  }
+
+  /* 상세 정보 */
+  const cond  = $('pdCondition');
+  const trade = $('pdTradeMethod');
+  const posted = $('pdPostedAt');
+  if (cond)   cond.textContent  = product.condition  || '—';
+  if (trade)  trade.textContent = product.trade || product.trade_method || '—';
+  if (posted) posted.textContent = product.postedAt  || product.created_at || '—';
+
   openModal('product');
 }
 

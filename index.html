@@ -1491,26 +1491,68 @@
 <!-- 상품 상세 모달 -->
 <div class="modal-ov" id="modal-product">
   <div class="modal modal--product">
-    <div class="modal__hd">
-      <h2 class="modal__title" id="pdProductTitle">상품 상세</h2>
-      <button class="modal__close" data-close="product" aria-label="닫기">✕</button>
+    <div class="pd-modal-hd">
+      <span class="pd-modal-hd__tag" id="pdProductCat">카테고리</span>
+      <button class="modal__close pd-modal-close" data-close="product" aria-label="닫기">✕</button>
     </div>
-    <div class="modal__body pd-modal-body">
-      <div class="pd-product-img-wrap">
-        <div class="pd-product-img" id="pdProductImg">📦</div>
-        <span class="pd-product-badge" id="pdProductBadge"></span>
+    <div class="pd-modal-body">
+
+      <!-- 이미지 -->
+      <div class="pd-img-wrap">
+        <div class="pd-img" id="pdProductImg">📦</div>
+        <span class="pd-badge" id="pdProductBadge"></span>
+        <div class="pd-img-meta">
+          <span>👁 <span id="pdViewCount">0</span></span>
+          <span>❤️ <span id="pdInterest">0</span>명 관심</span>
+        </div>
       </div>
-      <div class="pd-product-info">
-        <p class="pd-product-cat" id="pdProductCat"></p>
-        <h3 class="pd-product-name" id="pdProductName"></h3>
-        <p class="pd-product-seller" id="pdProductSeller"></p>
-        <p class="pd-product-price" id="pdProductPrice"></p>
-        <div class="pd-product-tags" id="pdProductTags"></div>
+
+      <!-- 기본 정보 -->
+      <div class="pd-info">
+        <div class="pd-info__row">
+          <h2 class="pd-name" id="pdProductName">상품명</h2>
+          <span class="pd-status-chip" id="pdProductStatus">판매중</span>
+        </div>
+        <p class="pd-price" id="pdProductPrice">₩ 0</p>
+        <div class="pd-tags" id="pdProductTags"></div>
       </div>
-      <div class="pd-product-actions">
-        <button class="btn btn--p" onclick="event.stopPropagation();requireLogin()">거래하기</button>
-        <button class="btn btn--o" onclick="event.stopPropagation();toggleBookmark(this)">🔖 북마크</button>
+
+      <div class="pd-divider"></div>
+
+      <!-- 셀러 -->
+      <div class="pd-seller">
+        <div class="pd-seller__av" id="pdSellerAv">🔥</div>
+        <div class="pd-seller__info">
+          <p class="pd-seller__name" id="pdProductSeller">셀러</p>
+          <p class="pd-seller__grade" id="pdSellerGrade">일반 셀러</p>
+        </div>
+        <button class="pd-chat-btn" onclick="event.stopPropagation();requireLogin()">💬 채팅</button>
       </div>
+
+      <div class="pd-divider"></div>
+
+      <!-- 상세 정보 -->
+      <div class="pd-detail">
+        <div class="pd-detail__row">
+          <span class="pd-detail__label">컨디션</span>
+          <span class="pd-detail__val" id="pdCondition">—</span>
+        </div>
+        <div class="pd-detail__row">
+          <span class="pd-detail__label">거래 방식</span>
+          <span class="pd-detail__val" id="pdTradeMethod">—</span>
+        </div>
+        <div class="pd-detail__row">
+          <span class="pd-detail__label">등록일</span>
+          <span class="pd-detail__val" id="pdPostedAt">—</span>
+        </div>
+      </div>
+
+      <!-- 하단 버튼 -->
+      <div class="pd-actions">
+        <button class="pd-bm-btn" id="pdBmBtn" onclick="event.stopPropagation();toggleBookmark(this)">🔖</button>
+        <button class="btn btn--p pd-trade-btn" onclick="event.stopPropagation();requireLogin()">거래하기</button>
+      </div>
+
     </div>
   </div>
 </div>
