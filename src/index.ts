@@ -11,7 +11,7 @@ app.use(
   "*",
   cors({
     origin: "https://resellground.pages.dev",
-    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowHeaders: ["Content-Type", "Authorization"],
   })
 );
@@ -632,6 +632,70 @@ app.get("/api/user/products", async (c) => {
       total: 0,
       totalPages: 1,
       products: []
+    }, 500);
+  }
+});
+app.patch("/api/products/:id/status", async (c) => {
+  try {
+    const id = String(c.req.param("id") || "").trim();
+    const body = await c.req.json().catch(() => ({}));
+    const status = String(body.status || "").trim();
+
+    const allowedStatuses = ["판매중", "예약중", "판매완료", "삭제됨"];
+
+    if (!id) {
+      return c.json({
+        ok: false,
+        message: "상품 ID가 필요합니다."
+      }, 400);
+    }
+
+    if (!allowedStatuses.includes(status)) {
+      return c.json({
+        ok: false,
+        message: "허용되지 않는 상태값입니다.",
+        allowedStatuses
+      }, 400);
+    }
+
+    const exists = await c.env.DB.prepare(`
+      SELECT id
+      FROM products
+      WHERE id = ?
+      LIMIT 1
+    `).bind(id).first();
+
+    if (!exists) {
+      return c.json({
+        ok: false,
+        message: "상품을 찾을 수 없습니다."
+      }, 404);
+    }
+
+    await c.env.DB.prepare(`
+      UPDATE products
+      SET status = ?
+      WHERE id = ?
+    `).bind(status, id).run();
+
+    const row = await c.env.DB.prepare(`
+      SELECT *
+      FROM products
+      WHERE id = ?
+      LIMIT 1
+    `).bind(id).first();
+
+    return c.json({
+      ok: true,
+      message: "상품 상태가 변경되었습니다.",
+      product: normalizeProductRow(row)
+    });
+  } catch (err) {
+    console.error(err);
+
+    return c.json({
+      ok: false,
+      message: "상품 상태 변경 중 오류가 발생했습니다."
     }, 500);
   }
 });
