@@ -399,38 +399,40 @@ app.get("/api/products", async (c) => {
 
     const offset = (page - 1) * limit;
 
-    const where: string[] = [];
-    const binds: unknown[] = [];
+const where: string[] = [];
+const binds: unknown[] = [];
 
-    if (category && category !== "전체") {
-      where.push("category = ?");
-      binds.push(category);
-    }
+where.push("status != ?");
+binds.push("삭제됨");
 
-    if (status && status !== "전체") {
-      where.push("status = ?");
-      binds.push(status);
-    }
+if (category && category !== "전체") {
+  where.push("category = ?");
+  binds.push(category);
+}
 
-    const whereSql = where.length ? `WHERE ${where.join(" AND ")}` : "";
+if (status && status !== "전체") {
+  where.push("status = ?");
+  binds.push(status);
+}
+const whereSql = where.length ? `WHERE ${where.join(" AND ")}` : "";
 
-    const countResult = await c.env.DB.prepare(`
-      SELECT COUNT(*) AS total
-      FROM products
-      ${whereSql}
-    `).bind(...binds).first();
+const countResult = await c.env.DB.prepare(`
+  SELECT COUNT(*) AS total
+  FROM products
+  ${whereSql}
+`).bind(...binds).first();
 
-    const total = Number(countResult?.total || 0);
-    const totalPages = Math.max(1, Math.ceil(total / limit));
+const total = Number(countResult?.total || 0);
+const totalPages = Math.max(1, Math.ceil(total / limit));
 
-    const result = await c.env.DB.prepare(`
-      SELECT *
-      FROM products
-      ${whereSql}
-      ORDER BY created_at DESC
-      LIMIT ?
-      OFFSET ?
-    `).bind(...binds, limit, offset).all();
+const result = await c.env.DB.prepare(`
+  SELECT *
+  FROM products
+  ${whereSql}
+  ORDER BY created_at DESC
+  LIMIT ?
+  OFFSET ?
+`).bind(...binds, limit, offset).all();
 
     const rows = result.results || [];
 
@@ -593,25 +595,27 @@ app.get("/api/user/products", async (c) => {
       }, 400);
     }
 
-    const countResult = await c.env.DB.prepare(`
-      SELECT COUNT(*) AS total
-      FROM products
-      WHERE seller_email = ?
-    `).bind(email).first();
+const countResult = await c.env.DB.prepare(`
+  SELECT COUNT(*) AS total
+  FROM products
+  WHERE seller_email = ?
+  AND status != ?
+`).bind(email, "삭제됨").first();
 
-    const total = Number(countResult?.total || 0);
-    const totalPages = Math.max(1, Math.ceil(total / limit));
+const total = Number(countResult?.total || 0);
+const totalPages = Math.max(1, Math.ceil(total / limit));
 
-    const result = await c.env.DB.prepare(`
-      SELECT *
-      FROM products
-      WHERE seller_email = ?
-      ORDER BY created_at DESC
-      LIMIT ?
-      OFFSET ?
-    `).bind(email, limit, offset).all();
+const result = await c.env.DB.prepare(`
+  SELECT *
+  FROM products
+  WHERE seller_email = ?
+  AND status != ?
+  ORDER BY created_at DESC
+  LIMIT ?
+  OFFSET ?
+`).bind(email, "삭제됨", limit, offset).all();
 
-    const rows = result.results || [];
+const rows = result.results || [];
 
     return c.json({
       ok: true,
