@@ -131,7 +131,7 @@
         </p>
         <div class="dc__foot">
           <p class="dc__price">${drop.price}</p>
-          <p class="dc__int">관심 <strong>${drop.interest}</strong>명</p>
+          <p class="dc__int">조회 <strong>${drop.views || drop.interest || 0}</strong>회</p>
         </div>
       </div>
     `;
@@ -302,7 +302,7 @@ function renderBookmarkCard(item) {
         <p class="pop__name">${drop.name}</p>
         <div class="pop__foot">
           <p class="pop__price">${drop.price}</p>
-          <p class="pop__views">👁 ${drop.interest*12}</p>
+          <p class="pop__views">👁 ${drop.views || drop.interest || 0}</p>
         </div>
       </div>
     `;
@@ -392,7 +392,7 @@ return div;
           <p class="dc__cat">${hero.cat}</p>
           <p class="dc__name lg">${hero.name}</p>
           <p class="dc__seller">by <strong>${hero.seller}</strong></p>
-          <div class="dc__foot"><p class="dc__price lg">${hero.price}</p><p class="dc__int">관심 <strong>${hero.interest}</strong>명</p></div>
+          <div class="dc__foot"><p class="dc__price lg">${hero.price}</p><p class="dc__int">조회 <strong>${hero.views || hero.interest || 0}</strong>회</p></div>
         </div>`;
       homeDG.appendChild(heroEl);
       const side = document.createElement('div');
