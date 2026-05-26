@@ -699,6 +699,52 @@ app.patch("/api/products/:id/status", async (c) => {
     }, 500);
   }
 });
+app.delete("/api/products/:id", async (c) => {
+  try {
+    const id = String(c.req.param("id") || "").trim();
+
+    if (!id) {
+      return c.json({
+        ok: false,
+        message: "상품 ID가 필요합니다."
+      }, 400);
+    }
+
+    const exists = await c.env.DB.prepare(`
+      SELECT id
+      FROM products
+      WHERE id = ?
+      LIMIT 1
+    `).bind(id).first();
+
+    if (!exists) {
+      return c.json({
+        ok: false,
+        message: "상품을 찾을 수 없습니다."
+      }, 404);
+    }
+
+    await c.env.DB.prepare(`
+      UPDATE products
+      SET status = '삭제됨'
+      WHERE id = ?
+    `).bind(id).run();
+
+    return c.json({
+      ok: true,
+      message: "상품이 삭제 처리되었습니다.",
+      id,
+      status: "삭제됨"
+    });
+  } catch (err) {
+    console.error(err);
+
+    return c.json({
+      ok: false,
+      message: "상품 삭제 중 오류가 발생했습니다."
+    }, 500);
+  }
+});
 app.get("/api/bookmarks/:email", async (c) => {
   try {
     const email = c.req.param("email");
