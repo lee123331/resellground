@@ -532,7 +532,6 @@ const agree = document.getElementById('preregAgree').checked;
 ═══════════════════════════════════════════════════ */
 function initDropForm() {
   initCharCounter('dropDesc', 'dropDescCount', 1000);
-  initFileUpload('uploadArea', 'fileInput', 'imagePreview');
   initPriceFormat('dropPrice', 'dropPriceDisplay');
   initDraftSave('dropFormInner', 'drop');
   initCloseGuard('addDrop', 'dropFormInner', 'drop');
@@ -549,33 +548,7 @@ function initDropForm() {
     });
   }
 
-  document.getElementById('dropSubmitBtn').addEventListener('click', () => {
-    const name = document.getElementById('dropName').value.trim();
-    const price = document.getElementById('dropPrice').value;
-    const cat = document.getElementById('dropCat').value;
-    const cond = document.getElementById('dropCond').value;
-    let ok = true;
-
-    if (!V.required(name)) { setErr('dropName','dropNameErr','상품명을 입력해주세요.'); ok=false; }
-    else setOk('dropName','dropNameErr');
-    if (!price) { setErr('dropPrice','dropPriceErr','가격을 입력해주세요.'); ok=false; }
-    else setOk('dropPrice','dropPriceErr');
-    if (!cat) { setErr('dropCat','dropCatErr','카테고리를 선택해주세요.'); ok=false; }
-    else setOk('dropCat','dropCatErr');
-    if (!cond) { setErr('dropCond','dropCondErr','상태를 선택해주세요.'); ok=false; }
-    else setOk('dropCond','dropCondErr');
-    if (!ok) return;
-
-    const btn = document.getElementById('dropSubmitBtn');
-    btnLoad(btn, '등록 중...');
-    setTimeout(() => {
-      btnReset(btn);
-      clearDraft('drop');
-      resetForm(document.getElementById('dropFormInner'));
-      closeModal('addDrop');
-      showToast('상품이 성공적으로 등록되었습니다! 🎉', 'success');
-    }, 1200);
-  });
+ 
 }
 
 /* ═══════════════════════════════════════════════════
@@ -664,13 +637,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 /* ── 상품 등록: DB 저장 연결 ── */
 function getProductImagesFromPreview() {
-  const imgs = [];
-
-  document.querySelectorAll('.rg-preview-grid img').forEach(img => {
-    if (img.src) imgs.push(img.src);
-  });
-
-  return imgs.slice(0, 10);
+  return selectedDropImageDataUrls.slice(0, 10);
 }
 
 function getSelectedProductCondition() {
@@ -788,34 +755,34 @@ async function submitProductToDB() {
     return;
   }
 
-  const payload = {
-    seller_email: user.email,
-    seller_name: user.name,
-    name,
-    description,
-    price,
-    brand_id: mapLegacyBrandToId(brandText),
-    category_id: mapLegacyCategoryToId(categoryText),
-    size_region: 'KR',
-    size_value: document.getElementById('dropSize')?.value || '',
-    condition,
-    trade_method: tradeMethod,
-    inspection_service: false,
-    images
-  };
+const payload = {
+  seller_email: user.email,
+  seller_name: user.name,
+  name,
+  description,
+  price,
+  brand_id: mapLegacyBrandToId(brandText),
+  category_id: mapLegacyCategoryToId(categoryText),
+  size_region: 'KR',
+  size_value: document.getElementById('dropSize')?.value || '',
+  condition,
+  trade_method: tradeMethod,
+  inspection_service: false,
+  images
+};
 
   try {
     submitBtn.disabled = true;
     submitBtn.textContent = '등록 중...';
 
-    const res = await fetch('https://resellground.di702934.workers.dev/api/products', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('rg_token') || ''}`
-      },
-      body: JSON.stringify(payload)
-    });
+    const res = await fetch(`${API_BASE}/api/products`, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${localStorage.getItem('rg_token') || ''}`
+  },
+  body: JSON.stringify(payload)
+});
 
     const data = await res.json();
 
@@ -823,8 +790,16 @@ async function submitProductToDB() {
       throw new Error(data.message || '상품 등록에 실패했습니다.');
     }
 
-    showToast('상품이 등록되었습니다.', 'success');
-    closeModal('addDrop');
+   showToast('상품이 등록되었습니다.', 'success');
+
+selectedDropImageDataUrls = [];
+renderDropImagePreview();
+updateDropImageCount();
+
+clearDraft('drop');
+resetForm(document.getElementById('dropFormInner'));
+
+closeModal('addDrop');
 
     if (typeof refreshProductsFromDB === 'function') {
       await refreshProductsFromDB({ page: 1 });
@@ -855,4 +830,107 @@ if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initProductSubmitDB);
 } else {
   initProductSubmitDB();
+}
+/* ── 상품 등록 이미지 선택 / 미리보기 ── */
+let selectedDropImageDataUrls = [];
+
+function updateDropImageCount() {
+  const countEl = document.querySelector('.rg-img-section__count');
+  if (countEl) countEl.textContent = `${selectedDropImageDataUrls.length} / 10`;
+}
+
+function renderDropImagePreview() {
+  const grid = document.querySelector('.rg-preview-grid');
+  if (!grid) return;
+
+  grid.innerHTML = '';
+
+  selectedDropImageDataUrls.forEach((src, index) => {
+    const item = document.createElement('div');
+    item.className = 'rg-preview-item';
+    item.style.position = 'relative';
+    item.style.border = '1px solid #e5e7eb';
+    item.style.borderRadius = '8px';
+    item.style.overflow = 'hidden';
+    item.style.background = '#f9fafb';
+
+    item.innerHTML = `
+      <img src="${src}" alt="상품 이미지 ${index + 1}" style="width:100%;height:90px;object-fit:cover;display:block;">
+      <button type="button" data-remove-image="${index}" style="
+        position:absolute;
+        top:4px;
+        right:4px;
+        width:22px;
+        height:22px;
+        border:none;
+        border-radius:50%;
+        background:rgba(0,0,0,.65);
+        color:#fff;
+        font-size:12px;
+        cursor:pointer;
+      ">×</button>
+      ${index === 0 ? '<span style="position:absolute;left:4px;bottom:4px;background:#111;color:#fff;font-size:10px;padding:2px 5px;border-radius:4px;">대표</span>' : ''}
+    `;
+
+    grid.appendChild(item);
+  });
+
+  grid.querySelectorAll('[data-remove-image]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const index = Number(btn.dataset.removeImage);
+      selectedDropImageDataUrls.splice(index, 1);
+      renderDropImagePreview();
+      updateDropImageCount();
+    });
+  });
+
+  updateDropImageCount();
+}
+
+function initDropImageUpload() {
+  const dropzone = document.querySelector('.rg-dropzone');
+  const input = document.getElementById('dropImageInput');
+
+  if (!dropzone || !input) return;
+
+  dropzone.addEventListener('click', e => {
+    if (e.target === input) return;
+    input.click();
+  });
+
+  input.addEventListener('change', () => {
+    const files = Array.from(input.files || []);
+
+    if (selectedDropImageDataUrls.length + files.length > 10) {
+      showToast('사진은 최대 10장까지 등록할 수 있습니다.', 'error');
+      input.value = '';
+      return;
+    }
+
+    files.forEach(file => {
+      if (!file.type.startsWith('image/')) return;
+
+      if (file.size > 10 * 1024 * 1024) {
+        showToast('이미지는 장당 10MB 이하만 등록할 수 있습니다.', 'error');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = e => {
+        selectedDropImageDataUrls.push(String(e.target.result || ''));
+        renderDropImagePreview();
+      };
+      reader.readAsDataURL(file);
+    });
+
+    input.value = '';
+  });
+
+  updateDropImageCount();
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initDropImageUpload);
+} else {
+  initDropImageUpload();
 }
