@@ -30,44 +30,92 @@ app.get("/", (c) => {
   return c.json({ message: "ResellGround API running" });
 });
 
-app.get("/api/products", async (c) => {
+app.get("/api/brands/search", async (c) => {
   try {
-    const category = c.req.query("category") || "전체";
-    const page = Math.max(1, parseInt(c.req.query("page") || "1"));
-    const limit = Math.min(20, Math.max(1, parseInt(c.req.query("limit") || "8")));
-    const sort = c.req.query("sort") || "popular";
-    const offset = (page - 1) * limit;
+    const q = String(c.req.query("q") || "").trim();
 
-    const params: (string | number)[] = [];
-    let whereClause = "";
-    if (category !== "전체") {
-      whereClause = "WHERE cat = ?";
-      params.push(category);
+    if (!q) {
+      return c.json({
+        success: true,
+        brands: [],
+      });
     }
 
-    const orderMap: Record<string, string> = {
-      popular: "interest DESC, view_count DESC",
-      new: "created_at DESC",
-      price_asc: "price_num ASC",
-      price_desc: "price_num DESC",
-    };
-    const orderClause = `ORDER BY ${orderMap[sort] ?? orderMap.popular}`;
+    const result = await c.env.DB.prepare(`
+      SELECT id, name_en, name_ko
+      FROM brands
+      WHERE
+        LOWER(name_en) LIKE LOWER(?)
+        OR name_ko LIKE ?
+        OR search_keywords LIKE ?
+      ORDER BY name_en ASC
+      LIMIT 20
+    `)
+      .bind(`%${q}%`, `%${q}%`, `%${q}%`)
+      .all();
 
-    const countResult = await c.env.DB.prepare(
-      `SELECT COUNT(*) as total FROM products ${whereClause}`
-    ).bind(...params).first<{ total: number }>();
-    const total = countResult?.total ?? 0;
-
-    const rows = await c.env.DB.prepare(
-      `SELECT * FROM products ${whereClause} ${orderClause} LIMIT ? OFFSET ?`
-    ).bind(...params, limit, offset).all();
-
-    return c.json({ items: rows.results, total, page, limit, hasMore: offset + limit < total });
+    return c.json({
+      success: true,
+      brands: result.results || [],
+    });
   } catch (err) {
-    console.error(err);
-    return c.json({ message: "서버 오류가 발생했습니다." }, 500);
+    console.error("Brand search error:", err);
+
+    return c.json(
+      {
+        success: false,
+        message: "브랜드 검색 중 오류가 발생했습니다.",
+      },
+      500
+    );
   }
 });
+
+app.get("/api/categories", async (c) => {
+  try {
+    const parentId = c.req.query("parent_id");
+
+    let result;
+
+    if (!parentId || parentId === "null") {
+      result = await c.env.DB.prepare(`
+        SELECT id, name, parent_id, depth, sort_order
+        FROM categories
+        WHERE parent_id IS NULL
+        ORDER BY sort_order ASC, id ASC
+      `).all();
+    } else {
+      result = await c.env.DB.prepare(`
+        SELECT id, name, parent_id, depth, sort_order
+        FROM categories
+        WHERE parent_id = ?
+        ORDER BY sort_order ASC, id ASC
+      `)
+        .bind(Number(parentId))
+        .all();
+    }
+
+    return c.json({
+      success: true,
+      categories: result.results || [],
+    });
+  } catch (err) {
+    console.error("Category fetch error:", err);
+
+    return c.json(
+      {
+        success: false,
+        message: "카테고리 조회 중 오류가 발생했습니다.",
+        error: err instanceof Error ? err.message : String(err),
+      },
+      500
+    );
+  }
+});
+
+
+
+
 
 app.post("/api/auth/signup", async (c) => {
   try {
@@ -353,80 +401,247 @@ app.get("/api/comments/:postId", async (c) => {
     return c.json({ message: "댓글을 불러오지 못했습니다." }, 500);
   }
 });
-
+app.post("/api/products/ping", async (c) => {
+  return c.json({
+    success: true,
+    message: "products post ping ok",
+  });
+});
 app.post("/api/products", async (c) => {
   try {
     const body = await c.req.json();
 
-    const id = String(body.id || `product_${Date.now()}`);
-    const sellerEmail = String(body.seller_email || "");
-    const sellerName = String(body.seller_name || "익명");
-    const name = String(body.name || "").trim();
-    const brand = String(body.brand || "").trim();
-    const category = String(body.category || "").trim();
+    const id = String(
+      body.id || `product_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`
+    );
 
-    const priceRaw = String(body.price || "").replace(/[^\d]/g, "");
-    const price = priceRaw ? Number(priceRaw) : 0;
+    const sellerEmail = String(
+      body.seller_email || body.sellerEmail || ""
+    ).trim().toLowerCase();
 
-    const condition = String(body.condition || "");
-    const tradeMethod = String(body.trade_method || "");
-    const description = String(body.description || "");
-    const images = JSON.stringify(Array.isArray(body.images) ? body.images : []);
-    const status = String(body.status || "판매중");
+    const sellerName = String(
+      body.seller_name || body.sellerName || "익명"
+    ).trim();
 
-    if (!name || !category || !Number.isFinite(price) || price <= 0) {
-      return c.json({
-        ok: false,
-        message: "상품명, 카테고리, 가격은 필수입니다."
-      }, 400);
+    const name = String(body.name || body.title || "").trim();
+    const description = String(body.description || "").trim();
+    const price = Number(body.price || 0);
+
+    const brandId = body.brand_id ? Number(body.brand_id) : null;
+    const categoryId = body.category_id ? Number(body.category_id) : null;
+
+    const sizeRegion = body.size_region ? String(body.size_region).trim() : null;
+    const sizeValue = body.size_value ? String(body.size_value).trim() : null;
+
+    const condition = String(body.condition || "").trim();
+    const tradeMethod = String(body.trade_method || body.tradeMethod || "").trim();
+
+    const inspectionService = body.inspection_service ? 1 : 0;
+    const images = Array.isArray(body.images) ? body.images : [];
+
+    if (!sellerEmail) {
+      return c.json(
+        {
+          success: false,
+          ok: false,
+          message: "판매자 이메일이 없습니다. 다시 로그인해주세요.",
+        },
+        400
+      );
     }
+
+    if (!name) {
+      return c.json(
+        {
+          success: false,
+          ok: false,
+          message: "상품명을 입력해주세요.",
+        },
+        400
+      );
+    }
+
+    if (!Number.isFinite(price) || price <= 0) {
+      return c.json(
+        {
+          success: false,
+          ok: false,
+          message: "가격을 올바르게 입력해주세요.",
+        },
+        400
+      );
+    }
+
+    if (!brandId) {
+      return c.json(
+        {
+          success: false,
+          ok: false,
+          message: "브랜드를 선택해주세요.",
+        },
+        400
+      );
+    }
+
+    if (!categoryId) {
+      return c.json(
+        {
+          success: false,
+          ok: false,
+          message: "카테고리를 선택해주세요.",
+        },
+        400
+      );
+    }
+
+    if (images.length > 10) {
+      return c.json(
+        {
+          success: false,
+          ok: false,
+          message: "사진은 최대 10장까지 등록할 수 있습니다.",
+        },
+        400
+      );
+    }
+
+    const brand = (await c.env.DB.prepare(`
+  SELECT id, name_en, name_ko
+  FROM brands
+  WHERE id = ?
+`)
+  .bind(brandId)
+  .first()) as { id: number; name_en: string; name_ko: string } | null;
+
+    if (!brand) {
+      return c.json(
+        {
+          success: false,
+          ok: false,
+          message: "존재하지 않는 브랜드입니다.",
+        },
+        400
+      );
+    }
+
+    const category = (await c.env.DB.prepare(`
+  SELECT id, name
+  FROM categories
+  WHERE id = ?
+`)
+  .bind(categoryId)
+  .first()) as { id: number; name: string } | null;
+
+    if (!category) {
+      return c.json(
+        {
+          success: false,
+          ok: false,
+          message: "존재하지 않는 카테고리입니다.",
+        },
+        400
+      );
+    }
+
+    const brandText = `${brand.name_en} (${brand.name_ko})`;
+    const categoryText = category.name;
 
     await c.env.DB.prepare(`
       INSERT INTO products (
-        id, seller_email, seller_name, name, brand, category, price,
-        condition, trade_method, description, images, status
-      )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).bind(
-      id,
-      sellerEmail,
-      sellerName,
-      name,
-      brand,
-      category,
-      price,
-      condition,
-      tradeMethod,
-      description,
-      images,
-      status
-    ).run();
-
-    return c.json({
-      ok: true,
-      message: "상품이 등록되었습니다.",
-      product: {
         id,
-        seller_email: sellerEmail,
-        seller_name: sellerName,
+        seller_email,
+        seller_name,
         name,
         brand,
         category,
         price,
         condition,
-        trade_method: tradeMethod,
+        trade_method,
         description,
-        images: Array.isArray(body.images) ? body.images : [],
-        status
-      }
-    }, 201);
-  } catch (err) {
-    console.error(err);
+        images,
+        status,
+        inspection_service,
+        brand_id,
+        category_id,
+        size_region,
+        size_value
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `)
+      .bind(
+        id,
+        sellerEmail,
+        sellerName,
+        name,
+        brandText,
+        categoryText,
+        price,
+        condition,
+        tradeMethod,
+        description,
+        JSON.stringify(images),
+        "판매중",
+        inspectionService,
+        brandId,
+        categoryId,
+        sizeRegion,
+        sizeValue
+      )
+      .run();
 
-    return c.json({
-      ok: false,
-      message: "상품 등록 중 오류가 발생했습니다."
-    }, 500);
+    for (let i = 0; i < images.length; i++) {
+      await c.env.DB.prepare(`
+        INSERT INTO product_images (
+          product_id,
+          image_url,
+          sort_order
+        )
+        VALUES (?, ?, ?)
+      `)
+        .bind(id, String(images[i]), i)
+        .run();
+    }
+
+    return c.json(
+      {
+        success: true,
+        ok: true,
+        message: "상품이 등록되었습니다.",
+        product_id: id,
+        product: {
+          id,
+          seller_email: sellerEmail,
+          seller_name: sellerName,
+          name,
+          brand: brandText,
+          category: categoryText,
+          price,
+          condition,
+          trade_method: tradeMethod,
+          description,
+          images,
+          status: "판매중",
+          inspection_service: inspectionService,
+          brand_id: brandId,
+          category_id: categoryId,
+          size_region: sizeRegion,
+          size_value: sizeValue,
+        },
+      },
+      201
+    );
+  } catch (err) {
+    console.error("Product create error:", err);
+
+    return c.json(
+      {
+        success: false,
+        ok: false,
+        message: "상품 등록 중 오류가 발생했습니다.",
+        error: err instanceof Error ? err.message : String(err),
+      },
+      500
+    );
   }
 });
 
@@ -527,6 +742,138 @@ app.get("/api/products", async (c) => {
     }, 500);
   }
 });
+
+app.get("/api/products/:id", async (c) => {
+  try {
+    const id = c.req.param("id");
+
+    const product = (await c.env.DB.prepare(`
+  SELECT
+    p.*,
+    b.name_en AS brand_name_en,
+    b.name_ko AS brand_name_ko,
+    c.name AS category_name
+  FROM products p
+  LEFT JOIN brands b ON p.brand_id = b.id
+  LEFT JOIN categories c ON p.category_id = c.id
+  WHERE p.id = ?
+`)
+  .bind(id)
+  .first()) as any;
+
+    if (!product) {
+      return c.json(
+        {
+          success: false,
+          message: "상품을 찾을 수 없습니다.",
+        },
+        404
+      );
+    }
+
+    const imageRows = await c.env.DB.prepare(`
+      SELECT image_url
+      FROM product_images
+      WHERE product_id = ?
+      ORDER BY sort_order ASC
+    `)
+      .bind(id)
+      .all();
+
+    let images: string[] = [];
+
+    if (imageRows.results && imageRows.results.length > 0) {
+      images = imageRows.results.map((row: any) => String(row.image_url));
+    } else {
+      try {
+        images = product.images ? JSON.parse(String(product.images)) : [];
+      } catch {
+        images = [];
+      }
+    }
+    
+const categoryPath: string[] = [];
+
+if (product.category_id) {
+  let currentCategoryId: number | null = Number(product.category_id);
+
+  while (currentCategoryId !== null) {
+const row = (await c.env.DB.prepare(`
+  SELECT id, name, parent_id
+  FROM categories
+  WHERE id = ?
+`)
+  .bind(currentCategoryId)
+  .first()) as {
+    id: number;
+    name: string;
+    parent_id: number | null;
+  } | null;
+
+    if (!row) {
+      break;
+    }
+
+    categoryPath.unshift(String(row.name));
+
+    currentCategoryId =
+      row.parent_id === null || row.parent_id === undefined
+        ? null
+        : Number(row.parent_id);
+  }
+}
+    return c.json({
+      success: true,
+      product: {
+        id: product.id,
+        seller_email: product.seller_email,
+        seller_name: product.seller_name,
+        name: product.name,
+        description: product.description,
+        price: product.price,
+        condition: product.condition,
+        trade_method: product.trade_method,
+        status: product.status,
+
+        brand_id: product.brand_id,
+        brand: {
+          id: product.brand_id,
+          name_en: product.brand_name_en,
+          name_ko: product.brand_name_ko,
+          label: product.brand_name_en && product.brand_name_ko
+            ? `${product.brand_name_en} (${product.brand_name_ko})`
+            : product.brand,
+        },
+
+        category_id: product.category_id,
+        category: {
+  id: product.category_id,
+  name: product.category_name || product.category,
+  path: categoryPath,
+  path_label: categoryPath.join(" > "),
+},
+
+        size_region: product.size_region,
+        size_value: product.size_value,
+        inspection_service: Boolean(product.inspection_service),
+
+        images,
+      },
+    });
+  } catch (err) {
+    console.error("Product detail error:", err);
+
+    return c.json(
+      {
+        success: false,
+        message: "상품 상세 조회 중 오류가 발생했습니다.",
+        error: err instanceof Error ? err.message : String(err),
+      },
+      500
+    );
+  }
+});
+
 app.get("/api/bookmarks/:email", async (c) => {
   try {
     const email = c.req.param("email");
