@@ -1,0 +1,41 @@
+[33m595cff8[m connect product card click to detail api
+[33m50b2043[m update frontend api url to resellground worker
+[33m8c7c053[m update product ui work
+[33m34fdb38[m save products from modal to database
+[33m48702d9[m render products from database
+[33m8aede96[m update product modal image uploader
+[33m6884fa7[m clean post card preview markdown
+[33m41a0e71[m improve post image upload and draft count
+[33maafa6b1[m enable post editor tools and tags
+[33m2c09cf8[m update write post editor modal design
+[33mf5e4d57[m connect community posts to D1 database
+[33m5dac446[m fix post creation and bookmark flow
+[33m0a4b510[m stabilize guide and seller trust UI
+[33mfb1e24a[m add interactive guide center
+[33ma0cc546[m fix trade bar fee display
+[33m22ef56a[m fix login state and logout function
+[33mf5b785f[m git push origin mainfix login button click state
+[33m0be25a8[m fix login button and mobile logout handlers
+[33m6a78be9[m fix mypage button login state
+[33m237c85e[m fix login state and desktop logout
+[33m3b2f9ab[m fix login state persistence
+[33m97158e8[m add logout menu for desktop and mobile
+[33m621d068[m restore stable frontend state
+[33m18fb6f2[m add desktop logout button
+[33m7f7de8d[m add desktop logout button
+[33me8b9742[m add desktop logout button
+[33m637c8e7[m show mobile logout button
+[33m650d829[m add mobile logout button
+[33m1a24a3e[m route auth button to mypage
+[33m99db37f[m fix mypage auth button route
+[33m231ed86[m fix mobile auth button state
+[33m592b71d[m show mypage button when authenticated
+[33m3764515[m hide mobile login button when authenticated
+[33mdcf6a22[m connect post create api
+[33mef953a5[m hide login button when authenticated
+[33m7284a18[m fix social login button init
+[33m2e9dcc4[m persist login state and prepare social login
+[33me570ff4[m debug login api call
+[33mc4579dc[m connect deployed backend api
+[33m89e89ac[m fix frontend auth integration
+[33ma148daa[m add frontend files
