@@ -814,9 +814,11 @@ console.log('입력값 확인:', {
 
     const data = await res.json();
 
-    if (!res.ok || !data.success) {
-      throw new Error(data.message || '상품 등록에 실패했습니다.');
-    }
+    const isSuccess = res.ok && (data.success === true || data.ok === true);
+
+if (!isSuccess) {
+  throw new Error(data.message || '상품 등록에 실패했습니다.');
+}
 
    showToast('상품이 등록되었습니다.', 'success');
 
