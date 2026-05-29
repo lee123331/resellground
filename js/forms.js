@@ -757,25 +757,51 @@ async function submitProductToDB() {
     return;
   }
 
+const categoryId = mapLegacyCategoryToId(categoryText);
+const brandId = mapLegacyBrandToId(brandText);
+
 const payload = {
   seller_email: user.email,
   seller_name: user.name,
+
+  // 신규 백엔드용
   name,
   description,
   price,
-  brand_id: mapLegacyBrandToId(brandText),
-  category_id: mapLegacyCategoryToId(categoryText),
+  brand_id: brandId,
+  category_id: categoryId,
   size_region: 'KR',
   size_value: document.getElementById('dropSize')?.value || '',
   condition,
   trade_method: tradeMethod,
   inspection_service: false,
-  images
+  images,
+
+  // 구버전 백엔드/목록 호환용
+  title: name,
+  brand: brandText,
+  category: categoryText,
+  cat: categoryText,
+  price_num: price,
+  tradeMethod: tradeMethod
 };
+
+console.log('상품 등록 payload:', payload);
+console.log('입력값 확인:', {
+  name,
+  brandText,
+  categoryText,
+  price,
+  condition,
+  tradeMethod,
+  imagesLength: images.length
+});
 
   try {
     submitBtn.disabled = true;
     submitBtn.textContent = '등록 중...';
+
+    console.log('상품 등록 요청 주소:', `${API_BASE}/api/products`);
 
     const res = await fetch(`${API_BASE}/api/products`, {
   method: 'POST',
