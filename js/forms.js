@@ -637,7 +637,9 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 /* ── 상품 등록: DB 저장 연결 ── */
 function getProductImagesFromPreview() {
-  return selectedDropImageDataUrls.slice(0, 10);
+  // 현재는 이미지 미리보기만 처리하고, 실제 업로드는 R2 연동 후 저장한다.
+  // D1에는 base64 이미지 문자열을 직접 저장하지 않는다.
+  return [];
 }
 
 function getSelectedProductCondition() {
