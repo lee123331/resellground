@@ -1598,11 +1598,377 @@
 <!-- 모바일 플로팅 버튼 -->
 <button class="fab-btn" id="fabBtn" aria-label="글쓰기/상품등록">✏</button>
 
+<!-- ══════════════════════════════════════
+     상품 등록 전용 페이지
+══════════════════════════════════════ -->
+<main class="page" id="page-product-register">
+  <div class="preg-wrap">
+
+    <!-- 상단 바 -->
+    <div class="preg-topbar">
+      <button class="preg-back" id="pregBackBtn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+        뒤로
+      </button>
+      <h1 class="preg-topbar__title">상품 등록</h1>
+      <div class="preg-topbar__actions">
+        <button class="preg-btn-save" id="pregSaveBtn">임시저장</button>
+        <button class="preg-btn-submit" id="pregSubmitBtn">등록하기 →</button>
+      </div>
+    </div>
+
+    <!-- 본문 2컬럼 -->
+    <div class="preg-body">
+
+      <!-- ── 왼쪽: 사진 업로드 ── -->
+      <aside class="preg-img-col">
+        <div class="preg-card">
+          <div class="preg-card__hd">
+            <span class="preg-card__title">사진 등록</span>
+            <span class="req-badge">필수</span>
+            <span class="preg-img-count" id="pregImgCount">0 / 10</span>
+          </div>
+
+          <!-- 드롭존 -->
+          <div class="preg-dropzone" id="pregDropzone">
+            <input type="file" id="pregFileInput" accept="image/*" multiple style="display:none">
+            <div class="preg-dropzone__content" id="pregDropContent">
+              <div class="preg-dropzone__icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+              </div>
+              <p class="preg-dropzone__text">클릭하거나 사진을 여기에 끌어다 놓으세요</p>
+              <p class="preg-dropzone__hint">JPG · PNG · WEBP · 최대 10장 · 장당 10MB</p>
+            </div>
+          </div>
+
+          <!-- 썸네일 그리드 -->
+          <div class="preg-thumb-grid" id="pregThumbGrid" style="display:none"></div>
+
+          <div class="preg-photo-tips">
+            <span>📌 첫 번째 사진이 대표 이미지</span>
+            <span>↕ 드래그로 순서 변경</span>
+          </div>
+        </div>
+
+        <!-- 등록 가이드 (데스크톱용) -->
+        <div class="preg-guide-card">
+          <p class="preg-guide-card__title">📋 등록 TIP</p>
+          <ul class="preg-guide-list">
+            <li>밝은 배경에서 촬영한 선명한 사진을 사용하세요</li>
+            <li>태그·시리얼 넘버 등 인증 사진을 추가하면 신뢰도가 높아집니다</li>
+            <li>흠집·사용감이 있다면 해당 부위를 꼭 촬영해 주세요</li>
+          </ul>
+        </div>
+      </aside>
+
+      <!-- ── 오른쪽: 폼 섹션들 ── -->
+      <section class="preg-form-col">
+
+        <!-- ① 기본 정보 -->
+        <div class="preg-card">
+          <div class="preg-card__hd">
+            <span class="preg-card__title">기본 정보</span>
+          </div>
+          <div class="preg-row-2">
+            <div class="preg-field">
+              <label class="preg-label">카테고리 <span class="req">*</span></label>
+              <input type="hidden" id="pregCat">
+              <button type="button" class="preg-cat-btn" id="pregCatBtn">
+                <span id="pregCatLabel">카테고리 선택</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+              <p class="preg-err" id="pregCatErr"></p>
+            </div>
+            <div class="preg-field">
+              <label class="preg-label" for="pregBrand">브랜드 <span class="req">*</span></label>
+              <input class="preg-input" id="pregBrand" type="text" placeholder="Nike, Rolex, Chanel…" autocomplete="off">
+              <p class="preg-err" id="pregBrandErr"></p>
+            </div>
+          </div>
+          <div class="preg-field">
+            <label class="preg-label" for="pregName">상품명 <span class="req">*</span></label>
+            <input class="preg-input" id="pregName" type="text" placeholder="예) Nike Air Jordan 1 Retro High OG Chicago 2022" autocomplete="off">
+            <p class="preg-err" id="pregNameErr"></p>
+          </div>
+          <div class="preg-row-2">
+            <div class="preg-field">
+              <label class="preg-label" for="pregModel">모델 번호 <span class="opt">(선택)</span></label>
+              <input class="preg-input" id="pregModel" type="text" placeholder="예) DD1391-100">
+            </div>
+            <div class="preg-field" id="pregSizeWrap">
+              <label class="preg-label" for="pregSize">사이즈 <span class="opt">(선택)</span></label>
+              <select class="preg-input" id="pregSize">
+                <option value="">선택</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- ② 상품 상태 -->
+        <div class="preg-card">
+          <div class="preg-card__hd">
+            <span class="preg-card__title">상품 상태</span>
+            <span class="req-badge">필수</span>
+          </div>
+          <div class="preg-cond-grid">
+            <label class="preg-cond-card">
+              <input type="radio" name="pregCond" value="S급 미착용">
+              <div class="preg-cond-card__body">
+                <span class="preg-cond-grade preg-cond-grade--s">S</span>
+                <div>
+                  <p class="preg-cond-name">S급 미착용</p>
+                  <p class="preg-cond-desc">태그 부착, 미사용 새 상품</p>
+                </div>
+              </div>
+            </label>
+            <label class="preg-cond-card">
+              <input type="radio" name="pregCond" value="A급 거의 새것">
+              <div class="preg-cond-card__body">
+                <span class="preg-cond-grade preg-cond-grade--a">A</span>
+                <div>
+                  <p class="preg-cond-name">A급 거의 새것</p>
+                  <p class="preg-cond-desc">1~3회 착용, 흠집 없음</p>
+                </div>
+              </div>
+            </label>
+            <label class="preg-cond-card">
+              <input type="radio" name="pregCond" value="B급 상태 좋음">
+              <div class="preg-cond-card__body">
+                <span class="preg-cond-grade preg-cond-grade--b">B</span>
+                <div>
+                  <p class="preg-cond-name">B급 상태 좋음</p>
+                  <p class="preg-cond-desc">착용감 있으나 상태 양호</p>
+                </div>
+              </div>
+            </label>
+            <label class="preg-cond-card">
+              <input type="radio" name="pregCond" value="C급 사용감 있음">
+              <div class="preg-cond-card__body">
+                <span class="preg-cond-grade preg-cond-grade--c">C</span>
+                <div>
+                  <p class="preg-cond-name">C급 사용감 있음</p>
+                  <p class="preg-cond-desc">스크래치·사용감 있음</p>
+                </div>
+              </div>
+            </label>
+          </div>
+          <p class="preg-err" id="pregCondErr"></p>
+        </div>
+
+        <!-- ③ 가격 -->
+        <div class="preg-card">
+          <div class="preg-card__hd">
+            <span class="preg-card__title">가격</span>
+          </div>
+          <div class="preg-row-2">
+            <div class="preg-field">
+              <label class="preg-label" for="pregPrice">판매가 <span class="req">*</span></label>
+              <div class="preg-price-wrap">
+                <input class="preg-input preg-input--price" id="pregPrice" type="number" min="0" placeholder="0" inputmode="numeric">
+                <span class="preg-price-unit">원</span>
+              </div>
+              <p class="preg-err" id="pregPriceErr"></p>
+            </div>
+            <div class="preg-field">
+              <label class="preg-label" for="pregRetail">정가 <span class="opt">(선택)</span></label>
+              <div class="preg-price-wrap">
+                <input class="preg-input preg-input--price" id="pregRetail" type="number" min="0" placeholder="0" inputmode="numeric">
+                <span class="preg-price-unit">원</span>
+              </div>
+            </div>
+          </div>
+          <div class="preg-fee-box" id="pregFeeBox">
+            <div class="preg-fee-row">
+              <span>판매가</span>
+              <strong id="pregPriceDisplay">—</strong>
+            </div>
+            <div class="preg-fee-row">
+              <span>수수료 <em class="preg-fee-rate">2.5%</em></span>
+              <span id="pregFeeDisplay" class="preg-fee-minus">—</span>
+            </div>
+            <div class="preg-fee-divider"></div>
+            <div class="preg-fee-row preg-fee-row--total">
+              <span>실수령액</span>
+              <strong id="pregNetDisplay" class="preg-net-val">—</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- ④ 상품 설명 -->
+        <div class="preg-card">
+          <div class="preg-card__hd">
+            <span class="preg-card__title">상품 설명</span>
+            <span class="opt-badge">선택</span>
+          </div>
+          <textarea class="preg-textarea" id="pregDesc" rows="6" maxlength="2000"
+            placeholder="· 사이즈·구성품 정보
+· 구매처 및 구매 시기
+· 착용 횟수 및 보관 상태
+· 하자·스크래치 여부
+위 내용을 포함한 상세 정보를 작성해 주세요"></textarea>
+          <div class="preg-char-row">
+            <span id="pregDescCount">0</span> / 2000
+          </div>
+        </div>
+
+        <!-- ⑤ 거래 방식 -->
+        <div class="preg-card">
+          <div class="preg-card__hd">
+            <span class="preg-card__title">거래 방식</span>
+          </div>
+          <div class="preg-trade-grid">
+            <label class="preg-trade-card">
+              <input type="checkbox" name="pregTrade" value="전국 안전결제">
+              <div class="preg-trade-card__body">
+                <span class="preg-trade-icon">📦</span>
+                <div>
+                  <p class="preg-trade-name">전국 택배 거래</p>
+                  <p class="preg-trade-desc">안전결제 시스템 연동</p>
+                </div>
+                <span class="preg-trade-check">✓</span>
+              </div>
+            </label>
+            <label class="preg-trade-card">
+              <input type="checkbox" name="pregTrade" value="근거리 직거래">
+              <div class="preg-trade-card__body">
+                <span class="preg-trade-icon">🤝</span>
+                <div>
+                  <p class="preg-trade-name">근거리 직거래</p>
+                  <p class="preg-trade-desc">직접 만나서 거래</p>
+                </div>
+                <span class="preg-trade-check">✓</span>
+              </div>
+            </label>
+          </div>
+          <div class="preg-field" id="pregLocationWrap" style="display:none; margin-top:14px">
+            <label class="preg-label" for="pregLocation">직거래 희망 지역</label>
+            <input class="preg-input" id="pregLocation" type="text" placeholder="예) 서울 강남구, 부산 해운대구">
+          </div>
+        </div>
+
+        <!-- ⑥ 추가 옵션 -->
+        <div class="preg-card">
+          <div class="preg-card__hd">
+            <span class="preg-card__title">추가 옵션</span>
+          </div>
+          <div class="preg-option-list">
+            <div class="preg-option-item preg-option-item--disabled">
+              <div class="preg-option-info">
+                <p class="preg-option-name">
+                  🔍 정가품 검수 서비스
+                  <button type="button" class="preg-verify-info-btn" id="pregVerifyInfoBtn">서비스 안내</button>
+                </p>
+                <p class="preg-option-desc">전문 검수 후 인증 마크 부여 <span class="preg-coming">준비 중</span></p>
+              </div>
+              <label class="preg-toggle">
+                <input type="checkbox" id="pregVerify" disabled>
+                <span class="preg-toggle__track"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- 주의사항 -->
+        <div class="preg-warn-box">
+          <span class="preg-warn-box__icon">⚠</span>
+          <span>허위 매물·가품 등록 시 영구 이용 정지 및 법적 조치가 취해질 수 있습니다.</span>
+        </div>
+
+      </section><!-- /preg-form-col -->
+    </div><!-- /preg-body -->
+
+    <!-- 하단 고정 바 -->
+    <div class="preg-sticky-bar">
+      <p class="preg-sticky-bar__fee">수수료 <b>2.5%</b> 고정 · 업계 최저</p>
+      <div class="preg-sticky-bar__btns">
+        <button class="preg-btn-save-b" id="pregSaveBtnB">임시저장</button>
+        <button class="preg-btn-submit-b" id="pregSubmitBtnB">등록하기 →</button>
+      </div>
+    </div>
+
+  </div><!-- /preg-wrap -->
+
+  <!-- 정가품 검수 서비스 안내 모달 -->
+  <div class="cat-overlay" id="verifyInfoOverlay">
+    <div class="cat-sheet verify-info-sheet">
+      <div class="cat-sheet__hd">
+        <span style="width:32px"></span>
+        <span class="cat-sheet__title">🔍 정가품 검수 서비스</span>
+        <button type="button" class="cat-close-btn" id="verifyInfoCloseBtn">✕</button>
+      </div>
+      <div style="padding:20px 24px 32px;overflow-y:auto">
+        <div class="verify-coming-badge">준비 중 · Coming Soon</div>
+        <p class="verify-info-lead">리셀그라운드가 직접 상품을 검수하고<br><strong>정품 인증 마크</strong>를 부여하는 서비스예요.</p>
+
+        <div class="verify-steps">
+          <div class="verify-step">
+            <span class="verify-step__num">01</span>
+            <div>
+              <p class="verify-step__title">상품 접수 · 발송</p>
+              <p class="verify-step__desc">판매자가 리셀그라운드 검수센터로 상품을 발송합니다.</p>
+            </div>
+          </div>
+          <div class="verify-step">
+            <span class="verify-step__num">02</span>
+            <div>
+              <p class="verify-step__title">전문 감정사 실물 검수</p>
+              <p class="verify-step__desc">카테고리별 전문 감정사가 정품 여부, 상태, 구성품을 꼼꼼히 확인합니다.</p>
+            </div>
+          </div>
+          <div class="verify-step">
+            <span class="verify-step__num">03</span>
+            <div>
+              <p class="verify-step__title">인증 마크 부여</p>
+              <p class="verify-step__desc">정품 확인 시 RG 인증 마크가 상품 페이지에 표시되어 구매자 신뢰도가 높아집니다.</p>
+            </div>
+          </div>
+          <div class="verify-step">
+            <span class="verify-step__num">04</span>
+            <div>
+              <p class="verify-step__title">구매자에게 직배송</p>
+              <p class="verify-step__desc">거래 성사 시 검수센터에서 구매자에게 직접 발송합니다.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="verify-benefit-box">
+          <p class="verify-benefit-title">✅ 인증 마크 혜택</p>
+          <ul class="verify-benefit-list">
+            <li>정품 보증으로 거래 신뢰도 상승</li>
+            <li>판매 완료율 및 가격 협상력 향상</li>
+            <li>분쟁 발생 시 리셀그라운드가 책임 중재</li>
+            <li>인증 셀러 등급 산정에 반영 예정</li>
+          </ul>
+        </div>
+
+        <p class="verify-notice">현재 서비스 준비 중입니다. 출시 시 가입한 이메일로 안내드릴게요.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 카테고리 캐스케이드 오버레이 -->
+  <div class="cat-overlay" id="pregCatOverlay">
+    <div class="cat-sheet" id="pregCatSheet">
+      <div class="cat-sheet__hd">
+        <button type="button" class="cat-back-btn" id="pregCatBackBtn" style="visibility:hidden">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <span class="cat-sheet__title" id="pregCatSheetTitle">카테고리 선택</span>
+        <button type="button" class="cat-close-btn" id="pregCatCloseBtn">✕</button>
+      </div>
+      <div class="cat-breadcrumb" id="pregCatBreadcrumb"></div>
+      <div class="cat-list" id="pregCatList"></div>
+    </div>
+  </div>
+
+</main>
+
 <script src="js/data.js"></script>
 <script src="js/render.js"></script>
 <script src="js/ui.js"></script>
 <script src="js/forms.js"></script>
 <script src="js/app.js"></script>
+<script src="js/product-detail-db.js"></script>
 
 </body>
 </html>

@@ -9,3 +9,952 @@
   --sp-5:var(--s5);--sp-6:var(--s6);--sp-8:var(--s8);
 }
 .sp-y{padding:var(--s10) var(--s5)}
+
+/* ══════════════════════════════════════════
+   상품 등록 페이지  #page-product-register
+══════════════════════════════════════════ */
+
+/* 래퍼 */
+#page-product-register {
+  background: var(--bg, #f5f5f5);
+  min-height: 100vh;
+}
+.preg-wrap {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding-bottom: 72px; /* sticky bar 높이 */
+}
+
+/* ── 상단 바 ── */
+.preg-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 24px;
+  height: 60px;
+  background: #fff;
+  border-bottom: 1px solid var(--border, #e5e7eb);
+  box-shadow: 0 1px 4px rgba(0,0,0,.06);
+}
+.preg-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-sub, #4b5563);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px 8px;
+  border-radius: 8px;
+  transition: background .15s;
+  flex-shrink: 0;
+}
+.preg-back:hover { background: var(--bg-soft, #f3f4f6); }
+.preg-topbar__title {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text, #111827);
+  flex: 1;
+}
+.preg-topbar__actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.preg-btn-save {
+  height: 36px;
+  padding: 0 16px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border, #e5e7eb);
+  background: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-sub, #4b5563);
+  cursor: pointer;
+  transition: all .15s;
+}
+.preg-btn-save:hover {
+  border-color: var(--text-sub, #4b5563);
+  color: var(--text, #111827);
+}
+.preg-btn-submit {
+  height: 36px;
+  padding: 0 20px;
+  border-radius: 8px;
+  border: none;
+  background: var(--brand, #1d4ed8);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .15s;
+}
+.preg-btn-submit:hover { background: var(--brand-d, #1e40af); }
+
+/* ── 본문 레이아웃 ── */
+.preg-body {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 20px;
+  max-width: 1100px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 24px 24px 0;
+  align-items: start;
+}
+
+/* ── 카드 공통 ── */
+.preg-card {
+  background: #fff;
+  border-radius: 14px;
+  border: 1px solid var(--border, #e5e7eb);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.preg-card__hd {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+.preg-card__title {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text, #111827);
+}
+.req-badge {
+  font-size: 10px;
+  font-weight: 700;
+  color: #ef4444;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 4px;
+  padding: 1px 6px;
+}
+.opt-badge {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-mute, #9ca3af);
+  background: var(--bg-soft, #f9fafb);
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 4px;
+  padding: 1px 6px;
+}
+.preg-img-count {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-mute, #9ca3af);
+}
+
+/* ── 드롭존 ── */
+.preg-dropzone {
+  position: relative;
+  border: 2px dashed var(--border, #d1d5db);
+  border-radius: 12px;
+  background: var(--bg-soft, #f9fafb);
+  min-height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all .2s;
+  overflow: hidden;
+}
+.preg-dropzone:hover,
+.preg-dropzone.is-dragover {
+  border-color: var(--brand, #1d4ed8);
+  background: #eff6ff;
+}
+.preg-dropzone__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 24px;
+  text-align: center;
+  pointer-events: none;
+}
+.preg-dropzone__icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--border, #e5e7eb);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-mute, #9ca3af);
+  margin-bottom: 4px;
+}
+.preg-dropzone__text {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-sub, #4b5563);
+}
+.preg-dropzone__hint {
+  font-size: 11px;
+  color: var(--text-mute, #9ca3af);
+}
+
+/* ── 썸네일 그리드 ── */
+.preg-thumb-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-top: 10px;
+}
+.preg-thumb {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1.5px solid var(--border, #e5e7eb);
+  cursor: grab;
+  background: var(--bg-soft, #f9fafb);
+  transition: border-color .15s;
+}
+.preg-thumb:hover { border-color: var(--text-sub); }
+.preg-thumb.is-dragging { opacity: .35; }
+.preg-thumb.is-dragover { border-color: var(--brand, #1d4ed8); border-style: dashed; }
+.preg-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.preg-thumb__del {
+  position: absolute;
+  top: 4px; right: 4px;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: rgba(0,0,0,.55);
+  color: #fff;
+  border: none;
+  font-size: 12px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity .15s;
+}
+.preg-thumb:hover .preg-thumb__del { opacity: 1; }
+.preg-thumb__badge {
+  position: absolute;
+  bottom: 4px; left: 4px;
+  font-size: 9px;
+  font-weight: 800;
+  color: #fff;
+  background: var(--brand, #1d4ed8);
+  border-radius: 4px;
+  padding: 1px 5px;
+  letter-spacing: .04em;
+}
+.preg-thumb-add {
+  aspect-ratio: 1;
+  border-radius: 8px;
+  border: 1.5px dashed var(--border, #d1d5db);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  cursor: pointer;
+  font-size: 20px;
+  color: var(--text-mute, #9ca3af);
+  gap: 4px;
+  transition: border-color .15s, color .15s;
+}
+.preg-thumb-add:hover { border-color: var(--text-sub); color: var(--text-sub); }
+.preg-thumb-add span { font-size: 10px; font-weight: 600; }
+
+/* 포토 팁 */
+.preg-photo-tips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+.preg-photo-tips span {
+  font-size: 11px;
+  color: var(--text-mute, #9ca3af);
+}
+
+/* 등록 가이드 카드 */
+.preg-guide-card {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin-bottom: 16px;
+}
+.preg-guide-card__title {
+  font-size: 12px;
+  font-weight: 800;
+  color: #1d4ed8;
+  margin-bottom: 10px;
+}
+.preg-guide-list {
+  list-style: none;
+  padding: 0; margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.preg-guide-list li {
+  font-size: 12px;
+  color: #2563eb;
+  padding-left: 14px;
+  position: relative;
+  line-height: 1.5;
+}
+.preg-guide-list li::before {
+  content: '·';
+  position: absolute;
+  left: 4px;
+}
+
+/* ── 폼 공통 ── */
+.preg-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.preg-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.preg-field:last-child { margin-bottom: 0; }
+.preg-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text, #111827);
+}
+.preg-label .req { color: #ef4444; font-style: normal; }
+.preg-label .opt { color: var(--text-mute, #9ca3af); font-weight: 500; }
+.preg-input {
+  height: 42px;
+  padding: 0 12px;
+  border: 1.5px solid var(--border, #e5e7eb);
+  border-radius: 9px;
+  font-size: 13px;
+  color: var(--text, #111827);
+  background: #fff;
+  outline: none;
+  transition: border-color .15s, box-shadow .15s;
+  font-family: var(--f, inherit);
+  width: 100%;
+  box-sizing: border-box;
+}
+.preg-input:focus {
+  border-color: var(--brand, #1d4ed8);
+  box-shadow: 0 0 0 3px rgba(29,78,216,.1);
+}
+.preg-input.err { border-color: #ef4444; box-shadow: 0 0 0 3px rgba(239,68,68,.08); }
+.preg-input.ok { border-color: #22c55e; }
+.preg-err {
+  font-size: 11px;
+  color: #ef4444;
+  min-height: 16px;
+  display: none;
+}
+.preg-err.show { display: block; }
+
+/* ── 상품 상태 ── */
+.preg-cond-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.preg-cond-card {
+  display: block;
+  cursor: pointer;
+}
+.preg-cond-card input { display: none; }
+.preg-cond-card__body {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border: 1.5px solid var(--border, #e5e7eb);
+  border-radius: 10px;
+  transition: all .15s;
+}
+.preg-cond-card:hover .preg-cond-card__body { border-color: var(--text-sub); }
+.preg-cond-card input:checked + .preg-cond-card__body {
+  border-color: var(--brand, #1d4ed8);
+  background: #eff6ff;
+  box-shadow: 0 0 0 3px rgba(29,78,216,.1);
+}
+.preg-cond-grade {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  font-weight: 900;
+  flex-shrink: 0;
+}
+.preg-cond-grade--s { background: #f0fdf4; color: #16a34a; }
+.preg-cond-grade--a { background: #eff6ff; color: #1d4ed8; }
+.preg-cond-grade--b { background: #fff7ed; color: #c2410c; }
+.preg-cond-grade--c { background: #fef2f2; color: #dc2626; }
+.preg-cond-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text, #111827);
+  margin-bottom: 2px;
+}
+.preg-cond-desc {
+  font-size: 11px;
+  color: var(--text-mute, #9ca3af);
+}
+
+/* ── 가격 ── */
+.preg-price-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.preg-input--price {
+  flex: 1;
+  -moz-appearance: textfield;
+}
+.preg-input--price::-webkit-outer-spin-button,
+.preg-input--price::-webkit-inner-spin-button { -webkit-appearance: none; }
+.preg-price-unit {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-sub, #4b5563);
+  flex-shrink: 0;
+}
+.preg-fee-box {
+  background: var(--bg-soft, #f9fafb);
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+.preg-fee-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  color: var(--text-sub, #4b5563);
+}
+.preg-fee-row strong { font-weight: 700; color: var(--text, #111827); }
+.preg-fee-rate {
+  font-style: normal;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--three, #f97316);
+  background: #fff7ed;
+  border-radius: 4px;
+  padding: 1px 5px;
+  margin-left: 4px;
+}
+.preg-fee-minus { color: #ef4444; font-weight: 600; }
+.preg-fee-divider {
+  height: 1px;
+  background: var(--border, #e5e7eb);
+  margin: 2px 0;
+}
+.preg-fee-row--total {
+  font-weight: 700;
+  font-size: 14px;
+}
+.preg-net-val { color: var(--brand, #1d4ed8) !important; font-size: 15px !important; }
+
+/* ── 설명 ── */
+.preg-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border: 1.5px solid var(--border, #e5e7eb);
+  border-radius: 9px;
+  font-size: 13px;
+  color: var(--text, #111827);
+  line-height: 1.7;
+  resize: vertical;
+  outline: none;
+  font-family: var(--f, inherit);
+  transition: border-color .15s, box-shadow .15s;
+}
+.preg-textarea:focus {
+  border-color: var(--brand, #1d4ed8);
+  box-shadow: 0 0 0 3px rgba(29,78,216,.1);
+}
+.preg-char-row {
+  text-align: right;
+  font-size: 11px;
+  color: var(--text-mute, #9ca3af);
+  margin-top: 6px;
+}
+
+/* ── 거래 방식 ── */
+.preg-trade-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.preg-trade-card { display: block; cursor: pointer; }
+.preg-trade-card input { display: none; }
+.preg-trade-card__body {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border: 1.5px solid var(--border, #e5e7eb);
+  border-radius: 10px;
+  transition: all .15s;
+  position: relative;
+}
+.preg-trade-card:hover .preg-trade-card__body { border-color: var(--text-sub); }
+.preg-trade-card input:checked + .preg-trade-card__body {
+  border-color: var(--brand, #1d4ed8);
+  background: #eff6ff;
+  box-shadow: 0 0 0 3px rgba(29,78,216,.1);
+}
+.preg-trade-icon { font-size: 22px; flex-shrink: 0; }
+.preg-trade-name { font-size: 13px; font-weight: 700; color: var(--text, #111827); margin-bottom: 2px; }
+.preg-trade-desc { font-size: 11px; color: var(--text-mute, #9ca3af); }
+.preg-trade-check {
+  margin-left: auto;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border, #d1d5db);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px;
+  color: transparent;
+  flex-shrink: 0;
+  transition: all .15s;
+}
+.preg-trade-card input:checked + .preg-trade-card__body .preg-trade-check {
+  background: var(--brand, #1d4ed8);
+  border-color: var(--brand, #1d4ed8);
+  color: #fff;
+}
+
+/* ── 추가 옵션 ── */
+.preg-option-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.preg-option-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border, #f3f4f6);
+}
+.preg-option-item:last-child { border-bottom: none; padding-bottom: 0; }
+.preg-option-item--disabled { opacity: .5; }
+.preg-option-name { font-size: 13px; font-weight: 700; color: var(--text, #111827); margin-bottom: 3px; }
+.preg-option-desc { font-size: 11px; color: var(--text-mute, #9ca3af); }
+.preg-coming {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  color: #7c3aed;
+  background: #f5f3ff;
+  border-radius: 4px;
+  padding: 1px 5px;
+  margin-left: 4px;
+}
+/* 토글 스위치 */
+.preg-toggle { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; }
+.preg-toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+.preg-toggle__track {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: var(--border, #d1d5db);
+  cursor: pointer;
+  transition: background .2s;
+}
+.preg-toggle__track::after {
+  content: '';
+  position: absolute;
+  width: 18px; height: 18px;
+  top: 3px; left: 3px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,.2);
+  transition: transform .2s;
+}
+.preg-toggle input:checked + .preg-toggle__track { background: var(--brand, #1d4ed8); }
+.preg-toggle input:checked + .preg-toggle__track::after { transform: translateX(20px); }
+.preg-toggle input:disabled + .preg-toggle__track { cursor: not-allowed; }
+
+/* ── 주의사항 ── */
+.preg-warn-box {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  background: #fff8f6;
+  border: 1.5px solid #fecaca;
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-size: 12px;
+  color: #b91c1c;
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+.preg-warn-box__icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+
+/* ── 하단 고정 바 ── */
+.preg-sticky-bar {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  z-index: 199;
+  background: #fff;
+  border-top: 1px solid var(--border, #e5e7eb);
+  box-shadow: 0 -2px 12px rgba(0,0,0,.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  height: 64px;
+}
+.preg-sticky-bar__fee {
+  font-size: 13px;
+  color: var(--text-sub, #4b5563);
+}
+.preg-sticky-bar__fee b { color: var(--brand, #1d4ed8); }
+.preg-sticky-bar__btns { display: flex; gap: 8px; }
+.preg-btn-save-b {
+  height: 40px;
+  padding: 0 20px;
+  border-radius: 9px;
+  border: 1.5px solid var(--border, #e5e7eb);
+  background: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-sub, #4b5563);
+  cursor: pointer;
+  transition: all .15s;
+}
+.preg-btn-save-b:hover { border-color: var(--text); color: var(--text); }
+.preg-btn-submit-b {
+  height: 40px;
+  padding: 0 28px;
+  border-radius: 9px;
+  border: none;
+  background: var(--brand, #1d4ed8);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .15s;
+}
+.preg-btn-submit-b:hover { background: var(--brand-d, #1e40af); }
+
+/* ══ 반응형 ══ */
+@media (max-width: 900px) {
+  .preg-body { grid-template-columns: 1fr; padding: 16px 16px 0; }
+  .preg-img-col { position: static; }
+  .preg-guide-card { display: none; }
+  .preg-topbar { padding: 0 16px; }
+  .preg-topbar__title { font-size: 15px; }
+  .preg-btn-save { display: none; }
+  .preg-sticky-bar { padding: 10px 16px; }
+}
+@media (max-width: 600px) {
+  .preg-cond-grid { grid-template-columns: 1fr 1fr; }
+  .preg-trade-grid { grid-template-columns: 1fr; }
+  .preg-row-2 { grid-template-columns: 1fr; }
+  .preg-thumb-grid { grid-template-columns: repeat(4, 1fr); }
+  .preg-topbar__actions { gap: 6px; }
+  .preg-btn-submit { padding: 0 14px; font-size: 12px; }
+}
+
+/* ══════════════════════════════════════
+   정가품 검수 서비스 안내 버튼 & 모달
+══════════════════════════════════════ */
+.preg-verify-info-btn {
+  margin-left: 8px;
+  padding: 2px 9px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--brand, #1e3a5f);
+  background: rgba(30,58,95,.08);
+  border: 1px solid rgba(30,58,95,.2);
+  border-radius: 20px;
+  cursor: pointer;
+  vertical-align: middle;
+  transition: background .12s;
+}
+.preg-verify-info-btn:hover { background: rgba(30,58,95,.14); }
+
+.verify-info-sheet { max-height: 85vh; }
+
+.verify-coming-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  background: #fef3c7;
+  color: #92400e;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 20px;
+  margin-bottom: 14px;
+  letter-spacing: .3px;
+}
+.verify-info-lead {
+  font-size: 15px;
+  color: var(--text, #111827);
+  line-height: 1.7;
+  margin-bottom: 20px;
+}
+.verify-steps { display: flex; flex-direction: column; gap: 16px; margin-bottom: 20px; }
+.verify-step {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+.verify-step__num {
+  width: 28px; height: 28px;
+  background: var(--brand, #1e3a5f);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.verify-step__title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text, #111827);
+  margin-bottom: 2px;
+}
+.verify-step__desc {
+  font-size: 12px;
+  color: var(--text-sub, #6b7280);
+  line-height: 1.6;
+}
+.verify-benefit-box {
+  background: rgba(5,150,105,.06);
+  border: 1px solid rgba(5,150,105,.2);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+}
+.verify-benefit-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--three, #059669);
+  margin-bottom: 8px;
+}
+.verify-benefit-list {
+  padding-left: 16px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.verify-benefit-list li {
+  font-size: 13px;
+  color: var(--text, #111827);
+  line-height: 1.55;
+}
+.verify-notice {
+  font-size: 12px;
+  color: var(--text-mute, #9ca3af);
+  text-align: center;
+  padding-top: 4px;
+}
+
+/* ══════════════════════════════════════
+   브랜드 자동완성 드롭다운
+══════════════════════════════════════ */
+.preg-brand-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0; right: 0;
+  background: #fff;
+  border: 1.5px solid var(--border, #e5e7eb);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.13);
+  z-index: 300;
+  overflow: hidden;
+}
+.preg-brand-item {
+  padding: 11px 16px;
+  font-size: 14px;
+  color: var(--text, #111827);
+  cursor: pointer;
+  border-bottom: 1px solid rgba(0,0,0,.04);
+  transition: background .1s;
+}
+.preg-brand-item:last-child { border-bottom: none; }
+.preg-brand-item:hover,
+.preg-brand-item.active { background: var(--bg-soft, #f3f4f6); }
+.preg-brand-item mark {
+  background: none;
+  color: var(--brand, #1e3a5f);
+  font-weight: 800;
+}
+.preg-brand-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.brand-en {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+.brand-ko {
+  font-size: 12px;
+  color: var(--text-mute, #9ca3af);
+  flex-shrink: 0;
+}
+
+/* ══════════════════════════════════════
+   카테고리 캐스케이드 선택기
+══════════════════════════════════════ */
+.preg-cat-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+  height: 44px;
+  background: var(--bg-white, #fff);
+  border: 1.5px solid var(--border, #e5e7eb);
+  border-radius: 10px;
+  font-size: 14px;
+  color: var(--text-mute, #9ca3af);
+  cursor: pointer;
+  transition: border-color .15s;
+  text-align: left;
+}
+.preg-cat-btn.has-value { color: var(--text, #111827); }
+.preg-cat-btn:hover { border-color: var(--brand, #1e3a5f); }
+.preg-cat-btn svg { flex-shrink: 0; opacity: .5; }
+
+/* 오버레이 */
+.cat-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.45);
+  z-index: 1200;
+  align-items: flex-end;
+}
+.cat-overlay.open { display: flex; }
+
+/* 바텀시트 */
+.cat-sheet {
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 20px 20px 0 0;
+  max-height: 72vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: catSheetUp .22s ease;
+}
+@keyframes catSheetUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+/* 헤더 */
+.cat-sheet__hd {
+  display: flex;
+  align-items: center;
+  padding: 16px 16px 12px;
+  border-bottom: 1px solid var(--border, #e5e7eb);
+  flex-shrink: 0;
+}
+.cat-sheet__title {
+  flex: 1;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text, #111827);
+}
+.cat-back-btn,
+.cat-close-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-sub, #6b7280);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: background .12s;
+}
+.cat-back-btn:hover,
+.cat-close-btn:hover { background: var(--bg-soft, #f3f4f6); }
+
+/* 브레드크럼 */
+.cat-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 16px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+  min-height: 0;
+}
+.cat-breadcrumb:empty { padding: 0; }
+.cat-crumb-item {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--brand, #1e3a5f);
+  background: rgba(30,58,95,.08);
+  padding: 3px 8px;
+  border-radius: 20px;
+}
+.cat-crumb-sep {
+  font-size: 11px;
+  color: var(--text-mute, #9ca3af);
+}
+
+/* 리스트 */
+.cat-list {
+  overflow-y: auto;
+  flex: 1;
+  padding: 4px 0 20px;
+}
+.cat-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  cursor: pointer;
+  transition: background .1s;
+  border-bottom: 1px solid rgba(0,0,0,.04);
+}
+.cat-item:hover { background: var(--bg-soft, #f9fafb); }
+.cat-item.selected { background: rgba(30,58,95,.06); }
+.cat-item__icon { font-size: 20px; width: 28px; text-align: center; flex-shrink: 0; }
+.cat-item__label {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text, #111827);
+}
+.cat-item.selected .cat-item__label { color: var(--brand, #1e3a5f); font-weight: 700; }
+.cat-item__arrow {
+  color: var(--text-mute, #9ca3af);
+  flex-shrink: 0;
+}
+.cat-item__check {
+  color: var(--brand, #1e3a5f);
+  font-size: 16px;
+  font-weight: 700;
+  flex-shrink: 0;
+}

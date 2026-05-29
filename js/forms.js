@@ -1,20 +1,19 @@
-HEAD
-'use strict';
+﻿'use strict';
 
-/* ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═??
-   FORMS.JS ???�전????검�?& UX ?�스??
-   - ?�시�?validation
-   - 비�?번호 ?��? / 강도 측정
-   - ?�일 ?�로??(미리보기, ?�한, ??��)
-   - 가�??�맷 (??콤마)
-   - 글?�수 카운??
-   - 중복 ?�릭 방�?
-   - ??초기??
-   - ?�시?�??(localStorage)
-   - XSS 방�? (textContent)
-?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═??*/
+/* ═══════════════════════════════════════════════════
+   FORMS.JS — 완전한 폼 검증 & UX 시스템
+   - 실시간 validation
+   - 비밀번호 토글 / 강도 측정
+   - 파일 업로드 (미리보기, 제한, 삭제)
+   - 가격 포맷 (₩ 콤마)
+   - 글자수 카운터
+   - 중복 클릭 방지
+   - 폼 초기화
+   - 임시저장 (localStorage)
+   - XSS 방지 (textContent)
+═══════════════════════════════════════════════════ */
 
-/* ?�?�?� VALIDATORS ?�?�?� */
+/* ─── VALIDATORS ─── */
 const V = {
   email: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v),
   tel: v => /^[0-9]{2,3}-?[0-9]{3,4}-?[0-9]{4}$/.test(v.replace(/\s/g,'')),
@@ -22,7 +21,7 @@ const V = {
   required: v => v.trim().length > 0,
 };
 
-/* ?�?�?� FIELD ERROR HELPERS ?�?�?� */
+/* ─── FIELD ERROR HELPERS ─── */
 function setErr(inputId, errId, msg) {
   const inp = document.getElementById(inputId);
   const err = document.getElementById(errId);
@@ -42,8 +41,8 @@ function clearField(inputId, errId) {
   if (err) err.classList.remove('show');
 }
 
-/* ?�?�?� BUTTON LOADING STATE ?�?�?� */
-function btnLoad(btn, text='처리 �?..') {
+/* ─── BUTTON LOADING STATE ─── */
+function btnLoad(btn, text='처리 중...') {
   btn.disabled = true;
   btn.dataset.origText = btn.textContent;
   btn.classList.add('btn--load');
@@ -52,10 +51,10 @@ function btnLoad(btn, text='처리 �?..') {
 function btnReset(btn) {
   btn.disabled = false;
   btn.classList.remove('btn--load');
-  btn.textContent = btn.dataset.origText || '?�출';
+  btn.textContent = btn.dataset.origText || '제출';
 }
 
-/* ?�?�?� FORM RESET ?�?�?� */
+/* ─── FORM RESET ─── */
 function resetForm(formEl) {
   if (!formEl) return;
   formEl.querySelectorAll('input,textarea,select').forEach(el => {
@@ -69,7 +68,7 @@ function resetForm(formEl) {
   clearImagePreviews(formEl);
 }
 
-/* ?�?�?� XSS-SAFE TEXT INSERT ?�?�?� */
+/* ─── XSS-SAFE TEXT INSERT ─── */
 function safeText(el, text) {
   if (el) el.textContent = text;
 }
@@ -97,20 +96,20 @@ function applyLoginState() {
   if (isLoggedIn) {
     if (loginBtn) {
       loginBtn.style.display = '';
-      loginBtn.textContent = '마이?�이지';
+      loginBtn.textContent = '마이페이지';
     }
 
     if (profileBtn) {
-      profileBtn.setAttribute('aria-label', '마이?�이지');
+      profileBtn.setAttribute('aria-label', '마이페이지');
     }
   } else {
     if (loginBtn) {
       loginBtn.style.display = '';
-      loginBtn.textContent = '로그??;
+      loginBtn.textContent = '로그인';
     }
 
     if (profileBtn) {
-      profileBtn.setAttribute('aria-label', '로그??);
+      profileBtn.setAttribute('aria-label', '로그인');
     }
   }
 
@@ -129,10 +128,10 @@ function logout() {
 
   applyLoginState();
 
-  showToast('로그?�웃?�었?�니??', 'success');
+  showToast('로그아웃되었습니다.', 'success');
   navigateTo('home');
 }
-/* ?�?�?� CHAR COUNTER ?�?�?� */
+/* ─── CHAR COUNTER ─── */
 function initCharCounter(textareaId, counterId, max) {
   const ta = document.getElementById(textareaId);
   const counter = document.getElementById(counterId);
@@ -147,7 +146,7 @@ function initCharCounter(textareaId, counterId, max) {
   update();
 }
 
-/* ?�?�?� PASSWORD TOGGLE ?�?�?� */
+/* ─── PASSWORD TOGGLE ─── */
 function initPwToggle(inputId, btnId) {
   const inp = document.getElementById(inputId);
   const btn = document.getElementById(btnId);
@@ -158,12 +157,12 @@ function initPwToggle(inputId, btnId) {
     btn.innerHTML = isText
       ? '<svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>'
       : '<svg viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
-    btn.setAttribute('aria-label', isText ? '비�?번호 ?�기�? : '비�?번호 보기');
+    btn.setAttribute('aria-label', isText ? '비밀번호 숨기기' : '비밀번호 보기');
     inp.focus();
   });
 }
 
-/* ?�?�?� PASSWORD STRENGTH ?�?�?� */
+/* ─── PASSWORD STRENGTH ─── */
 function calcPwStrength(pw) {
   let score = 0;
   if (pw.length >= 8) score++;
@@ -172,7 +171,7 @@ function calcPwStrength(pw) {
   if (/[A-Z]/.test(pw)) score++;
   if (/[0-9]/.test(pw)) score++;
   if (/[^a-zA-Z0-9]/.test(pw)) score++;
-  if (score <= 2) return { level: 'weak',   label: '?�함',   pct: 33 };
+  if (score <= 2) return { level: 'weak',   label: '약함',   pct: 33 };
   if (score <= 4) return { level: 'medium', label: '보통',   pct: 66 };
   return               { level: 'strong', label: '강함',   pct: 100 };
 }
@@ -189,7 +188,7 @@ function initPwStrength(inputId, barId, labelId) {
   });
 }
 
-/* ?�?�?� REAL-TIME VALIDATION ?�?�?� */
+/* ─── REAL-TIME VALIDATION ─── */
 function initRealTimeValidation(inputId, errId, validatorFn, errMsg) {
   const inp = document.getElementById(inputId);
   if (!inp) return;
@@ -203,7 +202,7 @@ function initRealTimeValidation(inputId, errId, validatorFn, errMsg) {
   }
 }
 
-/* ?�?�?� PHONE FORMAT ?�?�?� */
+/* ─── PHONE FORMAT ─── */
 function formatTel(val) {
   const n = val.replace(/\D/g, '');
   if (n.length <= 3) return n;
@@ -217,12 +216,12 @@ function initTelFormat(inputId) {
   inp.addEventListener('input', () => {
     const pos = inp.selectionStart;
     inp.value = formatTel(inp.value);
-    // 커서 ?�치 복원
+    // 커서 위치 복원
     try { inp.setSelectionRange(pos, pos); } catch(e) {}
   });
 }
 
-/* ?�?�?� PRICE FORMAT ?�?�?� */
+/* ─── PRICE FORMAT ─── */
 function formatPrice(val) {
   const n = val.replace(/\D/g, '');
   return n ? Number(n).toLocaleString('ko-KR') : '';
@@ -233,12 +232,12 @@ function initPriceFormat(inputId, displayId) {
   if (!inp) return;
   inp.addEventListener('input', () => {
     const raw = inp.value.replace(/\D/g, '');
-    inp.value = raw; // input?� ?�자�?
-    if (disp) safeText(disp, raw ? `??${Number(raw).toLocaleString('ko-KR')}` : '');
+    inp.value = raw; // input은 숫자만
+    if (disp) safeText(disp, raw ? `₩ ${Number(raw).toLocaleString('ko-KR')}` : '');
   });
 }
 
-/* ?�?�?� FILE UPLOAD ?�?�?� */
+/* ─── FILE UPLOAD ─── */
 const FILE_CONFIG = { maxCount: 10, maxSizeMB: 5, accepts: ['image/jpeg','image/png','image/webp'] };
 
 function initFileUpload(areaId, inputId, previewId) {
@@ -249,11 +248,11 @@ function initFileUpload(areaId, inputId, previewId) {
 
   let files = [];
 
-  // ?�릭?�로 ?�기
+  // 클릭으로 열기
   area.addEventListener('click', () => input.click());
   area.addEventListener('keydown', e => { if (e.key==='Enter'||e.key===' ') input.click(); });
 
-  // ?�래그앤?�롭
+  // 드래그앤드롭
   area.addEventListener('dragover', e => { e.preventDefault(); area.classList.add('drag-over'); });
   area.addEventListener('dragleave', () => area.classList.remove('drag-over'));
   area.addEventListener('drop', e => {
@@ -268,20 +267,20 @@ function initFileUpload(areaId, inputId, previewId) {
     const errors = [];
     newFiles.forEach(f => {
       if (!FILE_CONFIG.accepts.includes(f.type)) {
-        errors.push(`${f.name}: JPG/PNG/WebP�??�로??가?�합?�다.`); return;
+        errors.push(`${f.name}: JPG/PNG/WebP만 업로드 가능합니다.`); return;
       }
       if (f.size > FILE_CONFIG.maxSizeMB * 1024 * 1024) {
-        errors.push(`${f.name}: ?�일 ?�기가 ${FILE_CONFIG.maxSizeMB}MB�?초과?�니??`); return;
+        errors.push(`${f.name}: 파일 크기가 ${FILE_CONFIG.maxSizeMB}MB를 초과합니다.`); return;
       }
       if (files.length >= FILE_CONFIG.maxCount) {
-        errors.push(`최�? ${FILE_CONFIG.maxCount}?�까지 ?�로??가?�합?�다.`); return;
+        errors.push(`최대 ${FILE_CONFIG.maxCount}장까지 업로드 가능합니다.`); return;
       }
       files.push(f);
     });
     if (errors.length) showToast(errors[0], 'error');
     renderPreviews();
     updateAreaText();
-    // input 초기??(같�? ?�일 ?�선??가?�하?�록)
+    // input 초기화 (같은 파일 재선택 가능하도록)
     input.value = '';
   }
 
@@ -299,15 +298,15 @@ function initFileUpload(areaId, inputId, previewId) {
         info.className = 'upload-preview-info';
         const name = document.createElement('span');
         name.className = 'upload-preview-name';
-        safeText(name, f.name.length > 20 ? f.name.slice(0,20)+'?? : f.name);
+        safeText(name, f.name.length > 20 ? f.name.slice(0,20)+'…' : f.name);
         const size = document.createElement('span');
         size.className = 'upload-preview-size';
         safeText(size, `${(f.size/1024/1024).toFixed(1)}MB`);
         const delBtn = document.createElement('button');
         delBtn.className = 'upload-preview-del';
         delBtn.type = 'button';
-        delBtn.setAttribute('aria-label', `${f.name} ??��`);
-        delBtn.textContent = '??;
+        delBtn.setAttribute('aria-label', `${f.name} 삭제`);
+        delBtn.textContent = '✕';
         delBtn.addEventListener('click', () => { files.splice(i,1); renderPreviews(); updateAreaText(); });
         info.append(name, size, delBtn);
         item.append(img, info);
@@ -319,7 +318,7 @@ function initFileUpload(areaId, inputId, previewId) {
 
   function updateAreaText() {
     const countEl = area.querySelector('.upload-count');
-    if (countEl) safeText(countEl, `${files.length}/${FILE_CONFIG.maxCount}???�택??);
+    if (countEl) safeText(countEl, `${files.length}/${FILE_CONFIG.maxCount}장 선택됨`);
   }
 }
 
@@ -327,11 +326,11 @@ function clearImagePreviews(formEl) {
   formEl.querySelectorAll('.upload-preview-item').forEach(el => el.remove());
 }
 
-/* ?�?�?� DRAFT SAVE (localStorage) ?�?�?� */
+/* ─── DRAFT SAVE (localStorage) ─── */
 function initDraftSave(formId, key) {
   const form = document.getElementById(formId);
   if (!form) return;
-  // 불러?�기
+  // 불러오기
   try {
     const saved = localStorage.getItem(`draft_${key}`);
     if (saved) {
@@ -342,7 +341,7 @@ function initDraftSave(formId, key) {
       });
     }
   } catch(e) {}
-  // ?�동 ?�??
+  // 자동 저장
   form.querySelectorAll('input:not([type=password]):not([type=checkbox]),textarea,select').forEach(inp => {
     inp.addEventListener('input', () => saveDraft(form, key));
   });
@@ -384,7 +383,7 @@ function updatePostDraftCount() {
     hasDraft = false;
   }
 
-  countEl.textContent = `?�시?�??${hasDraft ? 1 : 0}`;
+  countEl.textContent = `임시저장 ${hasDraft ? 1 : 0}`;
 }
 
 function savePostDraftAndCount() {
@@ -435,7 +434,7 @@ function initPostDraftControls() {
 
     draftBtn.addEventListener('click', () => {
       savePostDraftAndCount();
-      showToast('?�시?�?�되?�습?�다.', 'success');
+      showToast('임시저장되었습니다.', 'success');
     });
   }
 
@@ -452,7 +451,7 @@ function initPostDraftControls() {
 
   restorePostDraftTags();
 }
-/* ?�?�?� CLOSE GUARD (?�기 ???�인) ?�?�?� */
+/* ─── CLOSE GUARD (닫기 전 확인) ─── */
 function initCloseGuard(modalId, formId, draftKey) {
   const modal = document.getElementById(`modal-${modalId}`);
   if (!modal) return;
@@ -465,7 +464,7 @@ function initCloseGuard(modalId, formId, draftKey) {
     const hasContent = form && [...form.querySelectorAll('input,textarea')]
       .some(el => el.type !== 'checkbox' && el.type !== 'password' && el.value.trim());
     if (hasContent) {
-      if (confirm('?�성 중인 ?�용???�어?? ?�시?�?�하�??�을까요?\n취소�??�르�??�용???��??�니??')) {
+      if (confirm('작성 중인 내용이 있어요. 임시저장하고 닫을까요?\n취소를 누르면 내용을 유지합니다.')) {
         saveDraft(form, draftKey);
         origClose();
       }
@@ -475,15 +474,15 @@ function initCloseGuard(modalId, formId, draftKey) {
   });
 }
 
-/* ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═??
+/* ═══════════════════════════════════════════════════
    LOGIN FORM
-?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═??*/
+═══════════════════════════════════════════════════ */
 function initLoginForm() {
-  // 비�?번호 ?��?
+  // 비밀번호 토글
   initPwToggle('loginPw', 'loginPwToggle');
 
-  // ?�시�?검�?
-  initRealTimeValidation('loginEmail','loginEmailErr', V.email, '?�바�??�메???�식???�력?�주?�요.');
+  // 실시간 검증
+  initRealTimeValidation('loginEmail','loginEmailErr', V.email, '올바른 이메일 형식을 입력해주세요.');
 
   document.getElementById('doLoginBtn').addEventListener('click', () => {
     const email = document.getElementById('loginEmail').value.trim();
@@ -491,12 +490,12 @@ function initLoginForm() {
     let ok = true;
 
     clearField('loginEmail','loginEmailErr'); clearField('loginPw','loginPwErr');
-    if (!V.email(email)) { setErr('loginEmail','loginEmailErr','?�바�??�메???�식???�력?�주?�요.'); ok=false; }
-    if (!pw) { setErr('loginPw','loginPwErr','비�?번호�??�력?�주?�요.'); ok=false; }
+    if (!V.email(email)) { setErr('loginEmail','loginEmailErr','올바른 이메일 형식을 입력해주세요.'); ok=false; }
+    if (!pw) { setErr('loginPw','loginPwErr','비밀번호를 입력해주세요.'); ok=false; }
     if (!ok) return;
 
    const btn = document.getElementById('doLoginBtn');
-btnLoad(btn, '로그??�?..');
+btnLoad(btn, '로그인 중...');
 
 fetch('https://resellground.di702934.workers.dev/api/auth/login', {
   method: 'POST',
@@ -510,7 +509,7 @@ fetch('https://resellground.di702934.workers.dev/api/auth/login', {
     const data = await res.json();
 
     if (!res.ok) {
-      throw new Error(data.message || '로그?�에 ?�패?�습?�다.');
+      throw new Error(data.message || '로그인에 실패했습니다.');
     }
 
     return data;
@@ -522,7 +521,7 @@ fetch('https://resellground.di702934.workers.dev/api/auth/login', {
   applyLoginState();
 
   closeModal('login');
-  showToast('로그?�되?�습?�다! ?�영?�니?? ?��', 'success');
+  showToast('로그인되었습니다! 환영합니다. 🎉', 'success');
 })
   .catch(err => {
     showToast(err.message, 'error');
@@ -533,44 +532,44 @@ fetch('https://resellground.di702934.workers.dev/api/auth/login', {
   });
 }
 
-/* ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═??
+/* ═══════════════════════════════════════════════════
    SIGNUP FORM
-?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═??*/
+═══════════════════════════════════════════════════ */
 function initSignupForm() {
   initPwToggle('signupPw', 'signupPwToggle');
   initPwToggle('signupPw2', 'signupPw2Toggle');
  
   initTelFormat('signupTel');
 
-  // ?�시�?검�?
-  initRealTimeValidation('signupNick','signupNickErr', V.required, '?�네?�을 ?�력?�주?�요.');
-  initRealTimeValidation('signupEmail','signupEmailErr', V.email, '?�바�??�메???�식???�력?�주?�요.');
+  // 실시간 검증
+  initRealTimeValidation('signupNick','signupNickErr', V.required, '닉네임을 입력해주세요.');
+  initRealTimeValidation('signupEmail','signupEmailErr', V.email, '올바른 이메일 형식을 입력해주세요.');
 
-  // 비�?번호 강도 ?�시�?
+  // 비밀번호 강도 실시간
   const pwInp = document.getElementById('signupPw');
   if (pwInp) {
     pwInp.addEventListener('input', () => {
       const v = pwInp.value;
       if (!v) { clearField('signupPw','signupPwErr'); return; }
       if (V.pw(v)) setOk('signupPw','signupPwErr');
-      else setErr('signupPw','signupPwErr','?�문+?�자 ?�함 8???�상 ?�력?�주?�요.');
-      // ?�인 비번???��?�?
+      else setErr('signupPw','signupPwErr','영문+숫자 포함 8자 이상 입력해주세요.');
+      // 확인 비번도 재검증
       const pw2 = document.getElementById('signupPw2');
       if (pw2 && pw2.value) {
         if (pw2.value === v) setOk('signupPw2','signupPw2Err');
-        else setErr('signupPw2','signupPw2Err','비�?번호가 ?�치?��? ?�습?�다.');
+        else setErr('signupPw2','signupPw2Err','비밀번호가 일치하지 않습니다.');
       }
     });
   }
 
-  // 비번 ?�인 ?�시�?
+  // 비번 확인 실시간
   const pw2Inp = document.getElementById('signupPw2');
   if (pw2Inp) {
     pw2Inp.addEventListener('input', () => {
       const pw = document.getElementById('signupPw')?.value;
       if (!pw2Inp.value) { clearField('signupPw2','signupPw2Err'); return; }
       if (pw2Inp.value === pw) setOk('signupPw2','signupPw2Err');
-      else setErr('signupPw2','signupPw2Err','비�?번호가 ?�치?��? ?�습?�다.');
+      else setErr('signupPw2','signupPw2Err','비밀번호가 일치하지 않습니다.');
     });
   }
 
@@ -582,40 +581,40 @@ function initSignupForm() {
     const terms = document.getElementById('agreeTerms').checked;
     let ok = true;
 
-    if (!V.required(nick)) { setErr('signupNick','signupNickErr','?�네?�을 ?�력?�주?�요.'); ok=false; }
+    if (!V.required(nick)) { setErr('signupNick','signupNickErr','닉네임을 입력해주세요.'); ok=false; }
     else setOk('signupNick','signupNickErr');
-    if (!V.email(email)) { setErr('signupEmail','signupEmailErr','?�바�??�메?�을 ?�력?�주?�요.'); ok=false; }
+    if (!V.email(email)) { setErr('signupEmail','signupEmailErr','올바른 이메일을 입력해주세요.'); ok=false; }
     else setOk('signupEmail','signupEmailErr');
-    if (!V.pw(pw)) { setErr('signupPw','signupPwErr','?�문+?�자 ?�함 8???�상 ?�력?�주?�요.'); ok=false; }
+    if (!V.pw(pw)) { setErr('signupPw','signupPwErr','영문+숫자 포함 8자 이상 입력해주세요.'); ok=false; }
     else setOk('signupPw','signupPwErr');
-    if (pw !== pw2) { setErr('signupPw2','signupPw2Err','비�?번호가 ?�치?��? ?�습?�다.'); ok=false; }
+    if (pw !== pw2) { setErr('signupPw2','signupPw2Err','비밀번호가 일치하지 않습니다.'); ok=false; }
     else if (pw2) setOk('signupPw2','signupPw2Err');
-    if (!terms) { showToast('?�용?��? ?�의가 ?�요?�니??', 'error'); ok=false; }
+    if (!terms) { showToast('이용약관 동의가 필요합니다.', 'error'); ok=false; }
     if (!ok) return;
 
     const btn = document.getElementById('doSignupBtn');
-    btnLoad(btn, '가??�?..');
+    btnLoad(btn, '가입 중...');
     setTimeout(() => {
       btnReset(btn);
       resetForm(document.getElementById('signup-pane'));
       closeModal('login');
-      showToast('?�원가?�이 ?�료?�었?�니?? ?�영?�요 ?��', 'success');
+      showToast('회원가입이 완료되었습니다! 환영해요 🎉', 'success');
     }, 1500);
   });
 }
 
-/* ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═??
+/* ═══════════════════════════════════════════════════
    PREREG FORM
-?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═??*/
+═══════════════════════════════════════════════════ */
 function initPreregForm() {
   initCharCounter('prIntro', 'introCount', 500);
   initTelFormat('prTel');
   initDraftSave('preregBody', 'prereg');
   initCloseGuard('prereg', 'preregBody', 'prereg');
 
-  // ?�시�?검�?
-  initRealTimeValidation('prName','prNameErr', V.required, '?�름???�력?�주?�요.');
-  initRealTimeValidation('prEmail','prEmailErr', V.email, '?�바�??�메?�을 ?�력?�주?�요.');
+  // 실시간 검증
+  initRealTimeValidation('prName','prNameErr', V.required, '이름을 입력해주세요.');
+  initRealTimeValidation('prEmail','prEmailErr', V.email, '올바른 이메일을 입력해주세요.');
 
 document.getElementById('preregSubmitBtn').addEventListener('click', () => {
 const name = document.getElementById('prName').value.trim();
@@ -628,17 +627,17 @@ const agree = document.getElementById('preregAgree').checked;
   let firstError = '';
 
   if (!V.required(name)) {
-    setErr('prName','prNameErr','?�름???�력?�주?�요.');
+    setErr('prName','prNameErr','이름을 입력해주세요.');
     ok = false;
-    firstError ||= '?�름???�력?�주?�요.';
+    firstError ||= '이름을 입력해주세요.';
   } else {
     setOk('prName','prNameErr');
   }
 
   if (!V.email(email)) {
-    setErr('prEmail','prEmailErr','?�바�??�메?�을 ?�력?�주?�요.');
+    setErr('prEmail','prEmailErr','올바른 이메일을 입력해주세요.');
     ok = false;
-    firstError ||= '?�바�??�메?�을 ?�력?�주?�요.';
+    firstError ||= '올바른 이메일을 입력해주세요.';
   } else {
     setOk('prEmail','prEmailErr');
   }
@@ -647,7 +646,7 @@ const agree = document.getElementById('preregAgree').checked;
     const telEl = document.getElementById('prTel');
     telEl.classList.add('err');
     ok = false;
-    firstError ||= '?�락처�? ?�력?�주?�요.';
+    firstError ||= '연락처를 입력해주세요.';
   } else {
     document.getElementById('prTel').classList.remove('err');
   }
@@ -655,7 +654,7 @@ const agree = document.getElementById('preregAgree').checked;
   const instaEl = document.getElementById('prInstagram');
   instaEl.classList.add('err');
   ok = false;
-  firstError ||= '?�스?�그램 ?�이?��? ?�력?�주?�요.';
+  firstError ||= '인스타그램 아이디를 입력해주세요.';
 } else {
   document.getElementById('prInstagram').classList.remove('err');
 }
@@ -664,7 +663,7 @@ const agree = document.getElementById('preregAgree').checked;
     const introEl = document.getElementById('prIntro');
     introEl.classList.add('err');
     ok = false;
-    firstError ||= '?�개글???�력?�주?�요.';
+    firstError ||= '소개글을 입력해주세요.';
   } else {
     document.getElementById('prIntro').classList.remove('err');
   }
@@ -672,7 +671,7 @@ const agree = document.getElementById('preregAgree').checked;
   if (!agree) {
     document.getElementById('preregAgreeErr').classList.add('show');
     ok = false;
-    firstError ||= '개인?�보 ?�집 ?�의가 ?�요?�니??';
+    firstError ||= '개인정보 수집 동의가 필요합니다.';
   } else {
     document.getElementById('preregAgreeErr').classList.remove('show');
   }
@@ -683,7 +682,7 @@ const agree = document.getElementById('preregAgree').checked;
   }
 
   const btn = document.getElementById('preregSubmitBtn');
-  btnLoad(btn, '?�출 �?..');
+  btnLoad(btn, '제출 중...');
   setTimeout(() => {
     btnReset(btn);
     clearDraft('prereg');
@@ -698,9 +697,9 @@ const agree = document.getElementById('preregAgree').checked;
   }, 1500);
 });
 }
-/* ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═??
-   PRODUCT IMAGE UPLOADER ???�품 ?�록 ?��?지 ?�리�?
-?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═??*/
+/* ═══════════════════════════════════════════════════
+   PRODUCT IMAGE UPLOADER — 상품 등록 이미지 프리뷰
+═══════════════════════════════════════════════════ */
 window.RG = window.RG || {};
 
 window.RG.initProductImageUploader = function () {
@@ -762,14 +761,14 @@ window.RG.initProductImageUploader = function () {
 
     const el = document.createElement('img');
     el.src = img.url;
-    el.alt = `?�품 ?��?지 ${i + 1}`;
+    el.alt = `상품 이미지 ${i + 1}`;
     wrap.appendChild(el);
 
     const del = document.createElement('button');
     del.className = 'rg-thumb__del';
     del.type = 'button';
-    del.textContent = '??;
-    del.setAttribute('aria-label', `?��?지 ${i + 1} ??��`);
+    del.textContent = '✕';
+    del.setAttribute('aria-label', `이미지 ${i + 1} 삭제`);
 
     del.addEventListener('click', e => {
       e.stopPropagation();
@@ -783,7 +782,7 @@ window.RG.initProductImageUploader = function () {
     if (i === 0) {
       const badge = document.createElement('div');
       badge.className = 'rg-thumb__main-badge';
-      badge.textContent = '?�??;
+      badge.textContent = '대표';
       wrap.appendChild(badge);
     }
 
@@ -825,7 +824,7 @@ window.RG.initProductImageUploader = function () {
     label.className = 'rg-thumb-add';
     label.innerHTML = `
       <span class="rg-thumb-add__plus">+</span>
-      <span>추�?</span>
+      <span>추가</span>
     `;
 
     const input = document.createElement('input');
@@ -846,17 +845,17 @@ window.RG.initProductImageUploader = function () {
   function handleFiles(files) {
     Array.from(files).forEach(file => {
       if (images.length >= MAX_IMAGES) {
-        showToast(`?��?지??최�? ${MAX_IMAGES}?�까지 ?�록?????�어??`, 'error');
+        showToast(`이미지는 최대 ${MAX_IMAGES}장까지 등록할 수 있어요.`, 'error');
         return;
       }
 
       if (!file.type.startsWith('image/')) {
-        showToast('?��?지 ?�일�??�로?�할 ???�어??', 'error');
+        showToast('이미지 파일만 업로드할 수 있어요.', 'error');
         return;
       }
 
       if (file.size > MAX_MB * 1024 * 1024) {
-        showToast(`${file.name}?� ${MAX_MB}MB�?초과?�요.`, 'error');
+        showToast(`${file.name}은 ${MAX_MB}MB를 초과해요.`, 'error');
         return;
       }
 
@@ -928,20 +927,20 @@ function getDropFormData() {
   const checkedTrade = [...document.querySelectorAll('input[name="product-trade"]:checked')]
     .map(el => el.value);
 
-  let tradeMethod = document.getElementById('dropTrade')?.value || '?�국 ?�전결제';
+  let tradeMethod = document.getElementById('dropTrade')?.value || '전국 안전결제';
 
-  if (checkedTrade.includes('?�국 ?�전결제') && checkedTrade.includes('근거�?직거??)) {
-    tradeMethod = '?�국+직거??모두';
-  } else if (checkedTrade.includes('근거�?직거??)) {
-    tradeMethod = '근거�?직거??;
-  } else if (checkedTrade.includes('?�국 ?�전결제')) {
-    tradeMethod = '?�국 ?�전결제';
+  if (checkedTrade.includes('전국 안전결제') && checkedTrade.includes('근거리 직거래')) {
+    tradeMethod = '전국+직거래 모두';
+  } else if (checkedTrade.includes('근거리 직거래')) {
+    tradeMethod = '근거리 직거래';
+  } else if (checkedTrade.includes('전국 안전결제')) {
+    tradeMethod = '전국 안전결제';
   }
 
   return {
     id: `product_${Date.now()}`,
     seller_email: user?.email || '',
-    seller_name: user?.nickname || user?.email || '??,
+    seller_name: user?.nickname || user?.email || '나',
     name: document.getElementById('dropName')?.value.trim() || '',
     brand: document.getElementById('dropBrand')?.value.trim() || '',
     category: document.getElementById('dropCat')?.value || '',
@@ -950,12 +949,12 @@ function getDropFormData() {
     trade_method: tradeMethod,
     description: document.getElementById('dropDesc')?.value.trim() || '',
     images: getProductImageMeta(),
-    status: '?�매�?
+    status: '판매중'
   };
 }
-/* ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═??
+/* ═══════════════════════════════════════════════════
    ADD DROP FORM
-?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═??*/
+═══════════════════════════════════════════════════ */
 function initDropForm() {
   initCharCounter('dropDesc', 'dropDescCount', 1000);
   initPriceFormat('dropPrice', 'dropPriceDisplay');
@@ -966,7 +965,7 @@ function initDropForm() {
     window.RG._productUploader = window.RG.initProductImageUploader();
   }
 
-  initRealTimeValidation('dropName', 'dropNameErr', V.required, '?�품명을 ?�력?�주?�요.');
+  initRealTimeValidation('dropName', 'dropNameErr', V.required, '상품명을 입력해주세요.');
 
   const priceInp = document.getElementById('dropPrice');
   const netEl = document.getElementById('product-net-price');
@@ -983,8 +982,8 @@ function initDropForm() {
 
       if (netEl) {
         netEl.textContent = price > 0
-          ? `${net.toLocaleString('ko-KR')}??
-          : '??;
+          ? `${net.toLocaleString('ko-KR')}원`
+          : '—';
       }
     });
   }
@@ -1013,12 +1012,12 @@ function initDropForm() {
       const tradeEl = document.getElementById('dropTrade');
 
       if (tradeEl) {
-        if (checked.includes('?�국 ?�전결제') && checked.includes('근거�?직거??)) {
-          tradeEl.value = '?�국+직거??모두';
-        } else if (checked.includes('근거�?직거??)) {
-          tradeEl.value = '근거�?직거??;
+        if (checked.includes('전국 안전결제') && checked.includes('근거리 직거래')) {
+          tradeEl.value = '전국+직거래 모두';
+        } else if (checked.includes('근거리 직거래')) {
+          tradeEl.value = '근거리 직거래';
         } else {
-          tradeEl.value = '?�국 ?�전결제';
+          tradeEl.value = '전국 안전결제';
         }
       }
     });
@@ -1035,41 +1034,41 @@ function initDropForm() {
     let ok = true;
 
     if (!V.required(product.name)) {
-      setErr('dropName', 'dropNameErr', '?�품명을 ?�력?�주?�요.');
+      setErr('dropName', 'dropNameErr', '상품명을 입력해주세요.');
       ok = false;
     } else {
       setOk('dropName', 'dropNameErr');
     }
 
     if (!product.price) {
-      setErr('dropPrice', 'dropPriceErr', '가격을 ?�력?�주?�요.');
+      setErr('dropPrice', 'dropPriceErr', '가격을 입력해주세요.');
       ok = false;
     } else {
       setOk('dropPrice', 'dropPriceErr');
     }
 
     if (!product.category) {
-      setErr('dropCat', 'dropCatErr', '카테고리�??�택?�주?�요.');
+      setErr('dropCat', 'dropCatErr', '카테고리를 선택해주세요.');
       ok = false;
     } else {
       setOk('dropCat', 'dropCatErr');
     }
 
     if (!product.condition) {
-      setErr('dropCond', 'dropCondErr', '?�태�??�택?�주?�요.');
+      setErr('dropCond', 'dropCondErr', '상태를 선택해주세요.');
       ok = false;
     } else {
       setOk('dropCond', 'dropCondErr');
     }
 
     if (!product.images.length) {
-      showToast('?�품 ?��?지�?최소 1???�록?�주?�요.', 'error');
+      showToast('상품 이미지를 최소 1장 등록해주세요.', 'error');
       ok = false;
     }
 
     if (!ok) return;
 
-    btnLoad(submitBtn, '?�록 �?..');
+    btnLoad(submitBtn, '등록 중...');
 
     try {
       const res = await fetch('https://resellground.di702934.workers.dev/api/products', {
@@ -1084,7 +1083,7 @@ function initDropForm() {
       const data = await res.json().catch(() => ({}));
 
       if (!res.ok) {
-        throw new Error(data.message || '?�품 DB ?�?�에 ?�패?�습?�다.');
+        throw new Error(data.message || '상품 DB 저장에 실패했습니다.');
       }
 
       clearDraft('drop');
@@ -1096,7 +1095,7 @@ function initDropForm() {
         window.RG._productUploader.reset();
       }
 
-      if (netEl) netEl.textContent = '??;
+      if (netEl) netEl.textContent = '—';
 
       closeModal('addDrop');
 
@@ -1104,10 +1103,10 @@ function initDropForm() {
         refreshProductsFromDB();
       }
 
-      showToast('?�품??DB???�록?�었?�니?? ?��', 'success');
+      showToast('상품이 DB에 등록되었습니다! 🎉', 'success');
     } catch (err) {
       console.error(err);
-      showToast(err.message || '?�품 ?�록 �??�류가 발생?�습?�다.', 'error');
+      showToast(err.message || '상품 등록 중 오류가 발생했습니다.', 'error');
     } finally {
       btnReset(submitBtn);
     }
@@ -1121,7 +1120,7 @@ function compressPostImage(file, options = {}) {
 
   return new Promise((resolve, reject) => {
     if (!file || !file.type.startsWith('image/')) {
-      reject(new Error('?��?지 ?�일�?첨�??????�어??'));
+      reject(new Error('이미지 파일만 첨부할 수 있어요.'));
       return;
     }
 
@@ -1161,11 +1160,11 @@ function compressPostImage(file, options = {}) {
         });
       };
 
-      img.onerror = () => reject(new Error('?��?지�?처리?��? 못했?�요.'));
+      img.onerror = () => reject(new Error('이미지를 처리하지 못했어요.'));
       img.src = e.target.result;
     };
 
-    reader.onerror = () => reject(new Error('?��?지�??��? 못했?�요.'));
+    reader.onerror = () => reject(new Error('이미지를 읽지 못했어요.'));
     reader.readAsDataURL(file);
   });
 }
@@ -1180,7 +1179,7 @@ function insertIntoPostContent(text, wrapMode = false) {
   let inserted = text;
 
   if (wrapMode) {
-    inserted = text.replace('{{selected}}', selected || '강조??문장');
+    inserted = text.replace('{{selected}}', selected || '강조할 문장');
   }
 
   contentEl.value =
@@ -1224,13 +1223,13 @@ function initPostEditorTools() {
       const okTypes = ['image/jpeg', 'image/png', 'image/webp'];
 
       if (!okTypes.includes(file.type)) {
-        showToast('JPG, PNG, WebP ?��?지�??�로?�할 ???�어??', 'error');
+        showToast('JPG, PNG, WebP 이미지만 업로드할 수 있어요.', 'error');
         imageInput.value = '';
         return;
       }
 
       if (file.size > 15 * 1024 * 1024) {
-  showToast('?��?지??15MB ?�하 ?�일�?첨�??????�어??', 'error');
+  showToast('이미지는 15MB 이하 파일만 첨부할 수 있어요.', 'error');
   imageInput.value = '';
   return;
 }
@@ -1238,10 +1237,10 @@ function initPostEditorTools() {
 compressPostImage(file)
   .then(({ dataUrl, outputKB }) => {
     insertIntoPostContent(`\n\n![${file.name}](${dataUrl})\n\n`);
-    showToast(`?��?지가 ?�축?�어 추�??�었?�니?? (${outputKB}KB)`, 'success');
+    showToast(`이미지가 압축되어 추가되었습니다. (${outputKB}KB)`, 'success');
   })
   .catch(err => {
-    showToast(err.message || '?��?지 첨�????�패?�어??', 'error');
+    showToast(err.message || '이미지 첨부에 실패했어요.', 'error');
   })
   .finally(() => {
     imageInput.value = '';
@@ -1250,10 +1249,10 @@ compressPostImage(file)
   }
 
   bindOnce(linkBtn, 'boundLink', () => {
-    const url = prompt('?�입??링크 URL???�력?�주?�요.');
+    const url = prompt('삽입할 링크 URL을 입력해주세요.');
     if (!url) return;
 
-    const text = prompt('링크???�시???�스?��? ?�력?�주?�요.') || '링크';
+    const text = prompt('링크에 표시할 텍스트를 입력해주세요.') || '링크';
     insertIntoPostContent(`[${text}](${url})`);
   });
 
@@ -1263,12 +1262,12 @@ compressPostImage(file)
 
   bindOnce(priceBtn, 'boundPrice', () => {
     insertIntoPostContent(
-      '\n\n[?�세 ?�보]\n?�품�? \n?�재 ?�세: ??n최근 변?? \n?�견: \n'
+      '\n\n[시세 정보]\n상품명: \n현재 시세: ₩\n최근 변동: \n의견: \n'
     );
   });
 
   bindOnce(emojiBtn, 'boundEmoji', () => {
-    const emoji = prompt('?�을 ?�모지�??�력?�주?�요. ?? ?�� ?�� ?�� ?��') || '?��';
+    const emoji = prompt('넣을 이모지를 입력해주세요. 예: 🔥 💎 👟 📈') || '🔥';
     insertIntoPostContent(emoji);
   });
 
@@ -1282,9 +1281,9 @@ compressPostImage(file)
 });
   });
 }
-/* ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═??
-   WRITE POST FORM ??게시�??�록
-?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═??*/
+/* ═══════════════════════════════════════════════════
+   WRITE POST FORM — 게시물 등록
+═══════════════════════════════════════════════════ */
 function initPostForm() {
   const btn = document.getElementById('postSubmitBtn');
   const titleEl = document.getElementById('postTitle');
@@ -1294,7 +1293,7 @@ function initPostForm() {
 
   if (!btn || !titleEl || !contentEl) return;
 
-  // 중복 ?�벤??방�?
+  // 중복 이벤트 방지
   if (btn.dataset.bound === '1') return;
   btn.dataset.bound = '1';
 
@@ -1337,7 +1336,7 @@ if (settingsToggle && settingsPanel && settingsToggle.dataset.bound !== '1') {
     }
 
     if (!ok) {
-      showToast('?�목�??�용???�력?�주?�요.', 'error');
+      showToast('제목과 내용을 입력해주세요.', 'error');
       return;
     }
 
@@ -1353,27 +1352,27 @@ if (settingsToggle && settingsPanel && settingsToggle.dataset.bound !== '1') {
     const newPost = {
       id: `post_${Date.now()}`,
       av: 'av-a',
-      em: '?��',
-      author: user?.nickname || user?.email || '??,
+      em: '📝',
+      author: user?.nickname || user?.email || '나',
       authorTier: '',
-      time: '방금 ??,
+      time: '방금 전',
       badge: board || 'RESELL TALK',
       tags: selectedTags,
       title,
       content,
       preview: typeof getPostPreview === 'function'
   ? getPostPreview({ content })
-  : (content.length > 90 ? content.slice(0, 90) + '?? : content),
+  : (content.length > 90 ? content.slice(0, 90) + '…' : content),
       likes: 0,
       comments: 0,
       views: 0,
 
-      // DB ?�동 ???�용???�비 ?�드
+      // DB 연동 시 사용할 예비 필드
       dbPending: true
     };
 
     const submitBtn = document.getElementById('postSubmitBtn');
-    btnLoad(submitBtn, '?�록 �?..');
+    btnLoad(submitBtn, '등록 중...');
 
     setTimeout(() => {
       DATA.userPosts.unshift(newPost);
@@ -1398,7 +1397,7 @@ if (settingsToggle && settingsPanel && settingsToggle.dataset.bound !== '1') {
         updatePostDraftCount();
 
       closeModal('writePost');
-      showToast('게시글???�록?�었?�니?? ?��', 'success');
+      showToast('게시글이 등록되었습니다! 🎉', 'success');
 
       if (typeof openPostDetail === 'function') {
         setTimeout(() => openPostDetail(newPost), 250);
@@ -1420,30 +1419,30 @@ if (settingsToggle && settingsPanel && settingsToggle.dataset.bound !== '1') {
     const data = await res.json().catch(() => ({}));
 
     if (!res.ok) {
-      throw new Error(data.message || 'DB ?�?�에 ?�패?�습?�다.');
+      throw new Error(data.message || 'DB 저장에 실패했습니다.');
     }
 
     return data;
   })
   .then(() => {
-    console.log('게시글 DB ?�???�료');
+    console.log('게시글 DB 저장 완료');
   })
   .catch(err => {
     console.error(err);
-    showToast('?�면?�는 ?�록?��?�?DB ?�?�에 ?�패?�어??', 'warn');
+    showToast('화면에는 등록됐지만 DB 저장에 실패했어요.', 'warn');
   });
     }, 600);
   });
 }
-/* ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═??
+/* ═══════════════════════════════════════════════════
    SUPPORT / MYPAGE
-?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═??*/
+═══════════════════════════════════════════════════ */
 function initSupportForm() {
   const btn = document.getElementById('supportBtn');
   if (!btn) return;
   btn.addEventListener('click', () => {
-    btnLoad(btn, '?�송 �?..');
-    setTimeout(() => { btnReset(btn); showToast('문의가 ?�수?�었?�니?? 빠르�??��??�리겠습?�다.', 'success'); }, 1000);
+    btnLoad(btn, '전송 중...');
+    setTimeout(() => { btnReset(btn); showToast('문의가 접수되었습니다. 빠르게 답변드리겠습니다.', 'success'); }, 1000);
   });
 }
 
@@ -1453,14 +1452,810 @@ function initMypageForm() {
   initTelFormat('mpTel');
   initCharCounter('mpBio', 'mpBioCount', 200);
   btn.addEventListener('click', () => {
-    btnLoad(btn, '?�??�?..');
-    setTimeout(() => { btnReset(btn); showToast('?�로?�이 ?�?�되?�습?�다.', 'success'); }, 800);
+    btnLoad(btn, '저장 중...');
+    setTimeout(() => { btnReset(btn); showToast('프로필이 저장되었습니다.', 'success'); }, 800);
   });
 }
 
-/* ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═??
-   BOOT ???�체 초기??
-?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═??*/
+/* ═══════════════════════════════════════════════════
+   PRODUCT REGISTER PAGE  — 상품 등록 전용 페이지
+═══════════════════════════════════════════════════ */
+
+/* ── 카테고리 트리 (상품 타입 기반) ── */
+const CATEGORY_TREE = [
+  { id:'clothing', label:'의류', icon:'👕', children:[
+    { id:'mens', label:'남성의류', children:[
+      { id:'mens_top', label:'상의', children:[
+        { id:'mens_tshirt',  label:'티셔츠' },
+        { id:'mens_sweat',   label:'맨투맨 · 후드티' },
+        { id:'mens_shirt',   label:'셔츠' },
+        { id:'mens_knit',    label:'니트 · 가디건' },
+        { id:'mens_top_etc', label:'남성 상의 기타' },
+      ]},
+      { id:'mens_bottom', label:'하의', children:[
+        { id:'mens_jeans',       label:'청바지' },
+        { id:'mens_slacks',      label:'슬랙스 · 치노팬츠' },
+        { id:'mens_shorts',      label:'반바지' },
+        { id:'mens_jogger',      label:'트레이닝 · 조거팬츠' },
+        { id:'mens_bottom_etc',  label:'남성 하의 기타' },
+      ]},
+      { id:'mens_outer', label:'아우터', children:[
+        { id:'mens_jacket',      label:'자켓 · 블레이저' },
+        { id:'mens_coat',        label:'코트' },
+        { id:'mens_padding',     label:'패딩 · 점퍼' },
+        { id:'mens_zip',         label:'집업 · 플리스' },
+        { id:'mens_outer_etc',   label:'남성 아우터 기타' },
+      ]},
+    ]},
+    { id:'womens', label:'여성의류', children:[
+      { id:'womens_top', label:'상의', children:[
+        { id:'womens_tshirt',   label:'티셔츠 · 탑' },
+        { id:'womens_blouse',   label:'블라우스 · 셔츠' },
+        { id:'womens_knit',     label:'니트 · 가디건' },
+        { id:'womens_top_etc',  label:'여성 상의 기타' },
+      ]},
+      { id:'womens_bottom', label:'하의', children:[
+        { id:'womens_jeans',       label:'청바지' },
+        { id:'womens_skirt',       label:'스커트' },
+        { id:'womens_slacks',      label:'슬랙스 · 팬츠' },
+        { id:'womens_bottom_etc',  label:'여성 하의 기타' },
+      ]},
+      { id:'womens_dress',  label:'원피스' },
+      { id:'womens_outer', label:'아우터', children:[
+        { id:'womens_jacket',      label:'자켓 · 블레이저' },
+        { id:'womens_coat',        label:'코트' },
+        { id:'womens_padding',     label:'패딩 · 점퍼' },
+        { id:'womens_outer_etc',   label:'여성 아우터 기타' },
+      ]},
+    ]},
+    { id:'unisex', label:'공용 (유니섹스)', children:[
+      { id:'unisex_top',   label:'상의' },
+      { id:'unisex_bottom',label:'하의' },
+      { id:'unisex_outer', label:'아우터' },
+    ]},
+    { id:'clothing_etc', label:'의류 기타' },
+  ]},
+  { id:'shoes', label:'신발', icon:'👟', children:[
+    { id:'sneakers', label:'스니커즈', children:[
+      { id:'hightop',      label:'하이탑' },
+      { id:'lowtop',       label:'로우탑' },
+      { id:'slipon',       label:'슬립온' },
+      { id:'sneakers_etc', label:'스니커즈 기타' },
+    ]},
+    { id:'dress_shoes',  label:'구두 · 로퍼' },
+    { id:'sandals',      label:'샌들 · 슬리퍼' },
+    { id:'boots',        label:'부츠 · 워커' },
+    { id:'shoes_etc',    label:'신발 기타' },
+  ]},
+  { id:'accessory', label:'패션잡화', icon:'👜', children:[
+    { id:'bag', label:'가방', children:[
+      { id:'backpack',    label:'백팩' },
+      { id:'shoulder',    label:'숄더백 · 크로스백' },
+      { id:'tote',        label:'토트백' },
+      { id:'clutch',      label:'클러치 · 파우치' },
+      { id:'bag_etc',     label:'가방 기타' },
+    ]},
+    { id:'wallet', label:'지갑 · 소품', children:[
+      { id:'longwallet',  label:'장지갑' },
+      { id:'shortwallet', label:'반지갑' },
+      { id:'cardwallet',  label:'카드지갑' },
+      { id:'keycase',     label:'키케이스 · 소품' },
+    ]},
+    { id:'hat', label:'모자', children:[
+      { id:'cap',         label:'볼캡 · 스냅백' },
+      { id:'beanie',      label:'비니' },
+      { id:'bucket',      label:'버킷햇' },
+      { id:'hat_etc',     label:'모자 기타' },
+    ]},
+    { id:'belt',         label:'벨트' },
+    { id:'scarf',        label:'스카프 · 넥타이' },
+    { id:'glasses',      label:'선글라스 · 안경테' },
+    { id:'acc_etc',      label:'잡화 기타' },
+  ]},
+  { id:'luxury', label:'명품', icon:'💎', children:[
+    { id:'lux_bag',      label:'명품 가방' },
+    { id:'lux_wallet',   label:'명품 지갑 · 소품' },
+    { id:'lux_clothes',  label:'명품 의류' },
+    { id:'lux_shoes',    label:'명품 신발' },
+    { id:'lux_jewelry',  label:'명품 주얼리 · 액세서리' },
+    { id:'lux_etc',      label:'명품 기타' },
+  ]},
+  { id:'watch', label:'시계', icon:'⌚', children:[
+    { id:'mech_watch',     label:'기계식 시계' },
+    { id:'quartz_watch',   label:'쿼츠 시계' },
+    { id:'smartwatch',     label:'스마트워치' },
+    { id:'vintage_watch',  label:'빈티지 시계' },
+    { id:'watch_etc',      label:'시계 기타' },
+  ]},
+  { id:'jewelry', label:'주얼리 · 액세서리', icon:'💍', children:[
+    { id:'necklace',  label:'목걸이' },
+    { id:'ring',      label:'반지' },
+    { id:'bracelet',  label:'팔찌 · 뱅글' },
+    { id:'earring',   label:'귀걸이' },
+    { id:'jewelry_etc', label:'주얼리 기타' },
+  ]},
+  { id:'tech', label:'테크 · 가전', icon:'💻', children:[
+    { id:'phone',     label:'스마트폰' },
+    { id:'laptop',    label:'노트북 · 태블릿' },
+    { id:'audio',     label:'이어폰 · 헤드폰' },
+    { id:'camera',    label:'카메라' },
+    { id:'game',      label:'게임기 · 콘솔' },
+    { id:'tech_etc',  label:'가전 기타' },
+  ]},
+  { id:'etc', label:'기타', icon:'📦', children:[] },
+];
+
+/* 최상위 카테고리 → 사이즈맵 키 매핑 */
+const CAT_TO_SIZE_KEY = {
+  shoes:    '신발',
+  clothing: '의류',
+};
+
+/* 카테고리별 사이즈 옵션 */
+const PREG_SIZE_MAP = {
+  '신발': [
+    { group: '한국 사이즈 (mm)', sizes: ['210','215','220','225','230','235','240','245','250','255','260','265','270','275','280','285','290','295','300','305','310'] },
+    { group: '유럽 사이즈 (EU)',  sizes: ['35','35.5','36','36.5','37','37.5','38','38.5','39','39.5','40','40.5','41','41.5','42','42.5','43','43.5','44','44.5','45','45.5','46','46.5','47','47.5','48'] }
+  ],
+  '의류': [
+    { group: '한국 사이즈', sizes: ['44','55','66','77','88','95','100','105','110','FREE'] },
+    { group: '국제 사이즈',  sizes: ['XS','S','M','L','XL','2XL','3XL'] }
+  ],
+};
+
+function initProductRegisterPage() {
+  /* ── 이미지 업로더 ── */
+  const dropzone  = document.getElementById('pregDropzone');
+  const fileInput = document.getElementById('pregFileInput');
+  const thumbGrid = document.getElementById('pregThumbGrid');
+  const imgCount  = document.getElementById('pregImgCount');
+  if (!dropzone || !fileInput) return;
+
+  const MAX_IMG = 10, MAX_MB = 10;
+  let images = [];
+
+  function syncCount() {
+    if (imgCount) imgCount.textContent = `${images.length} / ${MAX_IMG}`;
+  }
+
+  function renderThumbs() {
+    if (!thumbGrid) return;
+    if (images.length === 0) {
+      thumbGrid.style.display = 'none';
+      thumbGrid.innerHTML = '';
+      dropzone.querySelector('#pregDropContent') &&
+        (dropzone.querySelector('#pregDropContent').style.display = '');
+      syncCount(); return;
+    }
+    dropzone.querySelector('#pregDropContent') &&
+      (dropzone.querySelector('#pregDropContent').style.display = 'none');
+    thumbGrid.style.display = 'grid';
+    thumbGrid.innerHTML = '';
+    images.forEach((img, i) => {
+      const wrap = document.createElement('div');
+      wrap.className = 'preg-thumb';
+      wrap.draggable = true;
+      wrap.dataset.idx = i;
+      const el = document.createElement('img');
+      el.src = img.url; el.alt = `상품 이미지 ${i+1}`;
+      wrap.appendChild(el);
+      if (i === 0) {
+        const badge = document.createElement('span');
+        badge.className = 'preg-thumb__badge';
+        badge.textContent = '대표';
+        wrap.appendChild(badge);
+      }
+      const del = document.createElement('button');
+      del.className = 'preg-thumb__del'; del.type = 'button'; del.textContent = '✕';
+      del.setAttribute('aria-label', `이미지 ${i+1} 삭제`);
+      del.addEventListener('click', e => {
+        e.stopPropagation();
+        URL.revokeObjectURL(img.url);
+        images.splice(i, 1);
+        renderThumbs();
+      });
+      wrap.appendChild(del);
+      /* drag-to-reorder */
+      wrap.addEventListener('dragstart', e => {
+        e.dataTransfer.setData('text/plain', String(i));
+        setTimeout(() => wrap.classList.add('is-dragging'), 0);
+      });
+      wrap.addEventListener('dragend', () => wrap.classList.remove('is-dragging'));
+      wrap.addEventListener('dragover', e => { e.preventDefault(); wrap.classList.add('is-dragover'); });
+      wrap.addEventListener('dragleave', () => wrap.classList.remove('is-dragover'));
+      wrap.addEventListener('drop', e => {
+        e.preventDefault(); wrap.classList.remove('is-dragover');
+        const from = parseInt(e.dataTransfer.getData('text/plain'), 10);
+        if (isNaN(from) || from === i) return;
+        const [moved] = images.splice(from, 1);
+        images.splice(i, 0, moved);
+        renderThumbs();
+      });
+      thumbGrid.appendChild(wrap);
+    });
+    if (images.length < MAX_IMG) {
+      const addSlot = document.createElement('label');
+      addSlot.className = 'preg-thumb-add';
+      addSlot.innerHTML = '<span>+</span><span>추가</span>';
+      const addInput = document.createElement('input');
+      addInput.type = 'file'; addInput.multiple = true; addInput.accept = 'image/*'; addInput.style.display = 'none';
+      addInput.addEventListener('change', e => { handleFiles(e.target.files); addInput.value = ''; });
+      addSlot.appendChild(addInput);
+      thumbGrid.appendChild(addSlot);
+    }
+    syncCount();
+  }
+
+  function handleFiles(files) {
+    Array.from(files).forEach(f => {
+      if (images.length >= MAX_IMG) { showToast(`이미지는 최대 ${MAX_IMG}장까지 등록할 수 있어요.`, 'error'); return; }
+      if (!f.type.startsWith('image/')) { showToast('이미지 파일만 업로드할 수 있어요.', 'error'); return; }
+      if (f.size > MAX_MB * 1024 * 1024) { showToast(`${f.name}: 파일 크기가 ${MAX_MB}MB를 초과해요.`, 'error'); return; }
+      images.push({ file: f, url: URL.createObjectURL(f) });
+    });
+    renderThumbs();
+  }
+
+  dropzone.addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', e => { handleFiles(e.target.files); fileInput.value = ''; });
+  dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('is-dragover'); });
+  dropzone.addEventListener('dragleave', () => dropzone.classList.remove('is-dragover'));
+  dropzone.addEventListener('drop', e => {
+    e.preventDefault(); dropzone.classList.remove('is-dragover');
+    handleFiles(e.dataTransfer.files);
+  });
+
+  /* ── 카테고리 캐스케이드 ── */
+  const catHidden  = document.getElementById('pregCat');
+  const catBtn     = document.getElementById('pregCatBtn');
+  const catLabel   = document.getElementById('pregCatLabel');
+  const catOverlay = document.getElementById('pregCatOverlay');
+  const catSheet   = document.getElementById('pregCatSheet');
+  const catTitle   = document.getElementById('pregCatSheetTitle');
+  const catBackBtn = document.getElementById('pregCatBackBtn');
+  const catCloseBtn= document.getElementById('pregCatCloseBtn');
+  const catBreadcrumb = document.getElementById('pregCatBreadcrumb');
+  const catList    = document.getElementById('pregCatList');
+
+  let catPath = [];   // 선택된 노드 배열 (depth별)
+  let catStack = [];  // 렌더 스택 [{title, items}]
+
+  function findNode(tree, id) {
+    for (const n of tree) {
+      if (n.id === id) return n;
+      if (n.children && n.children.length) {
+        const found = findNode(n.children, id);
+        if (found) return found;
+      }
+    }
+    return null;
+  }
+
+  function renderCatLevel(items, title) {
+    if (catTitle) catTitle.textContent = title;
+    if (catBackBtn) catBackBtn.style.visibility = catStack.length > 0 ? 'visible' : 'hidden';
+
+    // 브레드크럼
+    if (catBreadcrumb) {
+      if (catPath.length === 0) {
+        catBreadcrumb.innerHTML = '';
+      } else {
+        catBreadcrumb.innerHTML = catPath.map((n, i) =>
+          `${i > 0 ? '<span class="cat-crumb-sep">›</span>' : ''}
+           <span class="cat-crumb-item">${n.icon ? n.icon + ' ' : ''}${n.label}</span>`
+        ).join('');
+      }
+    }
+
+    if (!catList) return;
+    catList.innerHTML = '';
+    items.forEach(item => {
+      const hasChildren = item.children && item.children.length > 0;
+      const div = document.createElement('div');
+      div.className = 'cat-item';
+      div.innerHTML = `
+        ${item.icon ? `<span class="cat-item__icon">${item.icon}</span>` : '<span class="cat-item__icon" style="opacity:0"></span>'}
+        <span class="cat-item__label">${item.label}</span>
+        ${hasChildren
+          ? `<span class="cat-item__arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></span>`
+          : `<span class="cat-item__check" style="display:none">✓</span>`
+        }
+      `;
+      div.addEventListener('click', () => {
+        if (hasChildren) {
+          catStack.push({ title, items });
+          catPath.push(item);
+          renderCatLevel(item.children, item.label);
+        } else {
+          // 리프 선택 → 확정
+          catPath.push(item);
+          const fullLabel = catPath.map(n => n.label).join(' > ');
+          const topId = catPath[0].id;
+          if (catHidden) catHidden.value = topId;
+          if (catLabel) { catLabel.textContent = fullLabel; }
+          if (catBtn) catBtn.classList.add('has-value');
+
+          // 사이즈 맵 업데이트
+          const sizeKey = CAT_TO_SIZE_KEY[topId] || '';
+          updateSizeOptions(sizeKey);
+
+          closeCatOverlay();
+        }
+      });
+      catList.appendChild(div);
+    });
+  }
+
+  function openCatOverlay() {
+    catStack = [];
+    catPath  = [];
+    renderCatLevel(CATEGORY_TREE, '카테고리 선택');
+    if (catOverlay) catOverlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeCatOverlay() {
+    if (catOverlay) catOverlay.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  if (catBtn) catBtn.addEventListener('click', openCatOverlay);
+  if (catCloseBtn) catCloseBtn.addEventListener('click', closeCatOverlay);
+  if (catOverlay) catOverlay.addEventListener('click', e => { if (e.target === catOverlay) closeCatOverlay(); });
+
+  if (catBackBtn) {
+    catBackBtn.addEventListener('click', () => {
+      if (catStack.length > 0) {
+        catPath.pop();
+        const prev = catStack.pop();
+        renderCatLevel(prev.items, prev.title);
+      }
+    });
+  }
+
+  /* ── 사이즈 옵션 갱신 ── */
+  const sizeWrap = document.getElementById('pregSizeWrap');
+  const sizeSel  = document.getElementById('pregSize');
+  function updateSizeOptions(key) {
+    if (!sizeSel) return;
+    const groups = PREG_SIZE_MAP[key] || [];
+    sizeSel.innerHTML = '<option value="">선택</option>';
+    if (!groups.length) {
+      if (sizeWrap) sizeWrap.style.display = 'none';
+      return;
+    }
+    groups.forEach(({ group, sizes }) => {
+      const og = document.createElement('optgroup');
+      og.label = group;
+      sizes.forEach(s => {
+        const o = document.createElement('option');
+        o.value = s; o.textContent = s;
+        og.appendChild(o);
+      });
+      sizeSel.appendChild(og);
+    });
+    if (sizeWrap) sizeWrap.style.display = '';
+  }
+  updateSizeOptions('');
+
+  /* ── 브랜드 자동완성 ── */
+  const BRAND_LIST = [
+    /* 스니커즈 · 신발 */
+    {en:'Nike',          ko:'나이키'},
+    {en:'Jordan',        ko:'조던'},
+    {en:'Adidas',        ko:'아디다스'},
+    {en:'Yeezy',         ko:'이지'},
+    {en:'New Balance',   ko:'뉴발란스'},
+    {en:'Converse',      ko:'컨버스'},
+    {en:'Vans',          ko:'반스'},
+    {en:'Asics',         ko:'아식스'},
+    {en:'Puma',          ko:'퓨마'},
+    {en:'Reebok',        ko:'리복'},
+    {en:'Salomon',       ko:'살로몬'},
+    {en:'Saucony',       ko:'사코니'},
+    {en:'Brooks',        ko:'브룩스'},
+    {en:'On Running',    ko:'온러닝'},
+    {en:'Hoka',          ko:'호카'},
+    {en:'Mizuno',        ko:'미즈노'},
+    {en:'Timberland',    ko:'팀버랜드'},
+    {en:'UGG',           ko:'어그'},
+    {en:'Dr. Martens',   ko:'닥터마틴'},
+    {en:'Birkenstock',   ko:'버켄스탁'},
+    {en:'Crocs',         ko:'크록스'},
+    {en:'Clarks',        ko:'클락스'},
+    {en:'New Era',       ko:'뉴에라'},
+    {en:'Fila',          ko:'휠라'},
+    /* 스트릿 · 캐주얼 */
+    {en:'Supreme',               ko:'슈프림'},
+    {en:'Off-White',             ko:'오프화이트'},
+    {en:'Palace',                ko:'팔라스'},
+    {en:'Stüssy',                ko:'스투시'},
+    {en:'BAPE',                  ko:'베이프'},
+    {en:'Anti Social Social Club', ko:'ASSC'},
+    {en:'Kith',                  ko:'키스'},
+    {en:'Fear of God',           ko:'피어오브갓'},
+    {en:'Essentials',            ko:'에센셜'},
+    {en:'Stone Island',          ko:'스톤아일랜드'},
+    {en:'CP Company',            ko:'씨피컴퍼니'},
+    {en:'Carhartt WIP',          ko:'칼하트'},
+    {en:'Human Made',            ko:'휴먼메이드'},
+    {en:'Neighborhood',          ko:'네이버후드'},
+    {en:'Undercover',            ko:'언더커버'},
+    {en:'Ader Error',            ko:'아더에러'},
+    {en:'Covernat',              ko:'커버낫'},
+    /* 럭셔리 */
+    {en:'Louis Vuitton',         ko:'루이비통'},
+    {en:'Chanel',                ko:'샤넬'},
+    {en:'Gucci',                 ko:'구찌'},
+    {en:'Prada',                 ko:'프라다'},
+    {en:'Hermès',                ko:'에르메스'},
+    {en:'Dior',                  ko:'디올'},
+    {en:'Balenciaga',            ko:'발렌시아가'},
+    {en:'Saint Laurent',         ko:'생로랑'},
+    {en:'Givenchy',              ko:'지방시'},
+    {en:'Bottega Veneta',        ko:'보테가베네타'},
+    {en:'Valentino',             ko:'발렌티노'},
+    {en:'Versace',               ko:'베르사체'},
+    {en:'Burberry',              ko:'버버리'},
+    {en:'Fendi',                 ko:'펜디'},
+    {en:'Celine',                ko:'셀린느'},
+    {en:'Loewe',                 ko:'로에베'},
+    {en:'Alexander McQueen',     ko:'알렉산더맥퀸'},
+    {en:'Moncler',               ko:'몽클레르'},
+    {en:'Canada Goose',          ko:'캐나다구스'},
+    {en:'Maison Margiela',       ko:'메종마르지엘라'},
+    {en:'Rick Owens',            ko:'릭오웬스'},
+    {en:'Ami Paris',             ko:'아미파리'},
+    {en:'Jacquemus',             ko:'자크뮈스'},
+    /* 아우터 · 스포츠 */
+    {en:'The North Face',        ko:'노스페이스'},
+    {en:"Arc'teryx",             ko:'아크테릭스'},
+    {en:'Patagonia',             ko:'파타고니아'},
+    {en:'Columbia',              ko:'컬럼비아'},
+    {en:'Ralph Lauren',          ko:'랄프로렌'},
+    {en:'Tommy Hilfiger',        ko:'타미힐피거'},
+    {en:'Calvin Klein',          ko:'캘빈클라인'},
+    {en:'Lacoste',               ko:'라코스테'},
+    {en:'Champion',              ko:'챔피언'},
+    {en:"Levi's",                ko:'리바이스'},
+    {en:'Diesel',                ko:'디젤'},
+    {en:'Carhartt',              ko:'칼하트'},
+    /* 시계 */
+    {en:'Rolex',                 ko:'롤렉스'},
+    {en:'Omega',                 ko:'오메가'},
+    {en:'Patek Philippe',        ko:'파텍필립'},
+    {en:'Audemars Piguet',       ko:'오데마피게'},
+    {en:'Cartier',               ko:'까르띠에'},
+    {en:'IWC',                   ko:'아이더블유씨'},
+    {en:'Breitling',             ko:'브라이틀링'},
+    {en:'TAG Heuer',             ko:'태그호이어'},
+    {en:'Longines',              ko:'론진'},
+    {en:'Seiko',                 ko:'세이코'},
+    {en:'Grand Seiko',           ko:'그랜드세이코'},
+    {en:'Casio',                 ko:'카시오'},
+    {en:'G-Shock',               ko:'지샥'},
+    {en:'Richard Mille',         ko:'리샤르밀'},
+    {en:'Hublot',                ko:'위블로'},
+    {en:'Panerai',               ko:'파네라이'},
+    /* 테크 */
+    {en:'Apple',                 ko:'애플'},
+    {en:'Samsung',               ko:'삼성'},
+    {en:'Sony',                  ko:'소니'},
+    {en:'Bose',                  ko:'보스'},
+    {en:'Bang & Olufsen',        ko:'뱅앤올룹슨'},
+    {en:'Dyson',                 ko:'다이슨'},
+    {en:'Nintendo',              ko:'닌텐도'},
+    {en:'Beats',                 ko:'비츠'},
+    /* 주얼리 */
+    {en:'Tiffany & Co.',         ko:'티파니'},
+    {en:'Bulgari',               ko:'불가리'},
+    {en:'Van Cleef & Arpels',    ko:'반클리프아펠'},
+    /* 한국 */
+    {en:'MLB',                   ko:'엠엘비'},
+    {en:'Descente',              ko:'데상트'},
+    {en:'Matin Kim',             ko:'마뗑킴'},
+    {en:'Wooyoungmi',            ko:'우영미'},
+    {en:'Nau',                   ko:'나우'},
+  ];
+
+  const brandInp = document.getElementById('pregBrand');
+  if (brandInp) {
+    const brandWrap = brandInp.parentElement;
+    if (brandWrap) brandWrap.style.position = 'relative';
+
+    const dropdown = document.createElement('div');
+    dropdown.className = 'preg-brand-dropdown';
+    brandInp.insertAdjacentElement('afterend', dropdown);
+
+    let activeIdx = -1;
+
+    function showSuggestions(q) {
+      activeIdx = -1;
+      if (!q) { dropdown.style.display = 'none'; return; }
+      const ql = q.toLowerCase();
+      const test = b => b.en.toLowerCase().includes(ql) || b.ko.toLowerCase().includes(ql);
+      const starts   = BRAND_LIST.filter(b => b.en.toLowerCase().startsWith(ql) || b.ko.startsWith(ql));
+      const contains = BRAND_LIST.filter(b => !b.en.toLowerCase().startsWith(ql) && !b.ko.startsWith(ql) && test(b));
+      const matches  = [...starts, ...contains].slice(0, 8);
+      if (!matches.length) { dropdown.style.display = 'none'; return; }
+
+      dropdown.innerHTML = matches.map((b, i) => {
+        const enL = b.en.toLowerCase();
+        const idx = enL.indexOf(ql);
+        const hi  = idx >= 0
+          ? b.en.slice(0, idx) + '<mark>' + b.en.slice(idx, idx + q.length) + '</mark>' + b.en.slice(idx + q.length)
+          : b.en;
+        return `<div class="preg-brand-item" data-brand="${b.en}" data-i="${i}">
+          <span class="brand-en">${hi}</span>
+          ${b.ko ? `<span class="brand-ko">${b.ko}</span>` : ''}
+        </div>`;
+      }).join('');
+
+      dropdown.querySelectorAll('.preg-brand-item').forEach(item => {
+        item.addEventListener('mousedown', e => {
+          e.preventDefault();
+          brandInp.value = item.dataset.brand;
+          dropdown.style.display = 'none';
+        });
+      });
+      dropdown.style.display = 'block';
+    }
+
+    function highlightItem(idx) {
+      dropdown.querySelectorAll('.preg-brand-item').forEach((el, i) => el.classList.toggle('active', i === idx));
+    }
+
+    brandInp.addEventListener('input', () => showSuggestions(brandInp.value.trim()));
+    brandInp.addEventListener('focus', () => { if (brandInp.value.trim()) showSuggestions(brandInp.value.trim()); });
+    brandInp.addEventListener('blur',  () => setTimeout(() => { dropdown.style.display = 'none'; }, 150));
+    brandInp.addEventListener('keydown', e => {
+      const items = dropdown.querySelectorAll('.preg-brand-item');
+      if (!items.length || dropdown.style.display === 'none') return;
+      if (e.key === 'ArrowDown')       { e.preventDefault(); activeIdx = Math.min(activeIdx+1, items.length-1); highlightItem(activeIdx); }
+      else if (e.key === 'ArrowUp')    { e.preventDefault(); activeIdx = Math.max(activeIdx-1, 0); highlightItem(activeIdx); }
+      else if (e.key === 'Enter' && activeIdx >= 0) { e.preventDefault(); brandInp.value = items[activeIdx].dataset.brand; dropdown.style.display = 'none'; }
+      else if (e.key === 'Escape')     { dropdown.style.display = 'none'; }
+    });
+  }
+
+  /* ── 정가품 검수 서비스 안내 모달 ── */
+  const verifyInfoBtn   = document.getElementById('pregVerifyInfoBtn');
+  const verifyOverlay   = document.getElementById('verifyInfoOverlay');
+  const verifyCloseBtn  = document.getElementById('verifyInfoCloseBtn');
+  if (verifyInfoBtn && verifyOverlay) {
+    verifyInfoBtn.addEventListener('click', () => {
+      verifyOverlay.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    });
+    const closeVerify = () => { verifyOverlay.classList.remove('open'); document.body.style.overflow = ''; };
+    if (verifyCloseBtn) verifyCloseBtn.addEventListener('click', closeVerify);
+    verifyOverlay.addEventListener('click', e => { if (e.target === verifyOverlay) closeVerify(); });
+  }
+
+  /* ── 판매가 → 수수료 계산 ── */
+  const priceInp     = document.getElementById('pregPrice');
+  const priceDisplay = document.getElementById('pregPriceDisplay');
+  const feeDisplay   = document.getElementById('pregFeeDisplay');
+  const netDisplay   = document.getElementById('pregNetDisplay');
+  function updateFeeCalc() {
+    const raw = String(priceInp ? priceInp.value : '').replace(/[^\d]/g, '');
+    const price = raw ? Number(raw) : 0;
+    const fee   = Math.round(price * 0.025);
+    const net   = price - fee;
+    const fmt   = n => n > 0 ? `₩${n.toLocaleString('ko-KR')}` : '—';
+    if (priceDisplay) priceDisplay.textContent = fmt(price);
+    if (feeDisplay)   feeDisplay.textContent   = price > 0 ? `- ₩${fee.toLocaleString('ko-KR')}` : '—';
+    if (netDisplay)   netDisplay.textContent   = fmt(net);
+  }
+  if (priceInp) priceInp.addEventListener('input', updateFeeCalc);
+
+  /* ── 설명 글자 수 ── */
+  const descTA   = document.getElementById('pregDesc');
+  const descCnt  = document.getElementById('pregDescCount');
+  if (descTA && descCnt) {
+    descTA.addEventListener('input', () => {
+      descCnt.textContent = descTA.value.length;
+    });
+  }
+
+  /* ── 거래 방식 → 직거래 지역 표시 ── */
+  const locationWrap = document.getElementById('pregLocationWrap');
+  document.querySelectorAll('input[name="pregTrade"]').forEach(chk => {
+    chk.addEventListener('change', () => {
+      const hasLocal = [...document.querySelectorAll('input[name="pregTrade"]:checked')]
+        .some(el => el.value === '근거리 직거래');
+      if (locationWrap) locationWrap.style.display = hasLocal ? '' : 'none';
+    });
+  });
+
+  /* ── 뒤로 가기 ── */
+  const backBtn = document.getElementById('pregBackBtn');
+  if (backBtn) backBtn.addEventListener('click', () => {
+    if (typeof navigateTo === 'function') navigateTo('drops');
+  });
+
+  /* ── 임시저장 ── */
+  function saveDraftPreg() {
+    const data = {
+      cat: catHidden?.value || '',
+      catLabel: catLabel?.textContent || '',
+      brand: document.getElementById('pregBrand')?.value || '',
+      name: document.getElementById('pregName')?.value || '',
+      model: document.getElementById('pregModel')?.value || '',
+      size: sizeSel?.value || '',
+      cond: document.querySelector('input[name="pregCond"]:checked')?.value || '',
+      price: priceInp?.value || '',
+      retail: document.getElementById('pregRetail')?.value || '',
+      desc: descTA?.value || ''
+    };
+    try { localStorage.setItem('draft_preg', JSON.stringify(data)); } catch(e) {}
+  }
+  function loadDraftPreg() {
+    try {
+      const saved = JSON.parse(localStorage.getItem('draft_preg') || 'null');
+      if (!saved) return;
+      if (saved.cat && catHidden) {
+        catHidden.value = saved.cat;
+        if (catLabel) { catLabel.textContent = saved.catLabel || saved.cat; catBtn && catBtn.classList.add('has-value'); }
+        updateSizeOptions(CAT_TO_SIZE_KEY[saved.cat] || saved.cat);
+      }
+      const fields = ['brand','name','model','price','retail','desc'];
+      fields.forEach(f => {
+        const el = document.getElementById(`preg${f.charAt(0).toUpperCase()+f.slice(1)}`);
+        if (el && saved[f]) el.value = saved[f];
+      });
+      if (saved.size && sizeSel) sizeSel.value = saved.size;
+      if (saved.cond) {
+        const r = document.querySelector(`input[name="pregCond"][value="${saved.cond}"]`);
+        if (r) r.checked = true;
+      }
+      if (saved.price) updateFeeCalc();
+      if (saved.desc && descCnt) descCnt.textContent = saved.desc.length;
+    } catch(e) {}
+  }
+  loadDraftPreg();
+
+  [document.getElementById('pregSaveBtn'), document.getElementById('pregSaveBtnB')].forEach(btn => {
+    if (!btn || btn.dataset.bound === '1') return;
+    btn.dataset.bound = '1';
+    btn.addEventListener('click', () => {
+      saveDraftPreg();
+      showToast('임시저장되었습니다.', 'success');
+    });
+  });
+
+  /* ── 등록하기 ── */
+  function submitPreg(btn) {
+    if (!btn || btn.dataset.busy === '1') return;
+    /* 유효성 검사 */
+    let ok = true;
+    const reqFields = [
+      { id: 'pregCat',   errId: 'pregCatErr',   msg: '카테고리를 선택해주세요.' },
+      { id: 'pregBrand', errId: 'pregBrandErr', msg: '브랜드를 입력해주세요.' },
+      { id: 'pregName',  errId: 'pregNameErr',  msg: '상품명을 입력해주세요.' },
+      { id: 'pregPrice', errId: 'pregPriceErr', msg: '판매가를 입력해주세요.' }
+    ];
+    reqFields.forEach(({ id, errId, msg }) => {
+      const el = document.getElementById(id);
+      const err = document.getElementById(errId);
+      if (!el || !el.value.trim()) {
+        if (el) el.classList.add('err');
+        if (err) { err.textContent = msg; err.classList.add('show'); }
+        ok = false;
+      } else {
+        if (el) el.classList.remove('err');
+        if (err) err.classList.remove('show');
+      }
+    });
+    const condChecked = document.querySelector('input[name="pregCond"]:checked');
+    const condErr = document.getElementById('pregCondErr');
+    if (!condChecked) {
+      if (condErr) { condErr.textContent = '상품 상태를 선택해주세요.'; condErr.classList.add('show'); }
+      ok = false;
+    } else {
+      if (condErr) condErr.classList.remove('show');
+    }
+    if (images.length === 0) { showToast('상품 사진을 최소 1장 등록해주세요.', 'error'); ok = false; }
+    if (!ok) return;
+
+    /* 제출 */
+    const user = (typeof getAuthUser === 'function') ? getAuthUser() : null;
+    const tradeVals = [...document.querySelectorAll('input[name="pregTrade"]:checked')].map(el => el.value);
+    let tradeMethod = '전국 안전결제';
+    if (tradeVals.includes('전국 안전결제') && tradeVals.includes('근거리 직거래')) tradeMethod = '전국+직거래 모두';
+    else if (tradeVals.includes('근거리 직거래')) tradeMethod = '근거리 직거래';
+
+    const product = {
+      id: `product_${Date.now()}`,
+      seller_email: user?.email || '',
+      seller_name:  user?.nickname || user?.email || '익명',
+      category:     document.getElementById('pregCat')?.value || '',
+      brand:        document.getElementById('pregBrand')?.value.trim() || '',
+      name:         document.getElementById('pregName')?.value.trim() || '',
+      model:        document.getElementById('pregModel')?.value.trim() || '',
+      size:         sizeSel?.value || '',
+      condition:    condChecked?.value || '',
+      price:        Number(String(priceInp?.value || '0').replace(/[^\d]/g, '')),
+      retail_price: Number(String(document.getElementById('pregRetail')?.value || '0').replace(/[^\d]/g, '')),
+      description:  descTA?.value.trim() || '',
+      trade_method: tradeMethod,
+      location:     document.getElementById('pregLocation')?.value.trim() || '',
+      status:       '판매중',
+      images: images.map((img, idx) => ({
+        name: img.file?.name || `image_${idx+1}`,
+        type: img.file?.type || '',
+        size: img.file?.size || 0,
+        order: idx,
+        is_main: idx === 0
+      }))
+    };
+
+    btn.dataset.busy = '1';
+    const origText = btn.textContent;
+    btn.textContent = '등록 중…'; btn.disabled = true;
+
+    fetch('https://resellground.di702934.workers.dev/api/products', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('rg_token') || ''}`
+      },
+      body: JSON.stringify(product)
+    })
+    .then(async res => {
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.message || '상품 등록에 실패했습니다.');
+      return data;
+    })
+    .then(() => {
+      localStorage.removeItem('draft_preg');
+      images.forEach(img => URL.revokeObjectURL(img.url));
+      images = []; renderThumbs();
+      document.querySelectorAll('#page-product-register .preg-input').forEach(el => {
+        if (el.tagName === 'SELECT') el.selectedIndex = 0;
+        else el.value = '';
+        el.classList.remove('err','ok');
+      });
+      document.querySelectorAll('input[name="pregCond"], input[name="pregTrade"]').forEach(el => el.checked = false);
+      if (descTA) descTA.value = '';
+      if (descCnt) descCnt.textContent = '0';
+      updateFeeCalc();
+      showToast('상품이 등록되었습니다! 🎉', 'success');
+      if (typeof navigateTo === 'function') navigateTo('drops');
+      if (typeof refreshProductsFromDB === 'function') refreshProductsFromDB();
+    })
+    .catch(err => {
+      showToast(err.message || '상품 등록 중 오류가 발생했습니다.', 'error');
+    })
+    .finally(() => {
+      btn.textContent = origText; btn.disabled = false; btn.dataset.busy = '';
+    });
+  }
+
+  [document.getElementById('pregSubmitBtn'), document.getElementById('pregSubmitBtnB')].forEach(btn => {
+    if (!btn || btn.dataset.bound === '1') return;
+    btn.dataset.bound = '1';
+    btn.addEventListener('click', () => submitPreg(btn));
+  });
+
+  /* ── 입력 시 에러 제거 ── */
+  ['pregCat','pregBrand','pregName','pregPrice'].forEach(id => {
+    const el = document.getElementById(id);
+    const err = document.getElementById(`${id}Err`);
+    if (el) el.addEventListener('input', () => {
+      el.classList.remove('err');
+      if (err) err.classList.remove('show');
+    });
+    if (el && el.tagName === 'SELECT') el.addEventListener('change', () => {
+      el.classList.remove('err');
+      if (err) err.classList.remove('show');
+    });
+  });
+}
+
+/* ═══════════════════════════════════════════════════
+   BOOT — 전체 초기화
+═══════════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
   initLoginForm();
   initSignupForm();
@@ -1469,6 +2264,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initPostForm();
   initSupportForm();
   initMypageForm();
+  initProductRegisterPage();
 
   document.addEventListener('click', (e) => {
     const logoutTarget = e.target.closest('#logoutBtnPc, #logoutBtnM, [data-logout]');
@@ -1483,4 +2279,3 @@ document.addEventListener('DOMContentLoaded', () => {
 
   applyLoginState();
 });
-'38cb74f (update product ui work)'

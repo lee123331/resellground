@@ -21,7 +21,7 @@ app.use(
       ];
       return allowed.includes(origin) ? origin : "https://resellground.pages.dev";
     },
-    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowHeaders: ["Content-Type", "Authorization"],
   })
 );
@@ -527,6 +527,94 @@ app.get("/api/products", async (c) => {
     }, 500);
   }
 });
+/* ── 내 상품 목록: email 기준 ── */
+app.get("/api/user/products", async (c) => {
+  try {
+    const email = String(c.req.query("email") || "").trim().toLowerCase();
+    if (!email) return c.json({ ok: false, message: "email 파라미터가 필요합니다." }, 400);
+
+    const result = await c.env.DB.prepare(`
+      SELECT * FROM products
+      WHERE seller_email = ?
+      ORDER BY created_at DESC
+    `).bind(email).all();
+
+    const products = (result.results || []).map((row: any) => {
+      let images: string[] = [];
+      try { images = row.images ? JSON.parse(String(row.images)) : []; } catch { images = []; }
+      return {
+        id: row.id,
+        seller_email: row.seller_email,
+        seller_name: row.seller_name,
+        name: row.name,
+        brand: row.brand,
+        category: row.category,
+        price: row.price,
+        condition: row.condition,
+        trade_method: row.trade_method,
+        description: row.description,
+        images,
+        status: row.status,
+        created_at: row.created_at,
+      };
+    });
+
+    return c.json({ ok: true, products });
+  } catch (err) {
+    console.error(err);
+    return c.json({ ok: false, message: "내 상품 목록을 불러오지 못했습니다." }, 500);
+  }
+});
+
+/* ── 상품 상태 변경 ── */
+app.patch("/api/products/:id/status", async (c) => {
+  try {
+    const id = c.req.param("id");
+    const body = await c.req.json();
+    const status = String(body.status || "").trim();
+
+    const allowed = ["판매중", "판매완료", "예약중"];
+    if (!allowed.includes(status)) {
+      return c.json({ ok: false, message: "유효하지 않은 상태입니다." }, 400);
+    }
+
+    const result = await c.env.DB.prepare(`
+      UPDATE products SET status = ? WHERE id = ?
+    `).bind(status, id).run();
+
+    if (result.meta?.changes === 0) {
+      return c.json({ ok: false, message: "상품을 찾을 수 없습니다." }, 404);
+    }
+
+    return c.json({ ok: true, message: `상태가 "${status}"로 변경되었습니다.` });
+  } catch (err) {
+    console.error(err);
+    return c.json({ ok: false, message: "상태 변경 중 오류가 발생했습니다." }, 500);
+  }
+});
+
+/* ── 상품 삭제 ── */
+app.delete("/api/products/:id", async (c) => {
+  try {
+    const id = c.req.param("id");
+
+    const result = await c.env.DB.prepare(`
+      DELETE FROM products WHERE id = ?
+    `).bind(id).run();
+
+    if (result.meta?.changes === 0) {
+      return c.json({ ok: false, message: "상품을 찾을 수 없습니다." }, 404);
+    }
+
+    return c.json({ ok: true, message: "상품이 삭제되었습니다." });
+  } catch (err) {
+    console.error(err);
+    return c.json({ ok: false, message: "삭제 중 오류가 발생했습니다." }, 500);
+  }
+});
+
+/* ─────────────────────────────────────────────── */
+
 app.get("/api/bookmarks/:email", async (c) => {
   try {
     const email = c.req.param("email");

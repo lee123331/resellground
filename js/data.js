@@ -6,7 +6,7 @@
 /* 배포 후 실제 Workers URL로 교체 */
 const API_BASE = (() => {
   const h = window.location.hostname;
-  if (h === 'resellground.pages.dev') return 'https://backend.resellground.workers.dev';
+  if (h === 'resellground.pages.dev') return 'https://backend.cooltime601.workers.dev';
   return 'http://localhost:8787';
 })();
 

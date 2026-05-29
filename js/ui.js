@@ -1218,7 +1218,7 @@ const fabBtn = document.getElementById('fabBtn');
 if (fabBtn) {
   fabBtn.addEventListener('click', () => {
     if (!requireLogin()) return;
-    openModal('writePost');
+    navigateTo('product-register');
   });
 }
 
