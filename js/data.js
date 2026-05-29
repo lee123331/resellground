@@ -6,8 +6,12 @@
 /* 배포 후 실제 Workers URL로 교체 */
 const API_BASE = (() => {
   const h = window.location.hostname;
-  if (h === 'resellground.pages.dev') return 'https://backend.resellground.workers.dev';
-  return 'http://localhost:8787';
+
+  if (h === 'localhost' || h === '127.0.0.1') {
+    return 'http://localhost:8787';
+  }
+
+  return 'https://backend.di702934.workers.dev';
 })();
 
 const S = {
