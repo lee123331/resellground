@@ -11,7 +11,7 @@ app.use(
   "*",
   cors({
     origin: "https://resellground.pages.dev",
-    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowHeaders: ["Content-Type", "Authorization"],
   })
 );
@@ -399,38 +399,40 @@ app.get("/api/products", async (c) => {
 
     const offset = (page - 1) * limit;
 
-    const where: string[] = [];
-    const binds: unknown[] = [];
+const where: string[] = [];
+const binds: unknown[] = [];
 
-    if (category && category !== "전체") {
-      where.push("category = ?");
-      binds.push(category);
-    }
+where.push("status != ?");
+binds.push("삭제됨");
 
-    if (status && status !== "전체") {
-      where.push("status = ?");
-      binds.push(status);
-    }
+if (category && category !== "전체") {
+  where.push("category = ?");
+  binds.push(category);
+}
 
-    const whereSql = where.length ? `WHERE ${where.join(" AND ")}` : "";
+if (status && status !== "전체") {
+  where.push("status = ?");
+  binds.push(status);
+}
+const whereSql = where.length ? `WHERE ${where.join(" AND ")}` : "";
 
-    const countResult = await c.env.DB.prepare(`
-      SELECT COUNT(*) AS total
-      FROM products
-      ${whereSql}
-    `).bind(...binds).first();
+const countResult = await c.env.DB.prepare(`
+  SELECT COUNT(*) AS total
+  FROM products
+  ${whereSql}
+`).bind(...binds).first();
 
-    const total = Number(countResult?.total || 0);
-    const totalPages = Math.max(1, Math.ceil(total / limit));
+const total = Number(countResult?.total || 0);
+const totalPages = Math.max(1, Math.ceil(total / limit));
 
-    const result = await c.env.DB.prepare(`
-      SELECT *
-      FROM products
-      ${whereSql}
-      ORDER BY created_at DESC
-      LIMIT ?
-      OFFSET ?
-    `).bind(...binds, limit, offset).all();
+const result = await c.env.DB.prepare(`
+  SELECT *
+  FROM products
+  ${whereSql}
+  ORDER BY created_at DESC
+  LIMIT ?
+  OFFSET ?
+`).bind(...binds, limit, offset).all();
 
     const rows = result.results || [];
 
@@ -593,25 +595,27 @@ app.get("/api/user/products", async (c) => {
       }, 400);
     }
 
-    const countResult = await c.env.DB.prepare(`
-      SELECT COUNT(*) AS total
-      FROM products
-      WHERE seller_email = ?
-    `).bind(email).first();
+const countResult = await c.env.DB.prepare(`
+  SELECT COUNT(*) AS total
+  FROM products
+  WHERE seller_email = ?
+  AND status != ?
+`).bind(email, "삭제됨").first();
 
-    const total = Number(countResult?.total || 0);
-    const totalPages = Math.max(1, Math.ceil(total / limit));
+const total = Number(countResult?.total || 0);
+const totalPages = Math.max(1, Math.ceil(total / limit));
 
-    const result = await c.env.DB.prepare(`
-      SELECT *
-      FROM products
-      WHERE seller_email = ?
-      ORDER BY created_at DESC
-      LIMIT ?
-      OFFSET ?
-    `).bind(email, limit, offset).all();
+const result = await c.env.DB.prepare(`
+  SELECT *
+  FROM products
+  WHERE seller_email = ?
+  AND status != ?
+  ORDER BY created_at DESC
+  LIMIT ?
+  OFFSET ?
+`).bind(email, "삭제됨", limit, offset).all();
 
-    const rows = result.results || [];
+const rows = result.results || [];
 
     return c.json({
       ok: true,
@@ -632,6 +636,116 @@ app.get("/api/user/products", async (c) => {
       total: 0,
       totalPages: 1,
       products: []
+    }, 500);
+  }
+});
+app.patch("/api/products/:id/status", async (c) => {
+  try {
+    const id = String(c.req.param("id") || "").trim();
+    const body = await c.req.json().catch(() => ({}));
+    const status = String(body.status || "").trim();
+
+    const allowedStatuses = ["판매중", "예약중", "판매완료", "삭제됨"];
+
+    if (!id) {
+      return c.json({
+        ok: false,
+        message: "상품 ID가 필요합니다."
+      }, 400);
+    }
+
+    if (!allowedStatuses.includes(status)) {
+      return c.json({
+        ok: false,
+        message: "허용되지 않는 상태값입니다.",
+        allowedStatuses
+      }, 400);
+    }
+
+    const exists = await c.env.DB.prepare(`
+      SELECT id
+      FROM products
+      WHERE id = ?
+      LIMIT 1
+    `).bind(id).first();
+
+    if (!exists) {
+      return c.json({
+        ok: false,
+        message: "상품을 찾을 수 없습니다."
+      }, 404);
+    }
+
+    await c.env.DB.prepare(`
+      UPDATE products
+      SET status = ?
+      WHERE id = ?
+    `).bind(status, id).run();
+
+    const row = await c.env.DB.prepare(`
+      SELECT *
+      FROM products
+      WHERE id = ?
+      LIMIT 1
+    `).bind(id).first();
+
+    return c.json({
+      ok: true,
+      message: "상품 상태가 변경되었습니다.",
+      product: normalizeProductRow(row)
+    });
+  } catch (err) {
+    console.error(err);
+
+    return c.json({
+      ok: false,
+      message: "상품 상태 변경 중 오류가 발생했습니다."
+    }, 500);
+  }
+});
+app.delete("/api/products/:id", async (c) => {
+  try {
+    const id = String(c.req.param("id") || "").trim();
+
+    if (!id) {
+      return c.json({
+        ok: false,
+        message: "상품 ID가 필요합니다."
+      }, 400);
+    }
+
+    const exists = await c.env.DB.prepare(`
+      SELECT id
+      FROM products
+      WHERE id = ?
+      LIMIT 1
+    `).bind(id).first();
+
+    if (!exists) {
+      return c.json({
+        ok: false,
+        message: "상품을 찾을 수 없습니다."
+      }, 404);
+    }
+
+    await c.env.DB.prepare(`
+      UPDATE products
+      SET status = '삭제됨'
+      WHERE id = ?
+    `).bind(id).run();
+
+    return c.json({
+      ok: true,
+      message: "상품이 삭제 처리되었습니다.",
+      id,
+      status: "삭제됨"
+    });
+  } catch (err) {
+    console.error(err);
+
+    return c.json({
+      ok: false,
+      message: "상품 삭제 중 오류가 발생했습니다."
     }, 500);
   }
 });

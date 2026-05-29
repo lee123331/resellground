@@ -604,8 +604,9 @@ rawPrice: Number(String(product.price || '0').replace(/[^\d]/g, '') || 0),
     trade: product.trade_method || '',
     desc: product.description || '',
     images: Array.isArray(product.images) ? product.images : [],
-    interest: 0,
-    postedAt: product.created_at || ''
+    views: Number(product.views || 0),
+interest: Number(product.views || 0),
+postedAt: product.created_at || ''
   };
 }
 const PRODUCT_PAGE_STATE = {
@@ -1998,4 +1999,4 @@ async function openProductDetailFromDB(productId) {
     showToast('상품 상세 정보를 불러오지 못했습니다.', 'error');
   }
 }
-window.openProductDetailFromDB = openProductDetailFromDB;
+window.openProductDetailFromDB = openProductDetailFromDB; 
