@@ -2287,7 +2287,18 @@
 }
 
 #modal-addDrop .rg-product-input:focus {
-  border-color: #0f0f0f;
+ 
+ .dc-post__recommend.act {
+  background: #fff4f2;
+  border-color: #ffb4aa;
+  color: #e23b2e;
+}
+
+.dc-post__recommend.act em,
+.dc-post__recommend.act span {
+  color: #e23b2e;
+  font-weight: 800;
+} border-color: #0f0f0f;
   background: #fff;
 }
 
@@ -2838,4 +2849,14 @@
 }
 .rg-settings-save-btn:disabled { opacity: .4; cursor: not-allowed; }
 .rg-settings-save-btn--active { opacity: 1 !important; }
+.dc-post__recommend.act {
+  background: #fff4f2;
+  border-color: #ffb4aa;
+  color: #e23b2e;
+}
+
+.dc-post__recommend.act em,
+.dc-post__recommend.act span {
+  color: #e23b2e;
+  font-weight: 800;
 }

@@ -843,6 +843,69 @@ content.innerHTML = renderPostContent(
 );
 
 if (likes) likes.textContent = `👍 ${post.likes || 0}`;
+
+const recommendBtn = document.querySelector('#modal-postDetail .dc-post__recommend');
+
+if (recommendBtn && likes) {
+  const postId = post.id || post.title || String(Date.now());
+  const likedKey = `rg_liked_post_${postId}`;
+  const alreadyLiked = localStorage.getItem(likedKey) === '1';
+
+  recommendBtn.classList.toggle('act', alreadyLiked);
+
+  recommendBtn.onclick = async () => {
+    if (localStorage.getItem(likedKey) === '1') {
+      showToast('이미 추천한 게시글입니다.', 'info');
+      return;
+    }
+
+    const currentLikes = Number(post.likes || 0);
+    const nextLikes = currentLikes + 1;
+
+    post.likes = nextLikes;
+    localStorage.setItem(likedKey, '1');
+
+    likes.textContent = `👍 ${nextLikes}`;
+    recommendBtn.classList.add('act');
+
+    if (Array.isArray(DATA.posts)) {
+      const target = DATA.posts.find(p => String(p.id) === String(post.id));
+
+      if (target) {
+        target.likes = nextLikes;
+      }
+    }
+
+    const postList = document.getElementById('postList');
+
+    if (postList && typeof renderPostCard === 'function' && Array.isArray(DATA.posts)) {
+      postList.innerHTML = '';
+
+      DATA.posts.forEach(p => {
+        postList.appendChild(renderPostCard(p));
+      });
+    }
+
+    showToast('게시글을 추천했어요.', 'success');
+
+    try {
+  const res = await fetch(`${API_BASE}/api/posts/${encodeURIComponent(postId)}/like`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${localStorage.getItem('rg_token') || ''}`
+    }
+  });
+
+  if (!res.ok) {
+    throw new Error('추천 DB 반영 실패');
+  }
+} catch (err) {
+  console.warn('추천 DB 반영 실패:', err);
+}
+  };
+}
+
 if (comments) comments.textContent = `댓글 ${post.comments || 0}`;
 
 if (comments) {
