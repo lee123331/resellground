@@ -553,32 +553,109 @@ return div;
           <button class="mpi__btn mpi__btn--delete" data-product-id="${p.id}">삭제</button>
         </div>`;
 
-      item.querySelector('.mpi__btn--status').addEventListener('click', async (e) => {
-        e.stopPropagation();
-        const id = e.target.dataset.productId;
-        const cur = e.target.dataset.status;
-        const next = cur === '판매중' ? '판매완료' : '판매중';
-        try {
-          await fetch(`${API_BASE}/api/products/${id}/status`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ status: next }),
-          });
-          showToast(`"${next}"으로 상태를 변경했어요.`, 'success');
-          if (typeof loadMyProducts === 'function') loadMyProducts();
-        } catch { showToast('상태 변경에 실패했어요.', 'error'); }
-      });
+     item.querySelector('.mpi__btn--status').addEventListener('click', async (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+
+  const btn = e.currentTarget;
+  const id = btn.dataset.productId;
+  const cur = btn.dataset.status;
+  const next = cur === '판매중' ? '판매완료' : '판매중';
+
+  if (!id) {
+    showToast('상품 ID가 없습니다.', 'error');
+    return;
+  }
+
+  try {
+    btn.disabled = true;
+    btn.textContent = '변경 중...';
+
+    const res = await fetch(`${API_BASE}/api/products/${encodeURIComponent(id)}/status`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('rg_token') || ''}`
+      },
+      body: JSON.stringify({ status: next }),
+    });
+
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok || !(data.success === true || data.ok === true)) {
+      throw new Error(data.message || '상태 변경에 실패했습니다.');
+    }
+
+    showToast(`"${next}"으로 상태를 변경했어요.`, 'success');
+
+    if (typeof loadMyProducts === 'function') {
+      await loadMyProducts();
+    }
+
+    if (typeof refreshProductsFromDB === 'function') {
+      await refreshProductsFromDB({ page: 1 });
+    }
+  } catch (err) {
+    console.error(err);
+    showToast(err.message || '상태 변경에 실패했어요.', 'error');
+
+    btn.disabled = false;
+    btn.textContent = '상태 변경';
+  }
+});
 
       item.querySelector('.mpi__btn--delete').addEventListener('click', async (e) => {
-        e.stopPropagation();
-        if (!confirm('정말 삭제할까요?')) return;
-        const id = e.target.dataset.productId;
-        try {
-          await fetch(`${API_BASE}/api/products/${id}`, { method: 'DELETE' });
-          showToast('상품을 삭제했어요.', 'success');
-          if (typeof loadMyProducts === 'function') loadMyProducts();
-        } catch { showToast('삭제에 실패했어요.', 'error'); }
-      });
+  e.preventDefault();
+  e.stopPropagation();
+
+  const btn = e.currentTarget;
+  const id = btn.dataset.productId;
+
+  if (!id) {
+    showToast('상품 ID가 없습니다.', 'error');
+    return;
+  }
+
+  if (!confirm('정말 삭제할까요?')) return;
+
+  try {
+    btn.disabled = true;
+    btn.textContent = '삭제 중...';
+
+    const res = await fetch(`${API_BASE}/api/products/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('rg_token') || ''}`
+      }
+    });
+
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok || !(data.success === true || data.ok === true)) {
+      throw new Error(data.message || '삭제에 실패했습니다.');
+    }
+
+    showToast('상품을 삭제했어요.', 'success');
+
+    // 화면에서 즉시 제거
+    item.remove();
+
+    // DB 기준으로 다시 동기화
+    if (typeof loadMyProducts === 'function') {
+      await loadMyProducts();
+    }
+
+    if (typeof refreshProductsFromDB === 'function') {
+      await refreshProductsFromDB({ page: 1 });
+    }
+  } catch (err) {
+    console.error(err);
+    showToast(err.message || '삭제에 실패했어요.', 'error');
+
+    btn.disabled = false;
+    btn.textContent = '삭제';
+  }
+});
 
       item.addEventListener('click', () => {
         if (typeof openProductModal === 'function') openProductModal(p);
