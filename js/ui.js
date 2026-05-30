@@ -976,7 +976,7 @@ if (commentSubmit) {
       return;
     }
 
-    const user = getAuthUser();
+    const user = getSafeAuthUser();
 
     const newComment = {
       id: `comment_${Date.now()}`,
@@ -1750,7 +1750,7 @@ async function togglePostCardBookmark(btn) {
 
   const post = card._postData || {};
   const postId = card.dataset.postId || post.id || post.title;
-  const user = getAuthUser ? getAuthUser() : null;
+  const user = getSafeAuthUser();
 
   if (!user?.email) {
     showToast('로그인 정보가 없습니다. 다시 로그인해주세요.', 'error');
