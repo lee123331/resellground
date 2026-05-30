@@ -29,7 +29,17 @@ function navigateTo(pageId) {
     item.classList.toggle('act', item.dataset.goto === pageId);
   });
 }
+function getSafeAuthUser() {
+  if (typeof getAuthUser === 'function') {
+    return getAuthUser();
+  }
 
+  try {
+    return JSON.parse(localStorage.getItem('rg_user') || 'null');
+  } catch (err) {
+    return null;
+  }
+}
 /* ── 비로그인 체크 (항목 10) ── */
 function requireLogin() {
   if (S.loggedIn) return true;
@@ -855,7 +865,7 @@ if (views) views.textContent = `조회 ${post.views || 0}`;
 
 if (bookmarkBtn) {
   const postId = post.id || post.title || String(Date.now());
-  const user = getAuthUser();
+const user = getSafeAuthUser();
 
   if (!Array.isArray(DATA.bookmarks)) DATA.bookmarks = [];
 
@@ -1117,7 +1127,7 @@ async function refreshMpBookmarks() {
 
   if (!Array.isArray(DATA.bookmarks)) DATA.bookmarks = [];
 
-  const user = getAuthUser ? getAuthUser() : null;
+  const user = getSafeAuthUser();
 
   if (user?.email) {
     try {
