@@ -531,7 +531,7 @@ async function getCommentCountFromDB(postId) {
 
   try {
     const res = await fetch(
-      `https://resellground.di702934.workers.dev/api/comments/${encodeURIComponent(postId)}`,
+      `${API_BASE}/api/comments/${encodeURIComponent(postId)}`,
       { cache: 'no-store' }
     );
 
@@ -551,7 +551,7 @@ async function refreshCommunityPostsFromDB() {
   if (!postList || typeof renderPostCard !== 'function') return;
 
   try {
-    const res = await fetch('https://resellground.di702934.workers.dev/api/posts', {
+    const res = await fetch(`${API_BASE}/api/posts`, {
       cache: 'no-store'
     });
 
@@ -641,7 +641,7 @@ async function refreshProductsFromDB(options = {}) {
       params.set('status', PRODUCT_PAGE_STATE.status);
     }
 
-    const res = await fetch(`https://resellground.di702934.workers.dev/api/products?${params.toString()}`, {
+    const res = await fetch(`${API_BASE}/api/products?${params.toString()}`, {
       cache: 'no-store'
     });
 
@@ -882,7 +882,7 @@ if (bookmarkBtn) {
       if (idx >= 0) {
         DATA.bookmarks.splice(idx, 1);
 
-        await fetch('https://resellground.di702934.workers.dev/api/bookmarks', {
+       await fetch(`${API_BASE}/api/bookmarks`, {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
@@ -903,7 +903,7 @@ if (bookmarkBtn) {
           post: { ...post, id: postId }
         });
 
-        await fetch('https://resellground.di702934.workers.dev/api/bookmarks', {
+        await fetch(`${API_BASE}/api/bookmarks`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -1024,7 +1024,7 @@ if (commentSubmit) {
 
     // 5) DB 저장
     try {
-      const res = await fetch('https://resellground.di702934.workers.dev/api/comments', {
+      const res = await fetch(`${API_BASE}/api/comments`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1061,7 +1061,7 @@ async function loadAndRenderComments() {
 
   try {
     const res = await fetch(
-      `https://resellground.di702934.workers.dev/api/comments/${encodeURIComponent(post.id)}`
+      `${API_BASE}/api/comments/${encodeURIComponent(post.id)}`
     );
 
     const rows = res.ok ? await res.json() : [];
@@ -1122,7 +1122,7 @@ async function refreshMpBookmarks() {
   if (user?.email) {
     try {
       const res = await fetch(
-        `https://resellground.di702934.workers.dev/api/bookmarks/${encodeURIComponent(user.email)}`
+        `${API_BASE}/api/bookmarks/${encodeURIComponent(user.email)}`
       );
 
       if (res.ok) {
@@ -1758,7 +1758,7 @@ async function togglePostCardBookmark(btn) {
     if (idx >= 0) {
       DATA.bookmarks.splice(idx, 1);
 
-      await fetch('https://resellground.di702934.workers.dev/api/bookmarks', {
+      await fetch(`${API_BASE}/api/bookmarks`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -1779,7 +1779,7 @@ async function togglePostCardBookmark(btn) {
         post: { ...post, id: postId }
       });
 
-      await fetch('https://resellground.di702934.workers.dev/api/bookmarks', {
+      await fetch(`${API_BASE}/api/bookmarks`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1967,7 +1967,7 @@ async function openProductDetailFromDB(productId) {
 
   try {
     const res = await fetch(
-      `https://resellground.di702934.workers.dev/api/products/${encodeURIComponent(productId)}`,
+      `${API_BASE}/api/products/${encodeURIComponent(productId)}`,
       { cache: 'no-store' }
     );
 
