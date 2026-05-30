@@ -523,18 +523,9 @@ return div;
   }
 
   /* ── 내 상품 목록 렌더링 ── */
-  function renderMyProducts(products, loading) {
+  function renderMyProducts(products) {
     const list = document.getElementById('myProductList');
     if (!list) return;
-
-    if (loading) {
-      list.innerHTML = `
-        <div class="empty-state">
-          <p class="empty-state__icon" style="animation:spin 1s linear infinite;display:inline-block">⏳</p>
-          <p class="empty-state__title">불러오는 중...</p>
-        </div>`;
-      return;
-    }
 
     if (!products || products.length === 0) {
       list.innerHTML = `
@@ -548,97 +539,112 @@ return div;
 
     list.innerHTML = '';
     products.forEach(p => {
-      const statusClass = p.status === '판매완료' ? 'sold' : p.status === '예약중' ? 'reserved' : 'active';
-      const nextStatus  = p.status === '판매중' ? '판매완료' : '판매중';
-      const btnLabel    = p.status === '판매중' ? '판매완료로 변경' : '판매중으로 변경';
-      const priceLabel  = typeof p.price === 'number'
-        ? p.price.toLocaleString('ko-KR') + '원'
-        : (p.price || '-');
-
       const item = document.createElement('div');
       item.className = 'mpi';
       item.innerHTML = `
         <div class="mpi__em">${p.em || '📦'}</div>
         <div class="mpi__info">
           <p class="mpi__name">${p.name}</p>
-          <p class="mpi__meta">${p.category || p.cat || ''} · ${priceLabel}</p>
-          <span class="mpi__status mpi__status--${statusClass}">${p.status}</span>
+          <p class="mpi__meta">${p.cat} · ${p.price}</p>
+          <span class="mpi__status mpi__status--${p.status === '판매완료' ? 'sold' : p.status === '예약중' ? 'reserved' : 'active'}">${p.status}</span>
         </div>
         <div class="mpi__actions">
-          <button class="mpi__btn mpi__btn--status" data-product-id="${p.id}" data-status="${p.status}">${btnLabel}</button>
+          <button class="mpi__btn mpi__btn--status" data-product-id="${p.id}" data-status="${p.status}">상태 변경</button>
           <button class="mpi__btn mpi__btn--delete" data-product-id="${p.id}">삭제</button>
         </div>`;
 
       item.querySelector('.mpi__btn--status').addEventListener('click', async (e) => {
         e.stopPropagation();
-        const btn = e.currentTarget;
-        const id  = btn.dataset.productId;
-        const cur = btn.dataset.status;
+        const id = e.target.dataset.productId;
+        const cur = e.target.dataset.status;
         const next = cur === '판매중' ? '판매완료' : '판매중';
-        btn.disabled = true;
-        btn.textContent = '변경 중...';
         try {
-          const res = await fetch(`${API_BASE}/api/products/${id}/status`, {
+          await fetch(`${API_BASE}/api/products/${id}/status`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ status: next }),
           });
-          if (!res.ok) throw new Error();
-          showToast(`"${next}"으로 변경됐어요.`, 'success');
-          loadMyProducts();
-        } catch {
-          showToast('상태 변경에 실패했어요.', 'error');
-          btn.disabled = false;
-          btn.textContent = btnLabel;
-        }
+          showToast(`"${next}"으로 상태를 변경했어요.`, 'success');
+          if (typeof loadMyProducts === 'function') loadMyProducts();
+        } catch { showToast('상태 변경에 실패했어요.', 'error'); }
       });
 
       item.querySelector('.mpi__btn--delete').addEventListener('click', async (e) => {
         e.stopPropagation();
         if (!confirm('정말 삭제할까요?')) return;
-        const btn = e.currentTarget;
-        const id  = btn.dataset.productId;
-        btn.disabled = true;
-        btn.textContent = '삭제 중...';
+        const id = e.target.dataset.productId;
         try {
-          const res = await fetch(`${API_BASE}/api/products/${id}`, { method: 'DELETE' });
-          if (!res.ok) throw new Error();
+          await fetch(`${API_BASE}/api/products/${id}`, { method: 'DELETE' });
           showToast('상품을 삭제했어요.', 'success');
-          loadMyProducts();
-        } catch {
-          showToast('삭제에 실패했어요.', 'error');
-          btn.disabled = false;
-          btn.textContent = '삭제';
-        }
+          if (typeof loadMyProducts === 'function') loadMyProducts();
+        } catch { showToast('삭제에 실패했어요.', 'error'); }
+      });
+
+      item.addEventListener('click', () => {
+        if (typeof openProductModal === 'function') openProductModal(p);
       });
 
       list.appendChild(item);
     });
   }
 
-  async function loadMyProducts() {
-    const user = typeof getAuthUser === 'function' ? getAuthUser() : null;
-    if (!user?.email) {
-      renderMyProducts([]);
-      return;
-    }
+async function loadMyProducts() {
+  const list = document.getElementById('myProductList');
 
-    // 로딩 인디케이터 표시
-    renderMyProducts(null, true);
+  if (!list) return;
 
+  const user = (() => {
     try {
-      const params = new URLSearchParams({ email: user.email });
-      const res  = await fetch(`${API_BASE}/api/user/products?${params}`);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-      const list = data.products || data.items || data || [];
-      renderMyProducts(list);
+      if (typeof getSafeAuthUser === 'function') {
+        return getSafeAuthUser();
+      }
+
+      return JSON.parse(localStorage.getItem('rg_user') || 'null');
     } catch (err) {
-      console.warn('내 상품 불러오기 실패:', err);
-      showToast('상품 목록을 불러오지 못했어요.', 'error');
-      renderMyProducts([]);
+      return null;
     }
+  })();
+
+  const email = user?.email || '';
+
+  if (!email) {
+    renderMyProducts([]);
+    return;
   }
 
-  /* loadMyProducts를 전역에서 호출할 수 있도록 노출 */
-  window.loadMyProducts = loadMyProducts;
+  try {
+    const res = await fetch(`${API_BASE}/api/user/products?email=${encodeURIComponent(email)}`, {
+      cache: 'no-store'
+    });
+
+    if (!res.ok) {
+      throw new Error('내 상품 목록을 불러오지 못했습니다.');
+    }
+
+    const data = await res.json();
+    const products = Array.isArray(data.products) ? data.products : [];
+
+    console.log('내 상품 목록 조회 성공:', data);
+
+    renderMyProducts(products.map(product => ({
+      id: product.id,
+      em: '📦',
+      name: product.name || '상품명 없음',
+      cat: product.category || '기타',
+      price: `₩ ${Number(product.price || 0).toLocaleString('ko-KR')}`,
+      status: product.status || '판매중',
+      brand: product.brand || '',
+      seller: product.seller_name || '익명',
+      condition: product.condition || '',
+      trade: product.trade_method || '',
+      desc: product.description || '',
+      views: Number(product.views || 0),
+      created_at: product.created_at || ''
+    })));
+  } catch (err) {
+    console.error('내 상품 목록 조회 실패:', err);
+    renderMyProducts([]);
+  }
+}
+
+window.loadMyProducts = loadMyProducts;
