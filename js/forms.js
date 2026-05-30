@@ -943,6 +943,7 @@ function getDropFormData() {
     seller_name: user?.nickname || user?.email || '나',
     name: document.getElementById('dropName')?.value.trim() || '',
     brand: document.getElementById('dropBrand')?.value.trim() || '',
+    brand_id: document.getElementById('dropBrandId')?.value || null,
     category: document.getElementById('dropCat')?.value || '',
     price: getCleanPriceValue('dropPrice'),
     condition: document.getElementById('dropCond')?.value || '',
@@ -1838,185 +1839,182 @@ function initProductRegisterPage() {
   }
   updateSizeOptions('');
 
-  /* ── 브랜드 자동완성 ── */
-  const BRAND_LIST = [
-    /* 스니커즈 · 신발 */
-    {en:'Nike',          ko:'나이키'},
-    {en:'Jordan',        ko:'조던'},
-    {en:'Adidas',        ko:'아디다스'},
-    {en:'Yeezy',         ko:'이지'},
-    {en:'New Balance',   ko:'뉴발란스'},
-    {en:'Converse',      ko:'컨버스'},
-    {en:'Vans',          ko:'반스'},
-    {en:'Asics',         ko:'아식스'},
-    {en:'Puma',          ko:'퓨마'},
-    {en:'Reebok',        ko:'리복'},
-    {en:'Salomon',       ko:'살로몬'},
-    {en:'Saucony',       ko:'사코니'},
-    {en:'Brooks',        ko:'브룩스'},
-    {en:'On Running',    ko:'온러닝'},
-    {en:'Hoka',          ko:'호카'},
-    {en:'Mizuno',        ko:'미즈노'},
-    {en:'Timberland',    ko:'팀버랜드'},
-    {en:'UGG',           ko:'어그'},
-    {en:'Dr. Martens',   ko:'닥터마틴'},
-    {en:'Birkenstock',   ko:'버켄스탁'},
-    {en:'Crocs',         ko:'크록스'},
-    {en:'Clarks',        ko:'클락스'},
-    {en:'New Era',       ko:'뉴에라'},
-    {en:'Fila',          ko:'휠라'},
-    /* 스트릿 · 캐주얼 */
-    {en:'Supreme',               ko:'슈프림'},
-    {en:'Off-White',             ko:'오프화이트'},
-    {en:'Palace',                ko:'팔라스'},
-    {en:'Stüssy',                ko:'스투시'},
-    {en:'BAPE',                  ko:'베이프'},
-    {en:'Anti Social Social Club', ko:'ASSC'},
-    {en:'Kith',                  ko:'키스'},
-    {en:'Fear of God',           ko:'피어오브갓'},
-    {en:'Essentials',            ko:'에센셜'},
-    {en:'Stone Island',          ko:'스톤아일랜드'},
-    {en:'CP Company',            ko:'씨피컴퍼니'},
-    {en:'Carhartt WIP',          ko:'칼하트'},
-    {en:'Human Made',            ko:'휴먼메이드'},
-    {en:'Neighborhood',          ko:'네이버후드'},
-    {en:'Undercover',            ko:'언더커버'},
-    {en:'Ader Error',            ko:'아더에러'},
-    {en:'Covernat',              ko:'커버낫'},
-    /* 럭셔리 */
-    {en:'Louis Vuitton',         ko:'루이비통'},
-    {en:'Chanel',                ko:'샤넬'},
-    {en:'Gucci',                 ko:'구찌'},
-    {en:'Prada',                 ko:'프라다'},
-    {en:'Hermès',                ko:'에르메스'},
-    {en:'Dior',                  ko:'디올'},
-    {en:'Balenciaga',            ko:'발렌시아가'},
-    {en:'Saint Laurent',         ko:'생로랑'},
-    {en:'Givenchy',              ko:'지방시'},
-    {en:'Bottega Veneta',        ko:'보테가베네타'},
-    {en:'Valentino',             ko:'발렌티노'},
-    {en:'Versace',               ko:'베르사체'},
-    {en:'Burberry',              ko:'버버리'},
-    {en:'Fendi',                 ko:'펜디'},
-    {en:'Celine',                ko:'셀린느'},
-    {en:'Loewe',                 ko:'로에베'},
-    {en:'Alexander McQueen',     ko:'알렉산더맥퀸'},
-    {en:'Moncler',               ko:'몽클레르'},
-    {en:'Canada Goose',          ko:'캐나다구스'},
-    {en:'Maison Margiela',       ko:'메종마르지엘라'},
-    {en:'Rick Owens',            ko:'릭오웬스'},
-    {en:'Ami Paris',             ko:'아미파리'},
-    {en:'Jacquemus',             ko:'자크뮈스'},
-    /* 아우터 · 스포츠 */
-    {en:'The North Face',        ko:'노스페이스'},
-    {en:"Arc'teryx",             ko:'아크테릭스'},
-    {en:'Patagonia',             ko:'파타고니아'},
-    {en:'Columbia',              ko:'컬럼비아'},
-    {en:'Ralph Lauren',          ko:'랄프로렌'},
-    {en:'Tommy Hilfiger',        ko:'타미힐피거'},
-    {en:'Calvin Klein',          ko:'캘빈클라인'},
-    {en:'Lacoste',               ko:'라코스테'},
-    {en:'Champion',              ko:'챔피언'},
-    {en:"Levi's",                ko:'리바이스'},
-    {en:'Diesel',                ko:'디젤'},
-    {en:'Carhartt',              ko:'칼하트'},
-    /* 시계 */
-    {en:'Rolex',                 ko:'롤렉스'},
-    {en:'Omega',                 ko:'오메가'},
-    {en:'Patek Philippe',        ko:'파텍필립'},
-    {en:'Audemars Piguet',       ko:'오데마피게'},
-    {en:'Cartier',               ko:'까르띠에'},
-    {en:'IWC',                   ko:'아이더블유씨'},
-    {en:'Breitling',             ko:'브라이틀링'},
-    {en:'TAG Heuer',             ko:'태그호이어'},
-    {en:'Longines',              ko:'론진'},
-    {en:'Seiko',                 ko:'세이코'},
-    {en:'Grand Seiko',           ko:'그랜드세이코'},
-    {en:'Casio',                 ko:'카시오'},
-    {en:'G-Shock',               ko:'지샥'},
-    {en:'Richard Mille',         ko:'리샤르밀'},
-    {en:'Hublot',                ko:'위블로'},
-    {en:'Panerai',               ko:'파네라이'},
-    /* 테크 */
-    {en:'Apple',                 ko:'애플'},
-    {en:'Samsung',               ko:'삼성'},
-    {en:'Sony',                  ko:'소니'},
-    {en:'Bose',                  ko:'보스'},
-    {en:'Bang & Olufsen',        ko:'뱅앤올룹슨'},
-    {en:'Dyson',                 ko:'다이슨'},
-    {en:'Nintendo',              ko:'닌텐도'},
-    {en:'Beats',                 ko:'비츠'},
-    /* 주얼리 */
-    {en:'Tiffany & Co.',         ko:'티파니'},
-    {en:'Bulgari',               ko:'불가리'},
-    {en:'Van Cleef & Arpels',    ko:'반클리프아펠'},
-    /* 한국 */
-    {en:'MLB',                   ko:'엠엘비'},
-    {en:'Descente',              ko:'데상트'},
-    {en:'Matin Kim',             ko:'마뗑킴'},
-    {en:'Wooyoungmi',            ko:'우영미'},
-    {en:'Nau',                   ko:'나우'},
+  /* ══════════════════════════════════════════
+     브랜드 자동완성 (API + 로컬 폴백)
+  ══════════════════════════════════════════ */
+
+  /* 로컬 폴백 리스트 (API 실패 시 사용) */
+  const BRAND_FALLBACK = [
+    {id:null,name_en:'Nike',name_ko:'나이키'},{id:null,name_en:'Jordan',name_ko:'조던'},
+    {id:null,name_en:'Adidas',name_ko:'아디다스'},{id:null,name_en:'New Balance',name_ko:'뉴발란스'},
+    {id:null,name_en:'Supreme',name_ko:'슈프림'},{id:null,name_en:'Off-White',name_ko:'오프화이트'},
+    {id:null,name_en:'Louis Vuitton',name_ko:'루이비통'},{id:null,name_en:'Chanel',name_ko:'샤넬'},
+    {id:null,name_en:'Gucci',name_ko:'구찌'},{id:null,name_en:'Rolex',name_ko:'롤렉스'},
+    {id:null,name_en:'Omega',name_ko:'오메가'},{id:null,name_en:'Cartier',name_ko:'까르띠에'},
+    {id:null,name_en:'Apple',name_ko:'애플'},{id:null,name_en:'Samsung',name_ko:'삼성'},
+    {id:null,name_en:'The North Face',name_ko:'노스페이스'},{id:null,name_en:"Arc'teryx",name_ko:'아크테릭스'},
   ];
 
-  const brandInp = document.getElementById('pregBrand');
-  if (brandInp) {
-    const brandWrap = brandInp.parentElement;
-    if (brandWrap) brandWrap.style.position = 'relative';
+  /**
+   * initBrandAutocomplete
+   * @param {string} inputId   - 텍스트 input id
+   * @param {string} hiddenId  - hidden brand_id input id
+   * @param {string} [errId]   - 에러 메시지 p id
+   */
+  function initBrandAutocomplete(inputId, hiddenId, errId) {
+    const inp    = document.getElementById(inputId);
+    const hidden = hiddenId ? document.getElementById(hiddenId) : null;
+    const errEl  = errId    ? document.getElementById(errId)    : null;
+    if (!inp) return;
+
+    /* 드롭다운 생성 */
+    const wrap = inp.closest('.preg-field') || inp.parentElement;
+    if (wrap) wrap.style.position = 'relative';
 
     const dropdown = document.createElement('div');
     dropdown.className = 'preg-brand-dropdown';
-    brandInp.insertAdjacentElement('afterend', dropdown);
+    inp.insertAdjacentElement('afterend', dropdown);
 
-    let activeIdx = -1;
+    let activeIdx      = -1;
+    let confirmed      = false;   // 목록에서 선택했는지 여부
+    let debounceTimer  = null;
 
-    function showSuggestions(q) {
+    /* ── 에러 표시 / 숨기기 ── */
+    function showErr(msg) {
+      if (!errEl) return;
+      errEl.textContent = msg;
+      errEl.style.display = msg ? 'block' : 'none';
+    }
+    function clearErr() { showErr(''); }
+
+    /* ── API 호출 (실패 시 로컬 폴백) ── */
+    async function fetchBrands(q) {
+      try {
+        const res  = await fetch(`${API_BASE}/api/brands/search?q=${encodeURIComponent(q)}`);
+        const data = await res.json();
+        if (data.success && Array.isArray(data.brands) && data.brands.length) {
+          return data.brands;
+        }
+      } catch (_) { /* network error → fallback */ }
+
+      /* 로컬 폴백 */
+      const ql = q.toLowerCase();
+      const starts   = BRAND_FALLBACK.filter(b =>
+        b.name_en.toLowerCase().startsWith(ql) || b.name_ko.startsWith(ql));
+      const contains = BRAND_FALLBACK.filter(b =>
+        !b.name_en.toLowerCase().startsWith(ql) && !b.name_ko.startsWith(ql) &&
+        (b.name_en.toLowerCase().includes(ql) || b.name_ko.includes(ql)));
+      return [...starts, ...contains].slice(0, 8);
+    }
+
+    /* ── 강조 헬퍼 ── */
+    function highlight(text, q) {
+      if (!q) return text;
+      const idx = text.toLowerCase().indexOf(q.toLowerCase());
+      if (idx < 0) return text;
+      return text.slice(0, idx)
+        + '<mark>' + text.slice(idx, idx + q.length) + '</mark>'
+        + text.slice(idx + q.length);
+    }
+
+    /* ── 드롭다운 렌더링 ── */
+    async function showSuggestions(q) {
       activeIdx = -1;
       if (!q) { dropdown.style.display = 'none'; return; }
-      const ql = q.toLowerCase();
-      const test = b => b.en.toLowerCase().includes(ql) || b.ko.toLowerCase().includes(ql);
-      const starts   = BRAND_LIST.filter(b => b.en.toLowerCase().startsWith(ql) || b.ko.startsWith(ql));
-      const contains = BRAND_LIST.filter(b => !b.en.toLowerCase().startsWith(ql) && !b.ko.startsWith(ql) && test(b));
-      const matches  = [...starts, ...contains].slice(0, 8);
-      if (!matches.length) { dropdown.style.display = 'none'; return; }
 
-      dropdown.innerHTML = matches.map((b, i) => {
-        const enL = b.en.toLowerCase();
-        const idx = enL.indexOf(ql);
-        const hi  = idx >= 0
-          ? b.en.slice(0, idx) + '<mark>' + b.en.slice(idx, idx + q.length) + '</mark>' + b.en.slice(idx + q.length)
-          : b.en;
-        return `<div class="preg-brand-item" data-brand="${b.en}" data-i="${i}">
-          <span class="brand-en">${hi}</span>
-          ${b.ko ? `<span class="brand-ko">${b.ko}</span>` : ''}
+      const brands = await fetchBrands(q);
+      if (!brands.length) { dropdown.style.display = 'none'; return; }
+
+      dropdown.innerHTML = brands.slice(0, 8).map((b, i) => {
+        const enHi = highlight(b.name_en, q);
+        const koHi = highlight(b.name_ko || '', q);
+        return `<div class="preg-brand-item" data-brand="${b.name_en}"
+                  data-brand-id="${b.id ?? ''}" data-i="${i}">
+          <span class="brand-en">${enHi}</span>
+          ${b.name_ko ? `<span class="brand-ko">${koHi}</span>` : ''}
         </div>`;
       }).join('');
 
       dropdown.querySelectorAll('.preg-brand-item').forEach(item => {
         item.addEventListener('mousedown', e => {
           e.preventDefault();
-          brandInp.value = item.dataset.brand;
-          dropdown.style.display = 'none';
+          selectBrand(item);
         });
       });
       dropdown.style.display = 'block';
     }
 
-    function highlightItem(idx) {
-      dropdown.querySelectorAll('.preg-brand-item').forEach((el, i) => el.classList.toggle('active', i === idx));
+    /* ── 브랜드 선택 ── */
+    function selectBrand(item) {
+      inp.value        = item.dataset.brand;
+      if (hidden) hidden.value = item.dataset.brandId || '';
+      confirmed        = true;
+      activeIdx        = -1;
+      dropdown.style.display = 'none';
+      clearErr();
     }
 
-    brandInp.addEventListener('input', () => showSuggestions(brandInp.value.trim()));
-    brandInp.addEventListener('focus', () => { if (brandInp.value.trim()) showSuggestions(brandInp.value.trim()); });
-    brandInp.addEventListener('blur',  () => setTimeout(() => { dropdown.style.display = 'none'; }, 150));
-    brandInp.addEventListener('keydown', e => {
+    /* ── 키보드 강조 ── */
+    function highlightItem(i) {
+      dropdown.querySelectorAll('.preg-brand-item')
+        .forEach((el, idx) => el.classList.toggle('active', idx === i));
+    }
+
+    /* ── 이벤트 ── */
+    inp.addEventListener('input', () => {
+      confirmed = false;
+      if (hidden) hidden.value = '';
+      clearErr();
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => showSuggestions(inp.value.trim()), 200);
+    });
+
+    inp.addEventListener('focus', () => {
+      if (inp.value.trim()) showSuggestions(inp.value.trim());
+    });
+
+    inp.addEventListener('blur', () => {
+      setTimeout(() => {
+        dropdown.style.display = 'none';
+        /* 텍스트가 있는데 목록에서 선택 안 한 경우 → 필드 초기화 */
+        if (inp.value.trim() && !confirmed) {
+          inp.value = '';
+          if (hidden) hidden.value = '';
+          showErr('목록에서 브랜드를 선택해주세요.');
+        }
+      }, 200);
+    });
+
+    inp.addEventListener('keydown', e => {
       const items = dropdown.querySelectorAll('.preg-brand-item');
       if (!items.length || dropdown.style.display === 'none') return;
-      if (e.key === 'ArrowDown')       { e.preventDefault(); activeIdx = Math.min(activeIdx+1, items.length-1); highlightItem(activeIdx); }
-      else if (e.key === 'ArrowUp')    { e.preventDefault(); activeIdx = Math.max(activeIdx-1, 0); highlightItem(activeIdx); }
-      else if (e.key === 'Enter' && activeIdx >= 0) { e.preventDefault(); brandInp.value = items[activeIdx].dataset.brand; dropdown.style.display = 'none'; }
-      else if (e.key === 'Escape')     { dropdown.style.display = 'none'; }
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        activeIdx = Math.min(activeIdx + 1, items.length - 1);
+        highlightItem(activeIdx);
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        activeIdx = Math.max(activeIdx - 1, 0);
+        highlightItem(activeIdx);
+      } else if (e.key === 'Enter' && activeIdx >= 0) {
+        e.preventDefault();
+        selectBrand(items[activeIdx]);
+      } else if (e.key === 'Escape') {
+        dropdown.style.display = 'none';
+      }
+    });
+
+    /* 붙여넣기 시 confirmed 리셋 → blur 때 자동 초기화됨 */
+    inp.addEventListener('paste', () => {
+      confirmed = false;
+      if (hidden) hidden.value = '';
     });
   }
+
+  /* pregBrand */
+  initBrandAutocomplete('pregBrand', 'pregBrandId', 'pregBrandErr');
+  /* dropBrand (드롭 빠른등록 폼) */
+  initBrandAutocomplete('dropBrand', 'dropBrandId', 'dropBrandErr');
 
   /* ── 정가품 검수 서비스 안내 모달 ── */
   const verifyInfoBtn   = document.getElementById('pregVerifyInfoBtn');
@@ -2080,6 +2078,7 @@ function initProductRegisterPage() {
       cat: catHidden?.value || '',
       catLabel: catLabel?.textContent || '',
       brand: document.getElementById('pregBrand')?.value || '',
+      brandId: document.getElementById('pregBrandId')?.value || '',
       name: document.getElementById('pregName')?.value || '',
       model: document.getElementById('pregModel')?.value || '',
       size: sizeSel?.value || '',
@@ -2104,6 +2103,9 @@ function initProductRegisterPage() {
         const el = document.getElementById(`preg${f.charAt(0).toUpperCase()+f.slice(1)}`);
         if (el && saved[f]) el.value = saved[f];
       });
+      /* brand_id 복원 — draft에서 복원 시 선택 상태로 간주 */
+      const brandIdEl = document.getElementById('pregBrandId');
+      if (brandIdEl && saved.brandId) brandIdEl.value = saved.brandId;
       if (saved.size && sizeSel) sizeSel.value = saved.size;
       if (saved.cond) {
         const r = document.querySelector(`input[name="pregCond"][value="${saved.cond}"]`);
@@ -2147,6 +2149,16 @@ function initProductRegisterPage() {
         if (err) err.classList.remove('show');
       }
     });
+
+    /* 브랜드를 목록에서 선택했는지 추가 검증 */
+    const brandIdEl  = document.getElementById('pregBrandId');
+    const brandInpEl = document.getElementById('pregBrand');
+    const brandErrEl = document.getElementById('pregBrandErr');
+    if (brandInpEl?.value.trim() && !brandIdEl?.value) {
+      if (brandInpEl) brandInpEl.classList.add('err');
+      if (brandErrEl) { brandErrEl.textContent = '목록에서 브랜드를 선택해주세요.'; brandErrEl.classList.add('show'); }
+      ok = false;
+    }
     const condChecked = document.querySelector('input[name="pregCond"]:checked');
     const condErr = document.getElementById('pregCondErr');
     if (!condChecked) {
@@ -2171,6 +2183,7 @@ function initProductRegisterPage() {
       seller_name:  user?.nickname || user?.email || '익명',
       category:     document.getElementById('pregCat')?.value || '',
       brand:        document.getElementById('pregBrand')?.value.trim() || '',
+      brand_id:     document.getElementById('pregBrandId')?.value || null,
       name:         document.getElementById('pregName')?.value.trim() || '',
       model:        document.getElementById('pregModel')?.value.trim() || '',
       size:         sizeSel?.value || '',

@@ -1161,9 +1161,11 @@
           <p class="form-error" id="dropCatErr"></p>
         </div>
 
-        <div style="display:flex; flex-direction:column; gap:5px;">
+        <div style="display:flex; flex-direction:column; gap:5px; position:relative;">
           <label style="font-size:11px; font-weight:700; color:#0f0f0f;">브랜드 <em style="color:#ff3b30; font-style:normal;">*</em></label>
-          <input id="dropBrand" class="rg-product-input" type="text" placeholder="Nike, Rolex, Chanel …">
+          <input id="dropBrand" class="rg-product-input" type="text" placeholder="Nike, Rolex, Chanel …" autocomplete="off">
+          <input type="hidden" id="dropBrandId">
+          <p class="form-error" id="dropBrandErr"></p>
         </div>
 
         <div style="display:flex; flex-direction:column; gap:5px; grid-column:1/-1;">
@@ -1682,6 +1684,7 @@
             <div class="preg-field">
               <label class="preg-label" for="pregBrand">브랜드 <span class="req">*</span></label>
               <input class="preg-input" id="pregBrand" type="text" placeholder="Nike, Rolex, Chanel…" autocomplete="off">
+              <input type="hidden" id="pregBrandId">
               <p class="preg-err" id="pregBrandErr"></p>
             </div>
           </div>
