@@ -2112,7 +2112,8 @@ window.RG.categorySheet = (function () {
 
     _createDOM();
     _renderBreadcrumb();
-    _renderItems(window.RG_CATEGORIES || [], '카테고리 선택');
+    /* Fix 2: const는 window에 붙지 않으므로 직접 참조 */
+    _renderItems((typeof RG_CATEGORIES !== 'undefined' ? RG_CATEGORIES : []), '카테고리 선택');
     _overlay.classList.add('open');
     document.body.style.overflow = 'hidden';
   }
@@ -2251,21 +2252,23 @@ window.RG.chat.openFromProduct = function (productCtx) {
         </div>
         <span class="rg-chat-product-card__badge">상품 문의</span>
       </div>`;
+    /* Fix 4: 카드는 상단 고정, 스크롤도 상단으로 */
     area.insertBefore(card, area.firstChild);
-    window.RG.chat.scrollToBottom();
+    area.scrollTop = 0;
   }, 80);
 };
 
-/* ── 상품 모달의 채팅 버튼에 이벤트 연결 ── */
+/* ── 상품 모달의 채팅 버튼에 이벤트 연결 ──
+   Fix 1: pd-chat-btn의 인라인 onclick이 stopPropagation()을 호출해서
+   부모 modal에 위임하면 절대 실행 안 됨.
+   버튼에 직접 addEventListener 등록해야 함.
+   단, 버튼은 모달이 열릴 때마다 DOM에 있으므로 한 번만 바인딩하면 됨. */
 (function bindProductModalChatBtn() {
-  const modal = document.getElementById('modal-product');
-  if (!modal) return;
+  const btn = document.querySelector('#modal-product .pd-chat-btn');
+  if (!btn) return;
 
-  modal.addEventListener('click', function (e) {
-    const btn = e.target.closest('.pd-chat-btn');
-    if (!btn) return;
-
-    /* 비로그인 시 onclick의 requireLogin()이 이미 처리함 — 여기선 리턴 */
+  btn.addEventListener('click', function () {
+    /* 비로그인이면 인라인 onclick의 requireLogin()이 이미 처리 — 중복 방지 */
     if (!S.loggedIn) return;
 
     /* 로그인 상태면 채팅 연결 */

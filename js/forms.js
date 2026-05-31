@@ -2449,14 +2449,20 @@ window.RG.forms = window.RG.forms || {};
     }, true); /* capture=true → 기존 리스너보다 먼저 실행 */
   });
 
-  /* SPA 내비게이션: 하단 바 / 사이드 링크 이동 시 */
+  /* SPA 내비게이션: 하단 바 / 사이드 링크 이동 시
+     Fix 3: return 만으로는 다른 클릭 리스너(navigateTo)를 막을 수 없음.
+     capture=true + stopImmediatePropagation()으로 막아야 함. */
   document.querySelectorAll('[data-goto]').forEach(link => {
-    link.addEventListener('click', () => {
+    link.addEventListener('click', e => {
       if (_isDirty && _isEditing) {
-        if (!confirm('저장하지 않은 변경사항이 있습니다. 나가시겠습니까?')) return;
-        _isDirty = false;
-        _setEditMode(false);
+        if (!confirm('저장하지 않은 변경사항이 있습니다. 나가시겠습니까?')) {
+          e.stopImmediatePropagation();
+          e.preventDefault();
+        } else {
+          _isDirty = false;
+          _setEditMode(false);
+        }
       }
-    });
+    }, true); /* capture=true → 기존 리스너보다 먼저 실행 */
   });
 })();
