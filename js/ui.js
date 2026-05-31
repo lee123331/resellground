@@ -1999,4 +1999,276 @@ async function openProductDetailFromDB(productId) {
     showToast('상품 상세 정보를 불러오지 못했습니다.', 'error');
   }
 }
-window.openProductDetailFromDB = openProductDetailFromDB; 
+window.openProductDetailFromDB = openProductDetailFromDB;
+
+/* ═══════════════════════════════════════════════════════════════
+   Work 1 — RG.categorySheet
+   당근마켓 스타일 카테고리 캐스케이드 바텀시트 (범용 컴포넌트)
+   사용법: RG.categorySheet.open({ onSelect })
+═══════════════════════════════════════════════════════════════ */
+window.RG = window.RG || {};
+
+window.RG.categorySheet = (function () {
+  let _overlay = null;
+  let _stack   = [];   // [{items, title}] 뒤로가기 스택
+  let _path    = [];   // [{id, label}]    선택 경로
+  let _onSelect = null;
+
+  /* ── DOM 생성 (최초 1회) ── */
+  function _createDOM() {
+    if (_overlay) return;
+    _overlay = document.createElement('div');
+    _overlay.className = 'rg-category-sheet__overlay';
+    _overlay.innerHTML = `
+      <div class="rg-category-sheet" role="dialog" aria-modal="true">
+        <div class="rg-category-sheet__hd">
+          <button class="rg-category-sheet__back" id="rgCsBack" style="visibility:hidden" aria-label="뒤로">←</button>
+          <span  class="rg-category-sheet__title" id="rgCsTitle">카테고리 선택</span>
+          <button class="rg-category-sheet__close" id="rgCsClose" aria-label="닫기">✕</button>
+        </div>
+        <div class="rg-category-sheet__breadcrumb" id="rgCsBreadcrumb"></div>
+        <ul  class="rg-category-sheet__list"       id="rgCsList" role="list"></ul>
+      </div>`;
+    document.body.appendChild(_overlay);
+
+    _overlay.addEventListener('click', e => { if (e.target === _overlay) _close(); });
+    document.getElementById('rgCsClose').addEventListener('click', _close);
+    document.getElementById('rgCsBack').addEventListener('click',  _goBack);
+  }
+
+  /* ── 브레드크럼 렌더 ── */
+  function _renderBreadcrumb() {
+    const el = document.getElementById('rgCsBreadcrumb');
+    if (!el) return;
+    if (!_path.length) { el.innerHTML = ''; return; }
+    el.innerHTML = _path.map((n, i) =>
+      `<span class="rg-category-sheet__crumb${i === _path.length - 1 ? ' --last' : ''}">${n.label}</span>`
+    ).join('<span class="rg-category-sheet__crumb-sep">›</span>');
+  }
+
+  /* ── 항목 렌더 ── */
+  function _renderItems(items, title) {
+    const listEl  = document.getElementById('rgCsList');
+    const titleEl = document.getElementById('rgCsTitle');
+    const backBtn = document.getElementById('rgCsBack');
+    if (!listEl || !titleEl) return;
+
+    titleEl.textContent          = title || '카테고리 선택';
+    backBtn.style.visibility     = _stack.length ? 'visible' : 'hidden';
+
+    listEl.innerHTML = items.map(item => {
+      const hasChildren = !!(item.children && item.children.length);
+      return `<li class="rg-category-sheet__item${hasChildren ? '' : ' --leaf'}"
+                  data-id="${item.id}" data-label="${item.label}"
+                  data-has-children="${hasChildren}" role="option" tabindex="0">
+        ${item.icon ? `<span class="rg-category-sheet__item-icon">${item.icon}</span>` : '<span class="rg-category-sheet__item-icon"></span>'}
+        <span class="rg-category-sheet__item-label">${item.label}</span>
+        <span class="rg-category-sheet__item-arrow">${hasChildren ? '›' : ''}</span>
+      </li>`;
+    }).join('');
+
+    listEl.querySelectorAll('.rg-category-sheet__item').forEach(el => {
+      el.addEventListener('click',   () => _onItemClick(el, items));
+      el.addEventListener('keydown', e => { if (e.key === 'Enter') _onItemClick(el, items); });
+    });
+  }
+
+  /* ── 항목 클릭 ── */
+  function _onItemClick(el, items) {
+    const id          = el.dataset.id;
+    const label       = el.dataset.label;
+    const hasChildren = el.dataset.hasChildren === 'true';
+    const item        = items.find(i => i.id === id);
+    if (!item) return;
+
+    if (hasChildren) {
+      _stack.push({ items, title: document.getElementById('rgCsTitle').textContent });
+      _path.push({ id, label });
+      _renderBreadcrumb();
+      _renderItems(item.children, label);
+    } else {
+      _path.push({ id, label });
+      const fullPath = _path.map(n => n.label).join(' > ');
+      if (typeof _onSelect === 'function') _onSelect({ id, label, path: [..._path], fullPath });
+      _close();
+    }
+  }
+
+  /* ── 뒤로가기 ── */
+  function _goBack() {
+    if (!_stack.length) return;
+    _path.pop();
+    const prev = _stack.pop();
+    _renderBreadcrumb();
+    _renderItems(prev.items, prev.title);
+  }
+
+  /* ── 열기 ── */
+  function open(opts) {
+    opts      = opts || {};
+    _onSelect = opts.onSelect || null;
+    _stack    = [];
+    _path     = [];
+
+    _createDOM();
+    _renderBreadcrumb();
+    _renderItems(window.RG_CATEGORIES || [], '카테고리 선택');
+    _overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  /* ── 닫기 ── */
+  function _close() {
+    if (_overlay) _overlay.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  return { open };
+})();
+
+/* ── dropCat select → 카테고리 시트 연결 ── */
+(function bindDropCatToSheet() {
+  const select = document.getElementById('dropCat');
+  if (!select) return;
+
+  const wrap = select.closest('[style]') || select.parentElement;
+
+  /* 트리거 버튼 생성 */
+  const triggerBtn = document.createElement('button');
+  triggerBtn.type      = 'button';
+  triggerBtn.id        = 'dropCatTrigger';
+  triggerBtn.className = 'rg-product-input rg-cs-trigger-btn';
+  triggerBtn.innerHTML = `<span id="dropCatDisplay">카테고리 선택</span>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>`;
+
+  /* 원래 select 바로 앞에 삽입하고 숨기기 */
+  select.parentNode.insertBefore(triggerBtn, select);
+  select.style.display = 'none';
+
+  triggerBtn.addEventListener('click', () => {
+    window.RG.categorySheet.open({
+      onSelect({ id, label, path, fullPath }) {
+        document.getElementById('dropCatDisplay').textContent = fullPath;
+        triggerBtn.classList.add('has-value');
+
+        /* select value 업데이트 (없으면 option 추가) */
+        let opt = [...select.options].find(o =>
+          o.value === id || o.text === label || o.text.includes(label)
+        );
+        if (!opt) {
+          opt = new Option(label, id);
+          select.add(opt);
+        }
+        select.value = opt.value;
+
+        /* 유효성 에러 숨기기 */
+        const err = document.getElementById('dropCatErr');
+        if (err) err.style.display = 'none';
+      }
+    });
+  });
+})();
+
+
+/* ═══════════════════════════════════════════════════════════════
+   Work 2 — RG.chat 확장
+   스크롤 고정 해제 + scrollToBottom 유틸
+═══════════════════════════════════════════════════════════════ */
+window.RG.chat = window.RG.chat || {};
+
+window.RG.chat.scrollToBottom = function () {
+  const area = document.getElementById('chatMsgs');
+  if (area) requestAnimationFrame(() => { area.scrollTop = area.scrollHeight; });
+};
+
+/* 채팅 패널 크기 고정 → 내부 메시지 영역이 flex grow 하도록 클래스 추가 */
+(function fixChatPanelScroll() {
+  const panel = document.getElementById('chatPanel');
+  if (panel) panel.classList.add('rg-chat-scroll-fixed');
+})();
+
+
+/* ═══════════════════════════════════════════════════════════════
+   Work 3 — RG.chat.openFromProduct
+   상품 상세 모달 → 판매자와 채팅 연결
+═══════════════════════════════════════════════════════════════ */
+window.RG.chat.openFromProduct = function (productCtx) {
+  const ctx = productCtx || {};
+
+  /* 로그인 확인 */
+  if (!S.loggedIn) { openModal('login'); return; }
+
+  /* 판매자명 읽기 (파라미터 없으면 현재 열린 모달 DOM에서) */
+  const sellerName = ctx.seller || ctx.seller_name
+    || document.getElementById('pdProductSeller')?.textContent?.trim() || '';
+  const productName  = ctx.name  || document.getElementById('pdProductName')?.textContent?.trim()  || '';
+  const productPrice = ctx.price || document.getElementById('pdProductPrice')?.textContent?.trim() || '';
+  const productEm    = ctx.em    || document.getElementById('pdProductImg')?.textContent?.trim()    || '📦';
+
+  if (!sellerName) { showToast('판매자 정보를 찾을 수 없어요.', 'error'); return; }
+
+  /* 본인 상품 확인 */
+  const user = (typeof getAuthUser === 'function') ? getAuthUser() : null;
+  if (user && (user.nickname === sellerName || user.email === sellerName)) {
+    showToast('본인 상품입니다.', 'info');
+    return;
+  }
+
+  /* 상품 모달 닫기 */
+  if (typeof closeModal === 'function') closeModal('product');
+
+  /* 채팅 패널 열기 */
+  const panel = document.getElementById('chatPanel');
+  if (panel && !S.chatOpen) {
+    S.chatOpen = true;
+    panel.classList.add('open');
+    const fab = document.getElementById('fabBtn');
+    if (fab) fab.style.display = 'none';
+  }
+
+  /* 판매자와 대화 오픈 */
+  if (typeof openChatWith === 'function') openChatWith(sellerName);
+
+  /* 대화창 상단에 상품 카드 삽입 */
+  // TODO: DB - conversations 테이블에서 (buyer_id, seller_id, product_id) 조합으로 기존 방 조회
+  // TODO: DB - 없으면 신규 conversations INSERT
+  setTimeout(() => {
+    const area = document.getElementById('chatMsgs');
+    if (!area) return;
+
+    /* 중복 방지 */
+    const existing = area.querySelector('.rg-chat-product-card');
+    if (existing) existing.remove();
+
+    const card = document.createElement('div');
+    card.className = 'rg-chat-product-card';
+    card.innerHTML = `
+      <div class="rg-chat-product-card__inner">
+        <div class="rg-chat-product-card__img">${productEm}</div>
+        <div class="rg-chat-product-card__info">
+          <p class="rg-chat-product-card__name">${productName}</p>
+          <p class="rg-chat-product-card__price">${productPrice}</p>
+        </div>
+        <span class="rg-chat-product-card__badge">상품 문의</span>
+      </div>`;
+    area.insertBefore(card, area.firstChild);
+    window.RG.chat.scrollToBottom();
+  }, 80);
+};
+
+/* ── 상품 모달의 채팅 버튼에 이벤트 연결 ── */
+(function bindProductModalChatBtn() {
+  const modal = document.getElementById('modal-product');
+  if (!modal) return;
+
+  modal.addEventListener('click', function (e) {
+    const btn = e.target.closest('.pd-chat-btn');
+    if (!btn) return;
+
+    /* 비로그인 시 onclick의 requireLogin()이 이미 처리함 — 여기선 리턴 */
+    if (!S.loggedIn) return;
+
+    /* 로그인 상태면 채팅 연결 */
+    window.RG.chat.openFromProduct();
+  });
+})();

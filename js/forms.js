@@ -2292,3 +2292,171 @@ document.addEventListener('DOMContentLoaded', () => {
 
   applyLoginState();
 });
+
+/* ═══════════════════════════════════════════════════════════════
+   Work 4 — RG.forms.saveProfileSettings
+   마이페이지 프로필 설정을 편집 모드 진입 후 저장하는 방식으로 변경
+   - 기본 상태: 모든 입력창 readonly (읽기 전용)
+   - "프로필 편집" 버튼 클릭 → 편집 모드 (입력 활성화)
+   - 변경사항 있을 때만 저장 버튼 활성화
+   - 저장 or 취소 → 읽기 모드 복귀
+   - 미저장 상태로 페이지 이탈 시 confirm
+═══════════════════════════════════════════════════════════════ */
+window.RG = window.RG || {};
+window.RG.forms = window.RG.forms || {};
+
+(function initProfileSettings() {
+  /* 마이페이지 프로필 패널이 없으면 패스 */
+  const panel = document.getElementById('mp-panel-profile');
+  if (!panel) return;
+
+  /* ── 폼 입력 요소 수집 (체크박스·hidden 제외) ── */
+  const inputs = Array.from(
+    panel.querySelectorAll('input:not([type=checkbox]):not([type=hidden]), textarea, select')
+  );
+
+  let _origValues = {};
+  let _isDirty    = false;
+  let _isEditing  = false;
+
+  /* ── 초기값 스냅샷 ── */
+  function _snapshot() {
+    inputs.forEach((el, i) => { _origValues[i] = el.value; });
+  }
+
+  /* ── dirty 체크 ── */
+  function _checkDirty() {
+    _isDirty = inputs.some((el, i) => el.value !== _origValues[i]);
+    _updateSaveBtnState();
+  }
+
+  /* ── 저장 버튼 활성/비활성 ── */
+  function _updateSaveBtnState() {
+    const btn = document.getElementById('rgProfileSaveBtn');
+    if (!btn) return;
+    btn.disabled = !_isDirty;
+    btn.classList.toggle('rg-settings-save-btn--active', _isDirty);
+  }
+
+  /* ── 편집 모드 토글 ── */
+  function _setEditMode(editing) {
+    _isEditing = editing;
+
+    inputs.forEach(el => {
+      el.readOnly = !editing;
+      el.classList.toggle('rg-profile-readonly', !editing);
+    });
+
+    const editBtn = document.getElementById('rgProfileEditBtn');
+    const saveBtn = document.getElementById('rgProfileSaveBtn');
+    const cancelBtn = document.getElementById('rgProfileCancelBtn');
+
+    if (editBtn) editBtn.textContent = editing ? '취소' : '프로필 편집';
+    if (saveBtn)  saveBtn.style.display  = editing ? 'inline-flex' : 'none';
+    if (cancelBtn) cancelBtn.style.display = editing ? 'inline-flex' : 'none';
+
+    if (!editing) {
+      /* 취소 시 원래 값 복원 */
+      inputs.forEach((el, i) => { el.value = _origValues[i]; });
+      _isDirty = false;
+      _updateSaveBtnState();
+    }
+  }
+
+  /* ── 저장 실행 ── */
+  window.RG.forms.saveProfileSettings = function () {
+    if (!_isDirty) return;
+
+    const data = {};
+    inputs.forEach(el => { if (el.id) data[el.id] = el.value; });
+
+    // TODO: DB - profiles 테이블 UPDATE (닉네임, 소개글, SNS 링크 등)
+    window.RG.user = Object.assign(window.RG.user || {}, data);
+
+    _snapshot();
+    _isDirty = false;
+    _setEditMode(false);
+
+    showToast('저장되었습니다.', 'success');
+  };
+
+  /* ── 버튼 주입 ── */
+  function _injectButtons() {
+    const titleEl = panel.querySelector('.mp-sec-title');
+    if (!titleEl || document.getElementById('rgProfileEditBtn')) return;
+
+    /* 버튼 행 wrapper */
+    const row = document.createElement('div');
+    row.className  = 'rg-profile-btn-row';
+    row.style.cssText = 'display:flex;gap:8px;align-items:center;margin-bottom:16px;';
+
+    /* 편집/취소 버튼 */
+    const editBtn = document.createElement('button');
+    editBtn.id        = 'rgProfileEditBtn';
+    editBtn.className = 'btn btn--outline-brand btn--sm rg-settings-save-btn';
+    editBtn.textContent = '프로필 편집';
+    editBtn.addEventListener('click', () => _setEditMode(!_isEditing));
+
+    /* 저장 버튼 */
+    const saveBtn = document.createElement('button');
+    saveBtn.id        = 'rgProfileSaveBtn';
+    saveBtn.className = 'btn btn--p btn--sm rg-settings-save-btn rg-settings-save-btn--active';
+    saveBtn.textContent = '저장하기';
+    saveBtn.style.display = 'none';
+    saveBtn.disabled  = true;
+    saveBtn.addEventListener('click', window.RG.forms.saveProfileSettings);
+
+    /* 기존 mpSaveBtn 숨기기 (app.js 핸들러 유지, 시각만 숨김) */
+    const legacySave = document.getElementById('mpSaveBtn');
+    if (legacySave) legacySave.style.display = 'none';
+
+    row.appendChild(editBtn);
+    row.appendChild(saveBtn);
+    titleEl.parentNode.insertBefore(row, titleEl.nextSibling);
+  }
+
+  /* ── 초기화 실행 ── */
+  _injectButtons();
+  _snapshot();
+  _setEditMode(false);  /* 기본 = 읽기 모드 */
+
+  /* 변경 감지 */
+  inputs.forEach(el => {
+    el.addEventListener('input',  _checkDirty);
+    el.addEventListener('change', _checkDirty);
+  });
+
+  /* ── 페이지 이탈 경고 ── */
+  /* 브라우저 탭 닫기 / 새로고침 */
+  window.addEventListener('beforeunload', e => {
+    if (_isDirty && _isEditing) {
+      e.preventDefault();
+      e.returnValue = '저장하지 않은 변경사항이 있습니다.';
+    }
+  });
+
+  /* SPA 내비게이션: 다른 mp 탭 이동 시 */
+  document.querySelectorAll('[data-mp-tab]').forEach(link => {
+    link.addEventListener('click', e => {
+      if (_isDirty && _isEditing) {
+        if (!confirm('저장하지 않은 변경사항이 있습니다. 나가시겠습니까?')) {
+          e.stopImmediatePropagation();
+        } else {
+          _isDirty = false;
+          _setEditMode(false);
+        }
+      }
+    }, true); /* capture=true → 기존 리스너보다 먼저 실행 */
+  });
+
+  /* SPA 내비게이션: 하단 바 / 사이드 링크 이동 시 */
+  document.querySelectorAll('[data-goto]').forEach(link => {
+    link.addEventListener('click', () => {
+      if (_isDirty && _isEditing) {
+        if (!confirm('저장하지 않은 변경사항이 있습니다. 나가시겠습니까?')) return;
+        _isDirty = false;
+        _setEditMode(false);
+      }
+    });
+  });
+})();

@@ -2618,3 +2618,224 @@
     grid-template-columns: 1fr 1fr;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   Work 1 — .rg-category-sheet  카테고리 바텀시트
+═══════════════════════════════════════════════════════════════ */
+.rg-category-sheet__overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.45);
+  z-index: 2000;
+  align-items: flex-end;
+  justify-content: center;
+}
+.rg-category-sheet__overlay.open { display: flex; }
+
+.rg-category-sheet {
+  width: 100%;
+  max-width: 520px;
+  background: #fff;
+  border-radius: 20px 20px 0 0;
+  max-height: 62vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: rgCsUp .22s ease;
+}
+@keyframes rgCsUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+.rg-category-sheet__hd {
+  display: flex;
+  align-items: center;
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid var(--border, #e5e7eb);
+  flex-shrink: 0;
+}
+.rg-category-sheet__title {
+  flex: 1;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text, #111);
+}
+.rg-category-sheet__back,
+.rg-category-sheet__close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-sub, #6b7280);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: background .12s;
+}
+.rg-category-sheet__back:hover,
+.rg-category-sheet__close:hover { background: var(--bg-soft, #f3f4f6); }
+
+.rg-category-sheet__breadcrumb {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2px 4px;
+  padding: 8px 16px 6px;
+  border-bottom: 1px solid var(--border, #e5e7eb);
+  flex-shrink: 0;
+  min-height: 0;
+  font-size: 12px;
+  color: var(--text-mute, #9ca3af);
+}
+.rg-category-sheet__breadcrumb:empty { display: none; }
+.rg-category-sheet__crumb.--last { color: var(--brand, #1e3a5f); font-weight: 700; }
+.rg-category-sheet__crumb-sep { color: var(--text-mute, #9ca3af); }
+
+.rg-category-sheet__list {
+  flex: 1;
+  overflow-y: auto;
+  list-style: none;
+  margin: 0;
+  padding: 8px 0;
+}
+.rg-category-sheet__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 20px;
+  cursor: pointer;
+  transition: background .1s;
+  border-bottom: 1px solid rgba(0,0,0,.04);
+}
+.rg-category-sheet__item:last-child { border-bottom: none; }
+.rg-category-sheet__item:hover,
+.rg-category-sheet__item:focus-visible { background: var(--bg-soft, #f9fafb); outline: none; }
+.rg-category-sheet__item.--leaf:hover { background: #eff6ff; }
+.rg-category-sheet__item-icon { font-size: 18px; width: 24px; text-align: center; flex-shrink: 0; }
+.rg-category-sheet__item-label { flex: 1; font-size: 14px; font-weight: 600; color: var(--text, #111); }
+.rg-category-sheet__item-arrow { font-size: 16px; color: var(--text-mute, #9ca3af); }
+.rg-category-sheet__item.--leaf .rg-category-sheet__item-label { color: var(--brand, #1e3a5f); }
+
+/* 트리거 버튼 (dropCat 대체) */
+.rg-cs-trigger-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  text-align: left;
+  cursor: pointer;
+  background: var(--bg-soft, #f9fafb);
+  color: var(--text-mute, #9ca3af);
+  border: 1px solid var(--border, #e5e7eb);
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  width: 100%;
+  transition: border-color .15s;
+}
+.rg-cs-trigger-btn.has-value { color: var(--text, #111); }
+.rg-cs-trigger-btn:hover { border-color: var(--brand, #1e3a5f); }
+
+/* ═══════════════════════════════════════════════════════════════
+   Work 2 — 채팅 패널 스크롤 고정 해제
+   기존 .chat-panel / .chat-msgs 는 건드리지 않고 override 적용
+═══════════════════════════════════════════════════════════════ */
+.rg-chat-scroll-fixed.open {
+  height: 480px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+.rg-chat-scroll-fixed #chatMsgs {
+  flex: 1 1 0% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+}
+.rg-chat-scroll-fixed #chatConvList {
+  flex: 1 1 0% !important;
+  overflow-y: auto !important;
+  max-height: none !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Work 3 — .rg-chat-product-card  채팅창 상품 카드
+═══════════════════════════════════════════════════════════════ */
+.rg-chat-product-card {
+  background: #f8faff;
+  border: 1px solid #dbeafe;
+  border-radius: 10px;
+  margin: 0 0 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.rg-chat-product-card__inner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+}
+.rg-chat-product-card__img {
+  font-size: 28px;
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background: #e0e7ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.rg-chat-product-card__info { flex: 1; min-width: 0; }
+.rg-chat-product-card__name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text, #111);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 2px;
+}
+.rg-chat-product-card__price { font-size: 11px; color: var(--brand, #1e3a5f); font-weight: 800; }
+.rg-chat-product-card__badge {
+  font-size: 10px;
+  font-weight: 700;
+  color: #3b82f6;
+  background: #dbeafe;
+  padding: 3px 7px;
+  border-radius: 20px;
+  flex-shrink: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Work 4 — 마이페이지 설정 저장 방식
+═══════════════════════════════════════════════════════════════ */
+
+/* 읽기 전용 상태 input */
+.rg-profile-readonly {
+  background: var(--bg-soft, #f9fafb) !important;
+  color: var(--text, #111) !important;
+  cursor: default !important;
+  pointer-events: none;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+/* 저장 버튼 */
+.rg-settings-save-btn {
+  font-size: 13px;
+  font-weight: 700;
+  padding: 7px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: opacity .15s, background .15s;
+}
+.rg-settings-save-btn:disabled { opacity: .4; cursor: not-allowed; }
+.rg-settings-save-btn--active { opacity: 1 !important; }
+}

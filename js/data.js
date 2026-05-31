@@ -202,3 +202,94 @@ async function fetchProducts({ category = '전체', page = 1, limit = 8, sort = 
   const data = await res.json();
   return { items: (data.items || []).map(mapProduct), total: data.total, page: data.page, hasMore: data.hasMore };
 }
+
+/* ═══════════════════════════════════════════
+   RG_CATEGORIES — 카테고리 트리 (Work 1)
+   js/ui.js의 RG.categorySheet 에서 사용
+═══════════════════════════════════════════ */
+const RG_CATEGORIES = [
+  { id:'clothing',  label:'의류',     icon:'👕', children:[
+    { id:'mens',    label:'남성의류', children:[
+      { id:'mens_top',    label:'상의',   children:[
+        {id:'tshirt',  label:'티셔츠'},  {id:'shirt',   label:'셔츠'},
+        {id:'knit',    label:'니트·스웨터'}, {id:'hoodie',  label:'후드·맨투맨'},
+        {id:'sleeveless',label:'민소매'},
+      ]},
+      { id:'mens_outer',  label:'아우터', children:[
+        {id:'jacket',  label:'재킷'},    {id:'coat',    label:'코트'},
+        {id:'padded',  label:'패딩'},    {id:'vest',    label:'조끼·베스트'},
+      ]},
+      { id:'mens_bottom', label:'하의',   children:[
+        {id:'pants',   label:'팬츠·슬랙스'}, {id:'jeans',   label:'청바지'},
+        {id:'shorts',  label:'반바지'},  {id:'sweatpants',label:'스웨트팬츠'},
+      ]},
+    ]},
+    { id:'womens',  label:'여성의류', children:[
+      { id:'womens_top',  label:'상의',   children:[
+        {id:'wtshirt', label:'티셔츠·블라우스'}, {id:'wknit',   label:'니트·스웨터'},
+        {id:'wouter',  label:'아우터'},
+      ]},
+      { id:'womens_dress',label:'원피스·스커트', children:[
+        {id:'dress',   label:'원피스'},  {id:'skirt',   label:'스커트'},
+      ]},
+    ]},
+    { id:'unisex',  label:'유니섹스', children:[
+      {id:'u_hoodie', label:'후드·맨투맨'}, {id:'u_tshirt', label:'티셔츠'},
+      {id:'u_pants',  label:'팬츠'},
+    ]},
+  ]},
+  { id:'shoes',     label:'신발',     icon:'👟', children:[
+    { id:'sneakers',     label:'스니커즈', children:[
+      {id:'hi_top',  label:'하이탑'},   {id:'lo_top',  label:'로우탑'},
+      {id:'mid',     label:'미드탑'},   {id:'platform',label:'플랫폼'},
+    ]},
+    { id:'dress_shoes',  label:'구두·로퍼', children:[
+      {id:'loafer',  label:'로퍼'},     {id:'oxford',  label:'옥스포드'},
+      {id:'derby',   label:'더비'},
+    ]},
+    { id:'sandals',      label:'샌들·슬리퍼', children:[
+      {id:'sandal',  label:'샌들'},     {id:'slipper', label:'슬리퍼'},
+      {id:'birken',  label:'버켄스탁류'},
+    ]},
+    { id:'boots',        label:'부츠', children:[
+      {id:'ankle_boot', label:'앵클부츠'}, {id:'mid_boot', label:'미드부츠'},
+      {id:'long_boot',  label:'롱부츠'},
+    ]},
+  ]},
+  { id:'bag',       label:'가방',     icon:'👜', children:[
+    {id:'backpack',  label:'백팩'},    {id:'shoulder', label:'숄더백'},
+    {id:'tote',      label:'토트백'},  {id:'clutch',   label:'클러치'},
+    {id:'crossbody', label:'크로스바디'},
+  ]},
+  { id:'accessory', label:'패션잡화', icon:'🧣', children:[
+    { id:'hat',    label:'모자',   children:[
+      {id:'cap',    label:'볼캡·스냅백'}, {id:'beanie', label:'비니'},
+      {id:'bucket', label:'버킷햇'},
+    ]},
+    { id:'wallet', label:'지갑',   children:[
+      {id:'long_wallet',  label:'장지갑'}, {id:'short_wallet', label:'반지갑'},
+      {id:'card_wallet',  label:'카드지갑'},
+    ]},
+    {id:'belt',    label:'벨트'},     {id:'scarf',   label:'스카프·머플러'},
+    {id:'glasses', label:'안경·선글라스'},
+  ]},
+  { id:'luxury',    label:'명품',     icon:'💎', children:[
+    {id:'lux_bag',      label:'명품 가방'},  {id:'lux_wallet',  label:'명품 지갑'},
+    {id:'lux_clothes',  label:'명품 의류'},  {id:'lux_shoes',   label:'명품 신발'},
+    {id:'lux_jewelry',  label:'주얼리·액세서리'},
+  ]},
+  { id:'watch',     label:'시계',     icon:'⌚', children:[
+    {id:'mech_watch',    label:'기계식 시계'}, {id:'quartz_watch', label:'쿼츠 시계'},
+    {id:'smartwatch',    label:'스마트워치'},  {id:'vintage_watch',label:'빈티지 시계'},
+  ]},
+  { id:'jewelry',   label:'주얼리',   icon:'💍', children:[
+    {id:'necklace', label:'목걸이'},  {id:'ring',     label:'반지'},
+    {id:'bracelet', label:'팔찌'},    {id:'earring',  label:'귀걸이'},
+  ]},
+  { id:'tech',      label:'테크·가전',icon:'💻', children:[
+    {id:'phone',    label:'스마트폰'}, {id:'laptop',  label:'노트북·태블릿'},
+    {id:'audio',    label:'음향기기'}, {id:'camera',  label:'카메라'},
+    {id:'game',     label:'게임기기'},
+  ]},
+  { id:'etc',       label:'기타',     icon:'📦' },
+];
