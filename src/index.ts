@@ -225,6 +225,51 @@ app.post("/api/posts", async (c) => {
   }
 });
 
+app.patch('/api/posts/:id/like', async (c) => {
+  try {
+    const id = c.req.param('id');
+
+    if (!id) {
+      return c.json({
+        success: false,
+        ok: false,
+        message: '게시글 ID가 없습니다.'
+      }, 400);
+    }
+
+    await c.env.DB.prepare(`
+      UPDATE posts
+      SET likes = COALESCE(likes, 0) + 1
+      WHERE id = ?
+    `)
+      .bind(id)
+      .run();
+
+    const post = await c.env.DB.prepare(`
+      SELECT id, likes
+      FROM posts
+      WHERE id = ?
+    `)
+      .bind(id)
+      .first();
+
+    return c.json({
+      success: true,
+      ok: true,
+      message: '추천이 반영되었습니다.',
+      post
+    });
+  } catch (err) {
+    console.error('Post like error:', err);
+
+    return c.json({
+      success: false,
+      ok: false,
+      message: '추천 처리 중 오류가 발생했습니다.'
+    }, 500);
+  }
+});
+
 app.get("/api/posts", async (c) => {
   try {
     const result = await c.env.DB.prepare(`

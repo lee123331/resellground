@@ -277,6 +277,213 @@ async function createToken(payload: Record<string, unknown>) {
 
   return btoa(binary);
 }
+app.patch("/api/posts/:id/like", async (c) => {
+  try {
+    const id = c.req.param("id");
+
+    if (!id) {
+      return c.json(
+        {
+          success: false,
+          ok: false,
+          message: "게시글 ID가 없습니다.",
+        },
+        400
+      );
+    }
+
+    await c.env.DB.prepare(`
+      UPDATE posts
+      SET likes = COALESCE(likes, 0) + 1
+      WHERE id = ?
+    `)
+      .bind(id)
+      .run();
+
+    const post = await c.env.DB.prepare(`
+      SELECT id, likes
+      FROM posts
+      WHERE id = ?
+    `)
+      .bind(id)
+      .first();
+
+    return c.json({
+      success: true,
+      ok: true,
+      message: "추천이 반영되었습니다.",
+      post,
+    });
+  } catch (err) {
+    console.error("Post like error:", err);
+
+    return c.json(
+      {
+        success: false,
+        ok: false,
+        message: "추천 처리 중 오류가 발생했습니다.",
+      },
+      500
+    );
+  }
+});
+app.patch("/api/products/:id/status", async (c) => {
+  try {
+    const id = c.req.param("id");
+    const body = await c.req.json().catch(() => ({}));
+    const status = String(body.status || "").trim();
+
+    const allowedStatuses = ["판매중", "판매완료", "예약중", "삭제됨"];
+
+    if (!id) {
+      return c.json(
+        {
+          success: false,
+          ok: false,
+          message: "상품 ID가 없습니다.",
+        },
+        400
+      );
+    }
+
+    if (!allowedStatuses.includes(status)) {
+      return c.json(
+        {
+          success: false,
+          ok: false,
+          message: "유효하지 않은 상품 상태입니다.",
+        },
+        400
+      );
+    }
+
+    const result = await c.env.DB.prepare(`
+      UPDATE products
+      SET status = ?
+      WHERE id = ?
+    `)
+      .bind(status, id)
+      .run();
+
+    const product = await c.env.DB.prepare(`
+      SELECT
+        id,
+        seller_email,
+        seller_name,
+        name,
+        brand,
+        category,
+        price,
+        condition,
+        trade_method,
+        description,
+        status,
+        views,
+        created_at,
+        brand_id,
+        category_id,
+        size_region,
+        size_value,
+        inspection_service
+      FROM products
+      WHERE id = ?
+    `)
+      .bind(id)
+      .first();
+
+    if (!product) {
+      return c.json(
+        {
+          success: false,
+          ok: false,
+          message: "상품을 찾을 수 없습니다.",
+        },
+        404
+      );
+    }
+
+    return c.json({
+      success: true,
+      ok: true,
+      message: "상품 상태가 변경되었습니다.",
+      product,
+      result,
+    });
+  } catch (err) {
+    console.error("Product status update error:", err);
+
+    return c.json(
+      {
+        success: false,
+        ok: false,
+        message: "상품 상태 변경 중 오류가 발생했습니다.",
+      },
+      500
+    );
+  }
+});
+app.delete("/api/products/:id", async (c) => {
+  try {
+    const id = c.req.param("id");
+
+    if (!id) {
+      return c.json(
+        {
+          success: false,
+          ok: false,
+          message: "상품 ID가 없습니다.",
+        },
+        400
+      );
+    }
+
+    const existing = await c.env.DB.prepare(`
+      SELECT id
+      FROM products
+      WHERE id = ?
+    `)
+      .bind(id)
+      .first();
+
+    if (!existing) {
+      return c.json(
+        {
+          success: false,
+          ok: false,
+          message: "상품을 찾을 수 없습니다.",
+        },
+        404
+      );
+    }
+
+    // 실제 삭제 대신 소프트 삭제 처리
+    await c.env.DB.prepare(`
+      UPDATE products
+      SET status = '삭제됨'
+      WHERE id = ?
+    `)
+      .bind(id)
+      .run();
+
+    return c.json({
+      success: true,
+      ok: true,
+      message: "상품이 삭제되었습니다.",
+      product_id: id,
+    });
+  } catch (err) {
+    console.error("Product delete error:", err);
+
+    return c.json(
+      {
+        success: false,
+        ok: false,
+        message: "상품 삭제 중 오류가 발생했습니다.",
+      },
+      500
+    );
+  }
+});
 app.post("/api/posts", async (c) => {
   try {
     const body = await c.req.json();
@@ -406,6 +613,87 @@ app.post("/api/products/ping", async (c) => {
     success: true,
     message: "products post ping ok",
   });
+});
+app.get("/api/user/products", async (c) => {
+  try {
+    const email = c.req.query("email");
+    const page = Number(c.req.query("page") || 1);
+    const limit = Number(c.req.query("limit") || 20);
+    const offset = (page - 1) * limit;
+
+    if (!email) {
+      return c.json(
+        {
+          success: false,
+          ok: false,
+          message: "이메일이 필요합니다.",
+        },
+        400
+      );
+    }
+
+    const countRow = await c.env.DB.prepare(`
+  SELECT COUNT(*) AS total
+  FROM products
+  WHERE seller_email = ?
+    AND (status IS NULL OR TRIM(status) NOT IN ('삭제됨', 'deleted', 'DELETED'))
+`)
+  .bind(email)
+  .first<{ total: number }>();
+
+    const rows = await c.env.DB.prepare(`
+      SELECT
+        id,
+        seller_email,
+        seller_name,
+        name,
+        brand,
+        category,
+        price,
+        condition,
+        trade_method,
+        description,
+        status,
+        views,
+        created_at,
+        brand_id,
+        category_id,
+        size_region,
+        size_value,
+        inspection_service
+     FROM products
+WHERE seller_email = ?
+  AND (status IS NULL OR TRIM(status) NOT IN ('삭제됨', 'deleted', 'DELETED'))
+ORDER BY created_at DESC
+LIMIT ? OFFSET ?
+    `)
+      .bind(email, limit, offset)
+      .all();
+
+    const products = rows.results || [];
+    const total = Number(countRow?.total || 0);
+
+    return c.json({
+      success: true,
+      ok: true,
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+      products,
+    });
+  } catch (err) {
+    console.error("User products error:", err);
+
+    return c.json(
+      {
+        success: false,
+        ok: false,
+        message: "내 상품 목록 조회 중 오류가 발생했습니다.",
+      },
+      500
+    );
+  }
 });
 app.post("/api/products", async (c) => {
   try {
@@ -647,99 +935,100 @@ app.post("/api/products", async (c) => {
 
 app.get("/api/products", async (c) => {
   try {
-    const pageRaw = Number(c.req.query("page") || 1);
-    const limitRaw = Number(c.req.query("limit") || 12);
-    const category = String(c.req.query("category") || "").trim();
-    const status = String(c.req.query("status") || "").trim();
-
-    const page = Number.isFinite(pageRaw) && pageRaw > 0 ? Math.floor(pageRaw) : 1;
-    const limit = Number.isFinite(limitRaw) && limitRaw > 0
-      ? Math.min(Math.floor(limitRaw), 50)
-      : 12;
-
+    const category = c.req.query("category") || "전체";
+    const status = c.req.query("status") || "전체";
+    const page = Math.max(1, parseInt(c.req.query("page") || "1"));
+    const limit = Math.min(20, Math.max(1, parseInt(c.req.query("limit") || "8")));
+    const sort = c.req.query("sort") || "popular";
     const offset = (page - 1) * limit;
 
+    const params: (string | number)[] = [];
     const where: string[] = [];
-    const binds: unknown[] = [];
 
+    // 삭제된 상품 제외
+    where.push("(status IS NULL OR TRIM(status) NOT IN ('삭제됨', 'deleted', 'DELETED'))");
+
+    // 카테고리 필터
     if (category && category !== "전체") {
       where.push("category = ?");
-      binds.push(category);
+      params.push(category);
     }
 
+    // 상태 필터
     if (status && status !== "전체") {
       where.push("status = ?");
-      binds.push(status);
+      params.push(status);
     }
 
-    const whereSql = where.length ? `WHERE ${where.join(" AND ")}` : "";
+    const whereClause = where.length ? `WHERE ${where.join(" AND ")}` : "";
 
-    const countResult = await c.env.DB.prepare(`
-      SELECT COUNT(*) AS total
-      FROM products
-      ${whereSql}
-    `).bind(...binds).first();
+    const orderMap: Record<string, string> = {
+      popular: "views DESC, created_at DESC",
+      new: "created_at DESC",
+      price_asc: "price ASC",
+      price_desc: "price DESC",
+    };
+
+    const orderClause = `ORDER BY ${orderMap[sort] ?? orderMap.popular}`;
+
+    const countResult = await c.env.DB.prepare(
+      `SELECT COUNT(*) AS total FROM products ${whereClause}`
+    )
+      .bind(...params)
+      .first<{ total: number }>();
 
     const total = Number(countResult?.total || 0);
-    const totalPages = Math.max(1, Math.ceil(total / limit));
 
-    const result = await c.env.DB.prepare(`
-      SELECT *
+    const rows = await c.env.DB.prepare(`
+      SELECT
+        id,
+        seller_email,
+        seller_name,
+        name,
+        brand,
+        category,
+        price,
+        condition,
+        trade_method,
+        description,
+        status,
+        views,
+        created_at,
+        brand_id,
+        category_id,
+        size_region,
+        size_value,
+        inspection_service
       FROM products
-      ${whereSql}
-      ORDER BY created_at DESC
-      LIMIT ?
-      OFFSET ?
-    `).bind(...binds, limit, offset).all();
-
-    const rows = result.results || [];
-
-    const products = rows.map(row => {
-      let images = [];
-
-      try {
-        images = row.images ? JSON.parse(String(row.images)) : [];
-      } catch (e) {
-        images = [];
-      }
-
-      return {
-        id: row.id,
-        seller_email: row.seller_email,
-        seller_name: row.seller_name,
-        name: row.name,
-        brand: row.brand,
-        category: row.category,
-        price: row.price,
-        condition: row.condition,
-        trade_method: row.trade_method,
-        description: row.description,
-        images,
-        status: row.status,
-        created_at: row.created_at
-      };
-    });
+      ${whereClause}
+      ${orderClause}
+      LIMIT ? OFFSET ?
+    `)
+      .bind(...params, limit, offset)
+      .all();
 
     return c.json({
+      success: true,
       ok: true,
+      products: rows.results || [],
+      items: rows.results || [],
+      total,
       page,
       limit,
-      total,
-      totalPages,
-      products
+      totalPages: Math.ceil(total / limit),
+      hasMore: offset + limit < total,
     });
   } catch (err) {
-    console.error(err);
+    console.error("Products list error:", err);
 
-    return c.json({
-      ok: false,
-      message: "상품 목록을 불러오지 못했습니다.",
-      page: 1,
-      limit: 12,
-      total: 0,
-      totalPages: 1,
-      products: []
-    }, 500);
+    return c.json(
+      {
+        success: false,
+        ok: false,
+        message: "상품 목록 조회 중 오류가 발생했습니다.",
+      },
+      500
+    );
   }
 });
 
@@ -747,16 +1036,17 @@ app.get("/api/products/:id", async (c) => {
   try {
     const id = c.req.param("id");
 
-    const product = (await c.env.DB.prepare(`
+const product = (await c.env.DB.prepare(`
   SELECT
     p.*,
     b.name_en AS brand_name_en,
     b.name_ko AS brand_name_ko,
-    c.name AS category_name
+    cat.name AS category_name
   FROM products p
   LEFT JOIN brands b ON p.brand_id = b.id
-  LEFT JOIN categories c ON p.category_id = c.id
+  LEFT JOIN categories cat ON p.category_id = cat.id
   WHERE p.id = ?
+    AND (p.status IS NULL OR TRIM(p.status) NOT IN ('삭제됨', 'deleted', 'DELETED'))
 `)
   .bind(id)
   .first()) as any;
