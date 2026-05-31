@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="css/components.css"/>
 <link rel="stylesheet" href="css/pages.css"/>
 <link rel="stylesheet" href="css/responsive.css"/>
-<link rel="stylesheet" href="css/design-override.css?v=20260530-1"/>
+<link rel="stylesheet" href="css/design-override.css?v=20260601-1"/>
 </head>
 <body>
 
@@ -1135,7 +1135,7 @@
           <div class="rg-dropzone__icon">↑</div>
           <p class="rg-dropzone__text">클릭하거나 파일을 여기에 끌어다 놓으세요</p>
           <p class="rg-dropzone__hint">JPG · PNG · WEBP · 최대 5장 · 장당 10MB</p>
-          <input type="file" multiple accept="image/*" aria-label="이미지 파일 선택">
+          <input id="dropImageInput" type="file" multiple accept="image/*" aria-label="이미지 파일 선택">
         </div>
 
         <div class="rg-preview-grid"></div>
@@ -1149,18 +1149,19 @@
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
 
         <div style="display:flex; flex-direction:column; gap:5px;">
-          <label style="font-size:11px; font-weight:700; color:#0f0f0f;">카테고리 <em style="color:#ff3b30; font-style:normal;">*</em></label>
-          <select id="dropCat" class="rg-product-input">
-            <option value="">선택</option>
-            <option>스니커즈</option>
-            <option>명품 백</option>
-            <option>시계</option>
-            <option>의류/아우터</option>
-            <option>테크/가전</option>
-            <option>기타</option>
-          </select>
-          <p class="form-error" id="dropCatErr"></p>
-        </div>
+  <label style="font-size:11px; font-weight:700; color:#0f0f0f;">
+    카테고리 <em style="color:#ff3b30; font-style:normal;">*</em>
+  </label>
+
+  <button type="button" id="dropCatBtn" class="rg-product-input rg-cat-picker-btn">
+    <span id="dropCatLabel">카테고리 선택</span>
+    <span class="rg-cat-picker-arrow">›</span>
+  </button>
+
+  <input type="hidden" id="dropCat" value="">
+  <input type="hidden" id="dropCategoryId" value="">
+  <input type="hidden" id="dropCategoryPathLabel" value="">
+</div>
 
         <div style="display:flex; flex-direction:column; gap:5px; position:relative;">
           <label style="font-size:11px; font-weight:700; color:#0f0f0f;">브랜드 <em style="color:#ff3b30; font-style:normal;">*</em></label>
@@ -1966,12 +1967,34 @@
       <div class="cat-list" id="pregCatList"></div>
     </div>
   </div>
+<!-- ADD DROP CATEGORY CASCADE SHEET -->
 
 </main>
+
+<!-- ADD DROP CATEGORY CASCADE SHEET -->
+<div class="cat-overlay" id="dropCatOverlay">
+  <div class="cat-sheet" id="dropCatSheet">
+    <div class="cat-sheet__hd">
+      <button type="button" class="cat-back-btn" id="dropCatBackBtn" style="visibility:hidden">
+        ‹
+      </button>
+      <span class="cat-sheet__title" id="dropCatSheetTitle">카테고리 선택</span>
+      <button type="button" class="cat-close-btn" id="dropCatCloseBtn">✕</button>
+    </div>
+
+    <div class="cat-breadcrumb" id="dropCatBreadcrumb"></div>
+    <div class="cat-list" id="dropCatList"></div>
+  </div>
+</div>
+
 <script src="js/data.js?v=20260529-8"></script>
 <script src="js/render.js?v=20260529-8"></script>
 <script src="js/ui.js?v=20260529-8"></script>
-<script src="js/forms.js?v=20260529-8"></script>
+<script src="js/forms.js?v=20260601-1"></script>
+<script src="js/app.js?v=20260529-8"></script>
+<script src="js/product-detail-db.js?v=20260529-8"></script>
+<script src="js/ui.js?v=20260529-8"></script>
+<script src="js/forms.js?v=20260601-1"></script>
 <script src="js/app.js?v=20260529-8"></script>
 <script src="js/product-detail-db.js?v=20260529-8"></script>
 </body>

@@ -657,7 +657,228 @@ function getSelectedProductTradeMethod() {
   const fallback = document.getElementById('dropTrade');
   return fallback ? fallback.value : '';
 }
+/* ── 상품 등록 모달: 카테고리 캐스케이드 바텀시트 ── */
+let dropCategoryTree = [];
+let dropCategoryStack = [];
 
+function normalizeCategoryTree(raw) {
+  if (!raw) return [];
+
+  if (Array.isArray(raw)) return raw;
+
+  if (Array.isArray(raw.categories)) return raw.categories;
+  if (Array.isArray(raw.data)) return raw.data;
+  if (Array.isArray(raw.items)) return raw.items;
+
+  return [];
+}
+
+async function fetchDropCategories() {
+  try {
+    const res = await fetch(`${API_BASE}/api/categories`);
+    const data = await res.json();
+
+    const tree = normalizeCategoryTree(data);
+
+    if (tree.length) {
+      dropCategoryTree = tree;
+      console.log('카테고리 API 로드 성공:', tree);
+      return tree;
+    }
+
+    console.warn('카테고리 API 응답은 있으나 배열 구조를 찾지 못했습니다:', data);
+  } catch (err) {
+    console.warn('카테고리 API 로드 실패. RG_CATEGORIES fallback 사용:', err);
+  }
+
+  if (typeof RG_CATEGORIES !== 'undefined' && Array.isArray(RG_CATEGORIES)) {
+    dropCategoryTree = RG_CATEGORIES;
+    return RG_CATEGORIES;
+  }
+
+  dropCategoryTree = [];
+  return [];
+}
+
+function getCategoryChildren(node) {
+  return node?.children || node?.childrens || node?.subcategories || node?.items || [];
+}
+
+function getCategoryLabel(node) {
+  return node?.label || node?.name || node?.category_name || node?.title || '';
+}
+
+function getCategoryId(node) {
+  return node?.id || node?.category_id || node?.value || getCategoryLabel(node);
+}
+
+function getCurrentDropCategoryList() {
+  if (!dropCategoryStack.length) return dropCategoryTree;
+
+  const current = dropCategoryStack[dropCategoryStack.length - 1];
+  return getCategoryChildren(current);
+}
+
+function renderDropCategoryBreadcrumb() {
+  const el = document.getElementById('dropCatBreadcrumb');
+  if (!el) return;
+
+  if (!dropCategoryStack.length) {
+    el.innerHTML = '<span>전체</span>';
+    return;
+  }
+
+  el.innerHTML = dropCategoryStack
+    .map(item => `<span>${getCategoryLabel(item)}</span>`)
+    .join(' › ');
+}
+
+function renderDropCategoryList() {
+  const listEl = document.getElementById('dropCatList');
+  const titleEl = document.getElementById('dropCatSheetTitle');
+  const backBtn = document.getElementById('dropCatBackBtn');
+
+  if (!listEl) return;
+
+  const currentList = getCurrentDropCategoryList();
+
+  if (titleEl) {
+    titleEl.textContent = dropCategoryStack.length
+      ? getCategoryLabel(dropCategoryStack[dropCategoryStack.length - 1])
+      : '카테고리 선택';
+  }
+
+  if (backBtn) {
+    backBtn.style.visibility = dropCategoryStack.length ? 'visible' : 'hidden';
+  }
+
+  renderDropCategoryBreadcrumb();
+
+  if (!currentList.length) {
+    listEl.innerHTML = `
+      <div style="padding:24px 18px; color:#777; font-size:13px;">
+        하위 카테고리가 없습니다.
+      </div>
+    `;
+    return;
+  }
+
+  listEl.innerHTML = currentList.map((item, index) => {
+    const label = getCategoryLabel(item);
+    const children = getCategoryChildren(item);
+    const hasChildren = children.length > 0;
+
+    return `
+      <button type="button" class="cat-item" data-cat-index="${index}">
+        <span>
+          ${label}
+          ${hasChildren ? '<span class="cat-item__meta">하위 카테고리 선택</span>' : '<span class="cat-item__meta">이 카테고리로 선택</span>'}
+        </span>
+        <span class="cat-item__arrow">${hasChildren ? '›' : '✓'}</span>
+      </button>
+    `;
+  }).join('');
+}
+
+function closeDropCategorySheet() {
+  const overlay = document.getElementById('dropCatOverlay');
+  if (overlay) overlay.classList.remove('open');
+
+  document.body.style.overflow = '';
+}
+
+async function openDropCategorySheet() {
+  const overlay = document.getElementById('dropCatOverlay');
+  if (!overlay) return;
+
+  if (!dropCategoryTree.length) {
+    await fetchDropCategories();
+  }
+
+  dropCategoryStack = [];
+  renderDropCategoryList();
+
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function selectDropCategory(item) {
+  const id = getCategoryId(item);
+  const label = getCategoryLabel(item);
+
+  const fullPath = [...dropCategoryStack, item]
+    .map(v => getCategoryLabel(v))
+    .filter(Boolean)
+    .join(' > ');
+
+  const dropCat = document.getElementById('dropCat');
+  const dropCategoryId = document.getElementById('dropCategoryId');
+  const dropCategoryPathLabel = document.getElementById('dropCategoryPathLabel');
+  const dropCatLabel = document.getElementById('dropCatLabel');
+
+  if (dropCat) dropCat.value = label;
+  if (dropCategoryId) dropCategoryId.value = id;
+  if (dropCategoryPathLabel) dropCategoryPathLabel.value = fullPath;
+  if (dropCatLabel) dropCatLabel.textContent = fullPath || label;
+
+  console.log('카테고리 선택:', {
+    id,
+    label,
+    path_label: fullPath
+  });
+
+  closeDropCategorySheet();
+}
+
+function initDropCategorySheet() {
+  const btn = document.getElementById('dropCatBtn');
+  const overlay = document.getElementById('dropCatOverlay');
+  const closeBtn = document.getElementById('dropCatCloseBtn');
+  const backBtn = document.getElementById('dropCatBackBtn');
+  const listEl = document.getElementById('dropCatList');
+
+  if (!btn || !overlay || !listEl) return;
+
+  btn.addEventListener('click', openDropCategorySheet);
+
+  closeBtn?.addEventListener('click', closeDropCategorySheet);
+
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) closeDropCategorySheet();
+  });
+
+  backBtn?.addEventListener('click', () => {
+    dropCategoryStack.pop();
+    renderDropCategoryList();
+  });
+
+  listEl.addEventListener('click', (e) => {
+    const itemBtn = e.target.closest('.cat-item');
+    if (!itemBtn) return;
+
+    const index = Number(itemBtn.dataset.catIndex);
+    const currentList = getCurrentDropCategoryList();
+    const item = currentList[index];
+
+    if (!item) return;
+
+    const children = getCategoryChildren(item);
+
+    if (children.length) {
+      dropCategoryStack.push(item);
+      renderDropCategoryList();
+      return;
+    }
+
+    selectDropCategory(item);
+  });
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initDropCategorySheet);
+} else {
+  initDropCategorySheet();
+}
 function mapLegacyCategoryToId(categoryText) {
   const map = {
     '스니커즈': 18,
@@ -728,6 +949,8 @@ async function submitProductToDB() {
   const name = document.getElementById('dropName')?.value.trim() || '';
   const brandText = document.getElementById('dropBrand')?.value.trim() || '';
   const categoryText = document.getElementById('dropCat')?.value || '';
+const selectedCategoryId = document.getElementById('dropCategoryId')?.value || '';
+const selectedCategoryPathLabel = document.getElementById('dropCategoryPathLabel')?.value || '';
   const price = Number(document.getElementById('dropPrice')?.value || 0);
   const description = document.getElementById('dropDesc')?.value.trim() || '';
   const condition = getSelectedProductCondition() || document.getElementById('dropCond')?.value || '';
@@ -753,10 +976,10 @@ async function submitProductToDB() {
   }
 
   if (!categoryText) {
-    showToast('카테고리를 선택해주세요.', 'error');
-    document.getElementById('dropCat')?.focus();
-    return;
-  }
+  showToast('카테고리를 선택해주세요.', 'error');
+  document.getElementById('dropCatBtn')?.focus();
+  return;
+}
 
   if (!price || price <= 0) {
     showToast('판매가를 올바르게 입력해주세요.', 'error');
@@ -774,7 +997,7 @@ async function submitProductToDB() {
     return;
   }
 
-const categoryId = mapLegacyCategoryToId(categoryText);
+const categoryId = selectedCategoryId || mapLegacyCategoryToId(categoryText);
 const brandId = mapLegacyBrandToId(brandText);
 
 const payload = {
@@ -787,6 +1010,7 @@ const payload = {
   price,
   brand_id: brandId,
   category_id: categoryId,
+path_label: selectedCategoryPathLabel,
   size_region: 'KR',
   size_value: document.getElementById('dropSize')?.value || '',
   condition,
@@ -797,8 +1021,8 @@ const payload = {
   // 구버전 백엔드/목록 호환용
   title: name,
   brand: brandText,
-  category: categoryText,
-  cat: categoryText,
+category: selectedCategoryPathLabel || categoryText,
+cat: selectedCategoryPathLabel || categoryText,
   price_num: price,
   tradeMethod: tradeMethod
 };
@@ -845,6 +1069,9 @@ updateDropImageCount();
 
 clearDraft('drop');
 resetForm(document.getElementById('dropFormInner'));
+
+const dropCatLabel = document.getElementById('dropCatLabel');
+if (dropCatLabel) dropCatLabel.textContent = '카테고리 선택';
 
 closeModal('addDrop');
 
