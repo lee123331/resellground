@@ -1,0 +1,230 @@
+/*
+ * ═══════════════════════════════════════════════════════
+ * 리셀그라운드 — design-override.css
+ * 흰 배경 + 검정 투톤 네비 + 에메랄드 포인트
+ * 
+ * 적용 방법:
+ * index.html 에서 responsive.css 링크 바로 다음에 추가:
+ * <link rel="stylesheet" href="css/design-override.css"/>
+ * ═══════════════════════════════════════════════════════
+ */
+
+/* ── 1. 컬러 변수 ───────────────────────────────────── */
+:root {
+  --bg:        #ffffff;
+  --bg-white:  #ffffff;
+  --bg-soft:   #f7f7f7;
+  --bg-card:   #ffffff;
+  --brand:     #111111;
+  --brand-d:   #000000;
+  --brand-l:   #f7f7f7;
+  --text:      #111111;
+  --text-sub:  #444444;
+  --text-mute: #999999;
+  --three:     #059669;
+  --three-d:   #047857;
+  --three-l:   #ecfdf5;
+  --border:    #ebebeb;
+  --border-d:  #d4d4d4;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.06);
+  --shadow:    0 2px 8px rgba(0,0,0,.08);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,.1);
+  --c-accent:  #059669;
+}
+
+body { background: #f7f7f7 !important; }
+
+/* ── 2. 네비 상단 — 흰색 ────────────────────────────── */
+.nav { background: #ffffff !important; border-bottom: 1px solid #ebebeb !important; box-shadow: none !important; }
+.nav__logo { font-weight: 800 !important; letter-spacing: -0.5px !important; color: #111111 !important; }
+.nav__logo em { color: #059669 !important; }
+.nav__logo-fee { border-color: #d4d4d4 !important; color: #999999 !important; }
+.nav__searchbar { background: #f7f7f7 !important; border-color: #ebebeb !important; border-radius: 8px !important; }
+.nav__searchbar:focus-within { background: #fff !important; border-color: #111111 !important; }
+.nav .icon-btn { border-color: #ebebeb !important; background: #f7f7f7 !important; color: #444444 !important; }
+.nav .icon-btn:hover { border-color: #111111 !important; color: #111111 !important; }
+#notifBadge { background: #059669 !important; border-color: #ffffff !important; }
+.nav-btn-login { background: #ffffff !important; border: 1.5px solid #111111 !important; color: #111111 !important; font-weight: 700 !important; }
+.nav-btn-login:hover { background: #111111 !important; color: #fff !important; }
+.nav-btn-join { background: #059669 !important; color: #fff !important; border: none !important; font-weight: 800 !important; }
+.nav-btn-join:hover { background: #047857 !important; }
+.nav__dd { background: #fff !important; border-color: #ebebeb !important; box-shadow: 0 4px 16px rgba(0,0,0,.1) !important; }
+.nav__dd-link { color: #444 !important; }
+.nav__dd-link:hover { background: #f7f7f7 !important; color: #059669 !important; }
+
+/* ── 3. 네비 하단 — 검정 ────────────────────────────── */
+.nav__bottom { background: #111111 !important; border-top: none !important; }
+.nav__link, .nav__trigger { color: rgba(255,255,255,.6) !important; }
+.nav__link:hover, .nav__trigger:hover { color: #fff !important; background: rgba(255,255,255,.08) !important; }
+.nav__link.act { color: #fff !important; border-bottom-color: #059669 !important; font-weight: 700 !important; }
+
+/* ── 4. 마퀴 배너 — 검정 ────────────────────────────── */
+.mq { background: #111111 !important; border: none !important; }
+.mq__item { color: rgba(255,255,255,.45) !important; }
+.mq__item.hi { color: #6ee7b7 !important; font-weight: 700 !important; }
+.mq__sep { color: rgba(255,255,255,.2) !important; }
+
+/* ── 5. 히어로 ──────────────────────────────────────── */
+.hero { background: #f2f2f2 !important; border-bottom: 1px solid #ebebeb !important; }
+.hero__eye { color: #059669 !important; font-weight: 700 !important; }
+.hero__eye::before { background: #059669 !important; }
+.hero__title { font-weight: 800 !important; letter-spacing: -0.5px !important; color: #111111 !important; }
+.text-three { color: #059669 !important; }
+.hero__feed { background: #f7f7f7 !important; border-left: 1px solid #ebebeb !important; }
+.feed-hd { background: #ffffff !important; border-bottom: 2px solid #111111 !important; }
+.feed-hd__live { color: #059669 !important; }
+.feed-hd__live span { background: #059669 !important; }
+
+/* ── 6. 버튼 ────────────────────────────────────────── */
+.btn { border-radius: 8px !important; font-weight: 700 !important; transition: none !important; }
+.btn--p { background: #059669 !important; color: #fff !important; }
+.btn--p:hover { background: #047857 !important; transform: none !important; box-shadow: none !important; }
+.btn--outline-brand { color: #111111 !important; border: 1.5px solid #111111 !important; background: transparent !important; }
+.btn--outline-brand:hover { background: #111111 !important; color: #fff !important; }
+.btn--outline-three { color: #059669 !important; border: 1.5px solid #059669 !important; }
+.btn--outline-three:hover { background: #059669 !important; color: #fff !important; }
+.btn--g { background: #fff !important; border: 1px solid #ebebeb !important; color: #444 !important; }
+.btn--g:hover { border-color: #111 !important; color: #111 !important; }
+
+/* ── 7. KPI 카드 ─────────────────────────────────────── */
+.kpi-card { background: #ffffff !important; border: 1px solid #d4d4d4 !important; border-radius: 8px !important; box-shadow: none !important; }
+.kpi-card:hover { border-color: #111111 !important; }
+.kpi-card__label { color: #999 !important; font-size: 11px !important; }
+.kpi-card__value { font-size: 20px !important; font-weight: 800 !important; color: #111111 !important; }
+.kpi-card__change.up { color: #059669 !important; }
+.kpi-card__change.fixed { color: #059669 !important; }
+.kpi-card--three { background: #111111 !important; border-color: #111111 !important; }
+.kpi-card--three .kpi-card__label { color: rgba(255,255,255,.6) !important; }
+.kpi-card--three .kpi-card__value { color: #ffffff !important; font-size: 26px !important; }
+
+/* ── 8. 섹션 타이틀 ──────────────────────────────────── */
+.section-tag { color: #059669 !important; font-weight: 700 !important; font-size: 11px !important; }
+.section-tag::before { background: #059669 !important; }
+.section-h { font-weight: 800 !important; color: #111111 !important; letter-spacing: -0.3px !important; }
+.page-hd { background: #111111 !important; border-bottom: none !important; }
+.page-hd__title { color: #ffffff !important; font-weight: 800 !important; }
+.page-hd__title::before { background: #059669 !important; }
+.page-hd__sub { color: rgba(255,255,255,.6) !important; }
+
+/* ── 9. 거래 흐름 ────────────────────────────────────── */
+.trade-bar { background: #fff !important; border: 1px solid #ebebeb !important; border-left: 3px solid #111111 !important; }
+.trade-bar__num { color: #059669 !important; font-weight: 800 !important; }
+
+/* ── 10. 필터 버튼 ───────────────────────────────────── */
+.drops-flt-btn { border-color: #ebebeb !important; background: #fff !important; color: #444 !important; }
+.drops-flt-btn:hover { border-color: #111 !important; color: #111 !important; background: #f7f7f7 !important; }
+.drops-flt-btn.act { background: #111111 !important; border-color: #111111 !important; color: #fff !important; }
+.filter-btn { border-color: #ebebeb !important; }
+.filter-btn:hover, .filter-btn.act { background: #f7f7f7 !important; border-color: #111 !important; color: #111 !important; }
+
+/* ── 11. 다크 섹션 (수수료/스폰서/주간TOP) ───────────── */
+.fee-compare-section { background: #111111 !important; }
+section[style*="linear-gradient"] { background: #111111 !important; }
+div[style*="linear-gradient(135deg,var(--brand"] { background: #111111 !important; }
+.sponsor-banner { background: #111111 !important; }
+.weekly-top-section { background: #111111 !important; }
+.weekly-top-section::before { display: none !important; }
+.ad-slot { background: #111111 !important; }
+
+/* ── 12. 상품 카드 ───────────────────────────────────── */
+.dc { background: #fff !important; }
+.dc:hover { box-shadow: 0 4px 16px rgba(0,0,0,.1) !important; }
+.dc__overlay-btn { background: #fff !important; color: #111 !important; font-weight: 700 !important; }
+.sc { background: #fff !important; border-bottom: 1px solid #ebebeb !important; }
+.sc:hover { background: #f7f7f7 !important; }
+.sc:hover::after { background: #059669 !important; }
+.pc { background: #fff !important; border-bottom: 1px solid #ebebeb !important; }
+.pc:hover { background: #f7f7f7 !important; }
+.ri { background: #fff !important; border-bottom: 1px solid #ebebeb !important; }
+.ri:hover { background: #f7f7f7 !important; }
+.mkc { background: #fff !important; border: 1px solid #ebebeb !important; border-radius: 8px !important; }
+.mkc:hover { border-color: #111 !important; box-shadow: none !important; }
+.hot-item:hover .hot-item__t { color: #059669 !important; }
+
+/* ── 13. 그리드 구분선 ───────────────────────────────── */
+.g-popular, .g-drops-pg, .g-sellers-pg, .g-sellers, .g-drops { background: #ebebeb !important; }
+
+/* ── 14. 사이드 카드 ─────────────────────────────────── */
+.side-card { background: #fff !important; border-radius: 10px !important; border: 1px solid #ebebeb !important; box-shadow: none !important; }
+.side-card__t { border-bottom: 2px solid #111111 !important; }
+.hot-title { border-bottom: 2px solid #111111 !important; }
+.rt-title { border-bottom: 2px solid #111111 !important; }
+.pbar__fill { background: #111111 !important; }
+.side-card__rv { color: #059669 !important; font-weight: 700 !important; }
+.side-card__row { border-bottom: 1px solid #f0f0f0 !important; }
+.side-card__row:hover { background: #f7f7f7 !important; }
+
+/* ── 15. 커뮤니티 ────────────────────────────────────── */
+.comm-side { background: #ffffff !important; border-right: 1px solid #ebebeb !important; }
+.comm-right { background: #ffffff !important; border-left: 1px solid #ebebeb !important; }
+.comm-side__link { color: #444 !important; }
+.comm-side__link:hover { background: #f7f7f7 !important; color: #111 !important; }
+.comm-side__link.act { background: #f7f7f7 !important; color: #111 !important; font-weight: 700 !important; }
+.comm-side__link.act .comm-side__dot { background: #059669 !important; }
+.comm-main { background: #f7f7f7 !important; }
+.post-item { background: #fff !important; border-bottom: 1px solid #ebebeb !important; }
+.post-item:hover { background: #f7f7f7 !important; }
+
+/* ── 16. 모달 ────────────────────────────────────────── */
+.modal { border-radius: 12px !important; box-shadow: 0 16px 48px rgba(0,0,0,.12) !important; }
+.modal__hd { background: #111111 !important; border-radius: 12px 12px 0 0 !important; }
+.modal__title { color: #fff !important; }
+.modal__close { color: rgba(255,255,255,.7) !important; }
+.modal__close:hover { background: rgba(255,255,255,.1) !important; color: #fff !important; }
+.modal-tab.act { color: #111111 !important; border-bottom-color: #111111 !important; }
+
+/* ── 17. 채팅 ────────────────────────────────────────── */
+.chat-panel__hd { background: #111111 !important; }
+.chat-msg.me { background: #111111 !important; }
+.chat-send { background: #059669 !important; }
+.chat-send:hover { background: #047857 !important; }
+
+/* ── 18. 마이페이지 ──────────────────────────────────── */
+.mp-side { background: #fff !important; border-right: 1px solid #ebebeb !important; }
+.mp-nav-link { color: #555 !important; }
+.mp-nav-link:hover { background: #f7f7f7 !important; color: #111 !important; }
+.mp-nav-link.act { background: #f7f7f7 !important; color: #111 !important; font-weight: 700 !important; border-left: 2px solid #059669 !important; }
+.mp-stat__val { color: #111 !important; font-weight: 800 !important; }
+.mp-sec-title { border-bottom: 2px solid #111111 !important; color: #111 !important; }
+
+/* ── 19. 폼 ──────────────────────────────────────────── */
+.form-input, .form-select, .form-textarea { background: #fff !important; border: 1px solid #d4d4d4 !important; color: #111 !important; border-radius: 8px !important; }
+.form-input:focus, .form-select:focus, .form-textarea:focus { border-color: #111111 !important; box-shadow: 0 0 0 3px rgba(0,0,0,.06) !important; }
+.form-label { color: #444 !important; font-weight: 600 !important; }
+.tag-opt { border-color: #d4d4d4 !important; color: #444 !important; border-radius: 6px !important; }
+.tag-opt:hover { border-color: #111 !important; color: #111 !important; }
+.tag-opt.sel { background: #111111 !important; border-color: #111111 !important; color: #fff !important; }
+
+/* ── 20. 검색 오버레이 ───────────────────────────────── */
+.search-ov { background: rgba(0,0,0,.92) !important; }
+.search-chip { background: rgba(255,255,255,.1) !important; border-color: rgba(255,255,255,.2) !important; color: rgba(255,255,255,.7) !important; }
+.search-chip:hover { background: rgba(5,150,105,.2) !important; border-color: rgba(5,150,105,.5) !important; color: #6ee7b7 !important; }
+
+/* ── 21. 바텀 네비 ───────────────────────────────────── */
+.bottom-nav { background: #fff !important; border-top: 1px solid #ebebeb !important; }
+.bottom-nav__item { color: #999 !important; }
+.bottom-nav__item.act { color: #111111 !important; }
+
+/* ── 22. LIVE / 뱃지 ─────────────────────────────────── */
+.live-dot { background: #059669 !important; }
+.live-tag { color: #059669 !important; background: #ecfdf5 !important; border-color: #a7f3d0 !important; font-weight: 700 !important; }
+.live-tag span { background: #059669 !important; }
+.badge-new { background: #ecfdf5 !important; color: #059669 !important; border-color: #a7f3d0 !important; }
+
+/* ── 23. 토스트 ──────────────────────────────────────── */
+.toast { border-radius: 8px !important; }
+.toast.success { border-left-color: #059669 !important; }
+.toast.info { border-left-color: #111111 !important; }
+
+/* ── 24. 푸터 ────────────────────────────────────────── */
+.site-foot { background: #111111 !important; border-top: 3px solid #059669 !important; }
+.site-foot__logo { color: #fff !important; font-weight: 800 !important; }
+.site-foot__logo em { color: #6ee7b7 !important; }
+.site-foot__copy { color: rgba(255,255,255,.4) !important; }
+.site-foot__links a { color: rgba(255,255,255,.45) !important; }
+.site-foot__links a:hover { color: #6ee7b7 !important; }
+
+/* ── 25. 스크롤바 ────────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-thumb { background: #d4d4d4; border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: #aaaaaa; }
