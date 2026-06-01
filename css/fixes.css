@@ -1,0 +1,191 @@
+/* ================================================================
+   fixes.css — 4가지 기능 스타일
+================================================================ */
+
+/* ── 1. 카테고리 바텀시트 ── */
+.fix-cat-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.5);
+  z-index: 3000;
+  align-items: flex-end;
+  justify-content: center;
+}
+.fix-cat-overlay.open { display: flex; }
+
+.fix-cat-sheet {
+  width: 100%;
+  max-width: 540px;
+  background: #fff;
+  border-radius: 20px 20px 0 0;
+  max-height: 65vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: fixCatUp .22s ease;
+  box-shadow: 0 -4px 32px rgba(0,0,0,.12);
+}
+@keyframes fixCatUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+.fix-cat-hd {
+  display: flex;
+  align-items: center;
+  padding: 14px 12px 10px;
+  border-bottom: 1px solid #e5e7eb;
+  flex-shrink: 0;
+}
+.fix-cat-title {
+  flex: 1;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 700;
+  color: #111;
+}
+.fix-cat-nav-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  font-size: 16px;
+  color: #6b7280;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .1s;
+}
+.fix-cat-nav-btn:hover { background: #f3f4f6; }
+
+.fix-cat-breadcrumb {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 3px 6px;
+  padding: 7px 16px;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 12px;
+  color: #9ca3af;
+  flex-shrink: 0;
+  min-height: 36px;
+}
+.fix-cat-breadcrumb:empty { display: none; }
+.fix-cat-crumb--last { color: #1e3a5f; font-weight: 700; }
+.fix-cat-sep { color: #d1d5db; }
+
+.fix-cat-list {
+  flex: 1;
+  overflow-y: auto;
+  list-style: none;
+  margin: 0;
+  padding: 6px 0 24px;
+}
+.fix-cat-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 20px;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(0,0,0,.04);
+  transition: background .1s;
+  outline: none;
+}
+.fix-cat-item:last-child { border-bottom: none; }
+.fix-cat-item:hover,
+.fix-cat-item:focus { background: #f9fafb; }
+.fix-cat-item--leaf:hover { background: #eff6ff; }
+.fix-cat-icon  { font-size: 18px; width: 24px; text-align: center; flex-shrink: 0; }
+.fix-cat-label { flex: 1; font-size: 14px; font-weight: 600; color: #111; }
+.fix-cat-arrow { font-size: 18px; color: #d1d5db; }
+.fix-cat-item--leaf .fix-cat-label { color: #1e3a5f; }
+
+/* 드롭폼 트리거 버튼 */
+.fix-cat-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  cursor: pointer;
+  text-align: left;
+  color: #9ca3af;
+  width: 100%;
+}
+.fix-cat-trigger.has-value { color: #111; }
+.fix-cat-trigger:hover { border-color: #1e3a5f; }
+
+/* ── 2. 채팅창 드래그 ── */
+#chatPanel {
+  user-select: none;
+}
+#chatPanel.is-dragging {
+  opacity: .95;
+  box-shadow: 0 8px 40px rgba(0,0,0,.22);
+}
+
+/* ── 3. 상품 카드 (채팅창) ── */
+.fix-product-card {
+  background: #f0f7ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 10px;
+  margin: 0 0 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.fix-product-card__inner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+}
+.fix-product-card__em {
+  font-size: 26px;
+  width: 42px;
+  height: 42px;
+  background: #dbeafe;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.fix-product-card__info { flex: 1; min-width: 0; }
+.fix-product-card__name {
+  font-size: 12px;
+  font-weight: 700;
+  color: #111;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 2px;
+}
+.fix-product-card__price {
+  font-size: 12px;
+  font-weight: 800;
+  color: #1e3a5f;
+}
+.fix-product-card__badge {
+  font-size: 10px;
+  font-weight: 700;
+  background: #dbeafe;
+  color: #2563eb;
+  padding: 3px 8px;
+  border-radius: 20px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* ── 4. 마이페이지 프로필 편집 ── */
+#mp-panel-profile input[readonly],
+#mp-panel-profile textarea[readonly] {
+  background: #f9fafb !important;
+  border-color: transparent !important;
+  cursor: default !important;
+  pointer-events: none !important;
+  box-shadow: none !important;
+  color: #374151 !important;
+}
