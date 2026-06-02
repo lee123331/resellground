@@ -7,13 +7,13 @@
 <title>리셀그라운드— 리셀그라운드</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="css/base.css"/>
-<link rel="stylesheet" href="css/layout.css"/>
-<link rel="stylesheet" href="css/components.css"/>
-<link rel="stylesheet" href="css/pages.css"/>
-<link rel="stylesheet" href="css/responsive.css"/>
-<link rel="stylesheet" href="css/design-override.css?v=20260601-1"/>
-<link rel="stylesheet" href="css/fixes.css"/>
+<link rel="stylesheet" href="css/base.css?v=20260603-1"/>
+<link rel="stylesheet" href="css/layout.css?v=20260603-1"/>
+<link rel="stylesheet" href="css/components.css?v=20260603-1"/>
+<link rel="stylesheet" href="css/pages.css?v=20260603-1"/>
+<link rel="stylesheet" href="css/responsive.css?v=20260603-1"/>
+<link rel="stylesheet" href="css/design-override.css?v=20260603-1"/>
+<link rel="stylesheet" href="css/fixes.css?v=20260603-1"/>
 </head>
 <body>
 
@@ -885,35 +885,22 @@
   <div class="mp-layout">
     <aside class="mp-side">
       <div class="mp-profile"><div class="mp-av av-a">🔥</div><p class="mp-name">sneaker.kang</p><p class="mp-tier">큐레이션 셀러</p></div>
-      <div class="mp-nav-link act" data-mp-tab="profile">프로필 관리</div>
+      <div class="mp-nav-link act" data-mp-tab="profile">프로필</div>
       <div class="mp-nav-link" data-mp-tab="myproducts">내 상품</div>
       <div class="mp-nav-link" data-mp-tab="posts">내 게시글</div>
       <div class="mp-nav-link" data-mp-tab="history">거래 내역</div>
       <div class="mp-nav-link" data-mp-tab="reviews">리뷰 관리</div>
+      <div class="mp-nav-link" data-mp-tab="settings">설정</div>
 
       <div class="mp-nav-link mp-logout-link" id="logoutBtnPc" data-logout>로그아웃</div>
     </aside>
     <div class="mp-main">
 
-      <!-- 패널: 프로필 관리 -->
+      <!-- 패널: 프로필 -->
       <div class="mp-panel" id="mp-panel-profile">
         <div class="mp-stats"><div class="mp-stat"><p class="mp-stat__val">847</p><p class="mp-stat__label">판매 완료</p></div><div class="mp-stat"><p class="mp-stat__val">4.98</p><p class="mp-stat__label">평점</p></div><div class="mp-stat"><p class="mp-stat__val">3.2K</p><p class="mp-stat__label">팔로워</p></div><div class="mp-stat"><p class="mp-stat__val">₩1.2B</p><p class="mp-stat__label">총 거래액</p></div></div>
-        <p class="mp-sec-title">프로필 정보</p>
-        <div class="form-row" style="margin-bottom:var(--sp-4)">
-          <div class="form-group"><label class="form-label">닉네임</label><input class="form-input" value="sneaker.kang"/></div>
-          <div class="form-group"><label class="form-label">이메일</label><input class="form-input" type="email" value="kang@example.com"/></div>
-          <div class="form-group"><label class="form-label">연락처</label><input class="form-input" id="mpTel" type="tel" value="010-****-****" autocomplete="tel" inputmode="numeric"/></div>
-          <div class="form-group"><label class="form-label">지역</label><input class="form-input" value="서울"/></div>
-          <div class="form-group" style="grid-column:1/-1"><label class="form-label">소개글</label><textarea class="form-textarea" id="mpBio" maxlength="200">스니커즈 전문 셀러입니다. Jordan 브랜드 중심으로 거래합니다.</textarea>
-        <p class="form-char"><span class="char-count-cur" id="mpBioCount">0</span>/200</p></div>
-          <div class="form-group"><label class="form-label">인스타그램</label><input class="form-input" id="mpInstagram" placeholder="@아이디"/></div>
-          <div class="form-group"><label class="form-label">틱톡</label><input class="form-input" placeholder="@아이디"/></div>
-        </div>
-        <p class="mp-sec-title">관심 카테고리</p>
-        <div class="tag-select" style="margin-bottom:var(--sp-6)"><div class="tag-opt sel">스니커즈</div><div class="tag-opt sel">Jordan</div><div class="tag-opt sel">Nike SB</div><div class="tag-opt">명품</div><div class="tag-opt">시계</div><div class="tag-opt">아우터</div></div>
-        <button class="btn btn--p" id="mpSaveBtn">저장하기</button>
 
-        <p class="mp-sec-title" style="margin-top:var(--s6)">🔖 북마크</p>
+        <p class="mp-sec-title">🔖 북마크</p>
         <div id="mpBookmarkList" style="margin-bottom:var(--s5)">
           <div class="empty-state">
             <p class="empty-state__icon">🔖</p>
@@ -928,6 +915,24 @@
           <div class="recent-item"><div class="recent-item__img">⌚</div><p class="recent-item__name">Rolex Sub 41mm</p><p class="recent-item__price">₩12,800,000</p></div>
           <div class="recent-item"><div class="recent-item__img">👜</div><p class="recent-item__name">Gucci Ophidia</p><p class="recent-item__price">₩1,240,000</p></div>
         </div>
+      </div><!-- /mp-panel-profile -->
+
+      <!-- 패널: 설정 -->
+      <div class="mp-panel" id="mp-panel-settings" style="display:none">
+        <p class="mp-sec-title">프로필 정보</p>
+        <div class="form-row" style="margin-bottom:var(--sp-4)">
+          <div class="form-group"><label class="form-label">닉네임</label><input class="form-input" id="mpNick" value="sneaker.kang"/></div>
+          <div class="form-group"><label class="form-label">이메일</label><input class="form-input" id="mpEmail" type="email" value="kang@example.com"/></div>
+          <div class="form-group"><label class="form-label">연락처</label><input class="form-input" id="mpTel" type="tel" value="010-****-****" autocomplete="tel" inputmode="numeric"/></div>
+          <div class="form-group"><label class="form-label">지역</label><input class="form-input" id="mpRegion" value="서울"/></div>
+          <div class="form-group" style="grid-column:1/-1"><label class="form-label">소개글</label><textarea class="form-textarea" id="mpBio" maxlength="200">스니커즈 전문 셀러입니다. Jordan 브랜드 중심으로 거래합니다.</textarea>
+        <p class="form-char"><span class="char-count-cur" id="mpBioCount">0</span>/200</p></div>
+          <div class="form-group"><label class="form-label">인스타그램</label><input class="form-input" id="mpInstagram" placeholder="@아이디"/></div>
+          <div class="form-group"><label class="form-label">틱톡</label><input class="form-input" id="mpTiktok" placeholder="@아이디"/></div>
+        </div>
+        <p class="mp-sec-title">관심 카테고리</p>
+        <div class="tag-select" style="margin-bottom:var(--sp-6)"><div class="tag-opt sel">스니커즈</div><div class="tag-opt sel">Jordan</div><div class="tag-opt sel">Nike SB</div><div class="tag-opt">명품</div><div class="tag-opt">시계</div><div class="tag-opt">아우터</div></div>
+        <button class="btn btn--p" id="mpSaveBtn">저장하기</button>
 
         <p class="mp-sec-title" style="margin-top:var(--s5)">알림 설정</p>
         <div style="background:var(--bg-soft);border-radius:var(--radius);padding:var(--s4)">
@@ -935,7 +940,7 @@
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--s3)"><span style="font-size:13px;font-weight:600">새 드롭 알림</span><input type="checkbox" checked style="accent-color:var(--three);width:16px;height:16px"/></div>
           <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;font-weight:600">채팅 알림</span><input type="checkbox" checked style="accent-color:var(--three);width:16px;height:16px"/></div>
         </div>
-      </div><!-- /mp-panel-profile -->
+      </div><!-- /mp-panel-settings -->
 
       <!-- 패널: 내 상품 -->
       <div class="mp-panel" id="mp-panel-myproducts" style="display:none">
@@ -1531,7 +1536,7 @@
           <p class="pd-seller__name" id="pdProductSeller">셀러</p>
           <p class="pd-seller__grade" id="pdSellerGrade">일반 셀러</p>
         </div>
-        <button class="pd-chat-btn" onclick="event.stopPropagation();requireLogin()">💬 채팅</button>
+        <button class="pd-chat-btn" id="pdChatBtn">💬 채팅</button>
       </div>
 
       <div class="pd-divider"></div>
@@ -1555,7 +1560,7 @@
       <!-- 하단 버튼 -->
       <div class="pd-actions">
         <button class="pd-bm-btn" id="pdBmBtn" onclick="event.stopPropagation();toggleBookmark(this)">🔖</button>
-        <button class="btn btn--p pd-trade-btn" onclick="event.stopPropagation();requireLogin()">거래하기</button>
+        <button class="btn btn--p pd-trade-btn" id="pdTradeBtn">거래하기</button>
       </div>
 
     </div>
@@ -1988,16 +1993,12 @@
   </div>
 </div>
 
-<script src="js/data.js?v=20260529-8"></script>
-<script src="js/render.js?v=20260529-8"></script>
-<script src="js/ui.js?v=20260529-8"></script>
-<script src="js/forms.js?v=20260601-1"></script>
-<script src="js/app.js?v=20260529-8"></script>
-<script src="js/product-detail-db.js?v=20260529-8"></script>
-<script src="js/ui.js?v=20260529-8"></script>
-<script src="js/forms.js?v=20260601-1"></script>
-<script src="js/app.js?v=20260529-8"></script>
-<script src="js/product-detail-db.js?v=20260529-8"></script>
-<script src="js/fixes.js"></script>
+<script src="js/data.js?v=20260603-1"></script>
+<script src="js/render.js?v=20260603-1"></script>
+<script src="js/ui.js?v=20260603-1"></script>
+<script src="js/forms.js?v=20260603-1"></script>
+<script src="js/app.js?v=20260603-1"></script>
+<script src="js/product-detail-db.js?v=20260603-1"></script>
+<script src="js/fixes.js?v=20260603-1"></script>
 </body>
 </html>

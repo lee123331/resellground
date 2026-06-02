@@ -1,19 +1,21 @@
 'use strict';
 /* ================================================================
-   fixes.js — 4가지 기능 재구현
-   기존 코드 일절 수정 없이 이 파일에서만 추가
+   fixes.js — 4가지 기능
+   1. 카테고리 캐스케이드 바텀시트 (상품 등록 페이지)
+   2. 채팅창 드래그 이동
+   3. 판매 상품 → 채팅 연결 (💬채팅 / 거래하기)
+   4. 마이페이지 설정 탭 저장 버튼
 ================================================================ */
 
-document.addEventListener('DOMContentLoaded', function () {
+function _fixesInit() {
 
   /* ============================================================
      1. 카테고리 캐스케이드 바텀시트
-        - 상품 등록 페이지: #pregCatBtn 클릭 시 오픈
-        - 드롭 빠른등록:    #dropCat select를 버튼으로 대체
+        상품 등록 페이지 #pregCatBtn 전용
+        (상품 등록 모달은 forms.js의 initDropCategorySheet 처리)
   ============================================================ */
   (function setupCategorySheet() {
 
-    /* ── 카테고리 데이터 ── */
     var CATS = [
       { id:'clothing', label:'의류', icon:'👕', children:[
         { id:'mens', label:'남성의류', children:[
@@ -31,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function () {
           ]},
         ]},
         { id:'womens', label:'여성의류', children:[
-          { id:'womens_top',  label:'상의',         children:[
+          { id:'womens_top',  label:'상의', children:[
             {id:'wtshirt',label:'티셔츠·블라우스'},{id:'wknit',label:'니트'},
           ]},
           { id:'womens_dress',label:'원피스·스커트', children:[
@@ -90,7 +92,6 @@ document.addEventListener('DOMContentLoaded', function () {
       { id:'etc',     label:'기타',     icon:'📦' },
     ];
 
-    /* ── 바텀시트 DOM ── */
     var overlay = document.createElement('div');
     overlay.id        = 'fixCatOverlay';
     overlay.className = 'fix-cat-overlay';
@@ -186,10 +187,10 @@ document.addEventListener('DOMContentLoaded', function () {
     });
     overlay.addEventListener('click', function(e){ if (e.target === overlay) close(); });
 
-    /* ── 상품 등록 페이지: pregCatBtn 연결 ── */
-    var pregCatBtn   = document.getElementById('pregCatBtn');
+    /* 상품 등록 페이지: pregCatBtn 연결 */
+    var pregCatBtn    = document.getElementById('pregCatBtn');
     var pregCatHidden = document.getElementById('pregCat');
-    var pregCatLabel = document.getElementById('pregCatLabel');
+    var pregCatLabel  = document.getElementById('pregCatLabel');
 
     if (pregCatBtn) {
       pregCatBtn.addEventListener('click', function() {
@@ -205,52 +206,11 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     }
 
-    /* ── 드롭 빠른등록 폼: dropCat select 대체 ── */
-    var dropCatSelect = document.getElementById('dropCat');
-    if (dropCatSelect && !document.getElementById('fixDropCatBtn')) {
-      var dropCatWrap = dropCatSelect.parentElement;
-
-      var dropBtn = document.createElement('button');
-      dropBtn.type      = 'button';
-      dropBtn.id        = 'fixDropCatBtn';
-      dropBtn.className = 'rg-product-input fix-cat-trigger';
-      dropBtn.innerHTML = '<span id="fixDropCatLabel">카테고리 선택</span>' +
-        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>';
-
-      dropCatWrap.insertBefore(dropBtn, dropCatSelect);
-      dropCatSelect.style.display = 'none';
-
-      dropBtn.addEventListener('click', function() {
-        open({
-          onSelect: function(result) {
-            var label = document.getElementById('fixDropCatLabel');
-            if (label) label.textContent = result.fullPath;
-            dropBtn.classList.add('has-value');
-
-            /* select에 option 추가 후 값 세팅 */
-            var opt = null;
-            for (var i = 0; i < dropCatSelect.options.length; i++) {
-              if (dropCatSelect.options[i].value === result.path[0].id) { opt = dropCatSelect.options[i]; break; }
-            }
-            if (!opt) {
-              opt = new Option(result.path[0].label, result.path[0].id);
-              dropCatSelect.add(opt);
-            }
-            dropCatSelect.value = opt.value;
-
-            var err = document.getElementById('dropCatErr');
-            if (err) err.style.display = 'none';
-          }
-        });
-      });
-    }
-
   })(); /* end setupCategorySheet */
 
 
   /* ============================================================
      2. 채팅창 드래그 이동
-        cursor:move 있는 헤더를 잡고 채팅창 이동
   ============================================================ */
   (function setupChatDrag() {
     var panel = document.getElementById('chatPanel');
@@ -258,16 +218,19 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!panel || !hd) return;
 
     var dragging = false;
-    var ox = 0, oy = 0;   /* 마우스-패널 왼쪽위 오프셋 */
+    var ox = 0, oy = 0;
+
+    function setStyle(prop, val) {
+      panel.style.setProperty(prop, val, 'important');
+    }
 
     function startDrag(clientX, clientY) {
-      /* position:fixed + bottom/right → left/top 으로 전환 */
       var rect = panel.getBoundingClientRect();
-      panel.style.right  = 'auto';
-      panel.style.bottom = 'auto';
-      panel.style.left   = rect.left + 'px';
-      panel.style.top    = rect.top  + 'px';
-
+      setStyle('right',  'auto');
+      setStyle('bottom', 'auto');
+      setStyle('width',  rect.width + 'px');
+      setStyle('left',   rect.left + 'px');
+      setStyle('top',    rect.top  + 'px');
       ox = clientX - rect.left;
       oy = clientY - rect.top;
       dragging = true;
@@ -276,30 +239,26 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function doDrag(clientX, clientY) {
       if (!dragging) return;
-      var newLeft = clientX - ox;
-      var newTop  = clientY - oy;
-      /* 화면 밖 방지 */
-      newLeft = Math.max(0, Math.min(newLeft, window.innerWidth  - panel.offsetWidth));
-      newTop  = Math.max(0, Math.min(newTop,  window.innerHeight - panel.offsetHeight));
-      panel.style.left = newLeft + 'px';
-      panel.style.top  = newTop  + 'px';
+      var newLeft = Math.max(0, Math.min(clientX - ox, window.innerWidth  - panel.offsetWidth));
+      var newTop  = Math.max(0, Math.min(clientY - oy, window.innerHeight - panel.offsetHeight));
+      setStyle('left', newLeft + 'px');
+      setStyle('top',  newTop  + 'px');
     }
 
     function endDrag() {
+      if (!dragging) return;
       dragging = false;
       panel.classList.remove('is-dragging');
     }
 
-    /* 마우스 */
     hd.addEventListener('mousedown', function(e) {
-      if (e.target.closest('button')) return;   /* 버튼 클릭은 드래그 제외 */
+      if (e.target.closest('button')) return;
       e.preventDefault();
       startDrag(e.clientX, e.clientY);
     });
     document.addEventListener('mousemove', function(e) { doDrag(e.clientX, e.clientY); });
     document.addEventListener('mouseup',   endDrag);
 
-    /* 터치 */
     hd.addEventListener('touchstart', function(e) {
       if (e.target.closest('button')) return;
       var t = e.touches[0];
@@ -318,45 +277,35 @@ document.addEventListener('DOMContentLoaded', function () {
 
   /* ============================================================
      3. 판매 상품 → 채팅 연결
-        상품 모달 💬채팅 클릭 → 판매자 채팅창 오픈 + 상품 카드
+        #pdChatBtn (💬채팅), #pdTradeBtn (거래하기) 클릭
+        → 상품 모달 닫고 판매자와 채팅 오픈 + 상품 카드 삽입
   ============================================================ */
   (function setupProductChat() {
-    var pdModal = document.getElementById('modal-product');
-    if (!pdModal) return;
 
-    pdModal.addEventListener('click', function(e) {
-      var btn = e.target.closest('.pd-chat-btn');
-      if (!btn) return;
-
-      /* 로그인 상태 확인 */
+    function openSellerChat() {
       if (!window.S || !window.S.loggedIn) {
         if (typeof openModal === 'function') openModal('login');
         return;
       }
 
-      /* 판매자, 상품 정보 읽기 */
-      var sellerName = (document.getElementById('pdProductSeller') || {}).textContent || '';
-      sellerName = sellerName.trim();
-      var productName  = ((document.getElementById('pdProductName')  || {}).textContent || '').trim();
-      var productPrice = ((document.getElementById('pdProductPrice') || {}).textContent || '').trim();
-      var productEm    = ((document.getElementById('pdProductImg')   || {}).textContent || '📦').trim();
+      var sellerName   = ((document.getElementById('pdProductSeller') || {}).textContent || '').trim();
+      var productName  = ((document.getElementById('pdProductName')   || {}).textContent || '').trim();
+      var productPrice = ((document.getElementById('pdProductPrice')  || {}).textContent || '').trim();
+      var productEm    = ((document.getElementById('pdProductImg')    || {}).textContent || '📦').trim();
 
       if (!sellerName) {
         if (typeof showToast === 'function') showToast('판매자 정보를 찾을 수 없어요.', 'error');
         return;
       }
 
-      /* 본인 상품 확인 */
       var user = (typeof getAuthUser === 'function') ? getAuthUser() : null;
       if (user && (user.nickname === sellerName || user.email === sellerName)) {
         if (typeof showToast === 'function') showToast('본인 상품입니다.', 'info');
         return;
       }
 
-      /* 상품 모달 닫기 */
       if (typeof closeModal === 'function') closeModal('product');
 
-      /* 채팅 패널 열기 */
       var panel = document.getElementById('chatPanel');
       if (panel && window.S && !window.S.chatOpen) {
         window.S.chatOpen = true;
@@ -365,18 +314,13 @@ document.addEventListener('DOMContentLoaded', function () {
         if (fab) fab.style.display = 'none';
       }
 
-      /* 채팅 대화 오픈 */
       if (typeof openChatWith === 'function') {
         openChatWith(sellerName);
       }
 
-      /* 상품 카드 삽입 */
-      // TODO: DB - conversations 테이블 조회/생성
       setTimeout(function() {
         var area = document.getElementById('chatMsgs');
         if (!area) return;
-
-        /* 중복 제거 */
         var old = area.querySelector('.fix-product-card');
         if (old) old.remove();
 
@@ -395,157 +339,77 @@ document.addEventListener('DOMContentLoaded', function () {
         area.insertBefore(card, area.firstChild);
         area.scrollTop = 0;
       }, 100);
+    }
 
-    }); /* end pdModal click */
+    var chatBtn  = document.getElementById('pdChatBtn');
+    var tradeBtn = document.getElementById('pdTradeBtn');
+    if (chatBtn)  chatBtn.addEventListener('click',  openSellerChat);
+    if (tradeBtn) tradeBtn.addEventListener('click', openSellerChat);
 
   })(); /* end setupProductChat */
 
 
   /* ============================================================
-     4. 마이페이지 프로필 — 편집 모드 + 저장 버튼
-        기본 읽기전용, "프로필 편집" 버튼 누른 후에만 수정 가능
+     4. 마이페이지 설정 탭 저장 버튼 UX
+        저장하기 버튼 클릭 시 변경 감지 → 저장 완료 토스트
   ============================================================ */
-  (function setupProfileEdit() {
-    var panel = document.getElementById('mp-panel-profile');
-    if (!panel) return;
+  (function setupSettingsPanel() {
+    var panel   = document.getElementById('mp-panel-settings');
+    var saveBtn = document.getElementById('mpSaveBtn');
+    if (!panel || !saveBtn) return;
 
-    /* ── 대상 input/textarea 수집 (checkbox·hidden 제외) ── */
     var fields = Array.from(
       panel.querySelectorAll('input:not([type=checkbox]):not([type=hidden]), textarea')
     );
 
     var origVals = {};
-    var editing  = false;
-    var dirty    = false;
+    fields.forEach(function(el, i) { origVals[i] = el.value; });
 
-    /* ── 값 스냅샷 ── */
-    function snapshot() {
-      fields.forEach(function(el, i) { origVals[i] = el.value; });
+    function isDirty() {
+      return fields.some(function(el, i) { return el.value !== origVals[i]; });
     }
 
-    /* ── dirty 여부 ── */
-    function checkDirty() {
-      dirty = fields.some(function(el, i) { return el.value !== origVals[i]; });
-      if (saveBtn) {
-        saveBtn.disabled = !dirty;
-        saveBtn.style.opacity = dirty ? '1' : '0.4';
-      }
+    function updateBtn() {
+      var dirty = isDirty();
+      saveBtn.disabled    = !dirty;
+      saveBtn.style.opacity = dirty ? '1' : '0.5';
     }
 
-    /* ── 모드 전환 ── */
-    function setEdit(on) {
-      editing = on;
-      fields.forEach(function(el) {
-        el.readOnly = !on;
-        if (on) {
-          el.style.background   = '';
-          el.style.borderColor  = '';
-          el.style.cursor       = '';
-          el.style.pointerEvents = '';
-        } else {
-          el.style.background   = 'var(--bg-soft, #f9fafb)';
-          el.style.borderColor  = 'transparent';
-          el.style.cursor       = 'default';
-          el.style.pointerEvents = 'none';
-        }
-      });
+    /* 초기 상태: 아직 변경 없으면 비활성 */
+    saveBtn.disabled    = true;
+    saveBtn.style.opacity = '0.5';
 
-      editBtn.textContent = on ? '취소' : '프로필 편집';
-      if (saveBtn) saveBtn.style.display = on ? 'inline-flex' : 'none';
-
-      if (!on) {
-        /* 취소 → 원래 값 복원 */
-        fields.forEach(function(el, i) { el.value = origVals[i]; });
-        dirty = false;
-        if (saveBtn) { saveBtn.disabled = true; saveBtn.style.opacity = '0.4'; }
-      }
-    }
-
-    /* ── 버튼 생성 ── */
-    /* 기존 mpSaveBtn 숨기기 */
-    var legacyBtn = document.getElementById('mpSaveBtn');
-    if (legacyBtn) legacyBtn.style.display = 'none';
-
-    /* 편집 버튼 */
-    var editBtn = document.createElement('button');
-    editBtn.type      = 'button';
-    editBtn.id        = 'fixProfileEditBtn';
-    editBtn.className = 'btn btn--outline-brand btn--sm';
-    editBtn.style.cssText = 'margin-bottom:16px;margin-right:8px;';
-    editBtn.textContent = '프로필 편집';
-    editBtn.addEventListener('click', function() { setEdit(!editing); });
-
-    /* 저장 버튼 */
-    var saveBtn = document.createElement('button');
-    saveBtn.type      = 'button';
-    saveBtn.id        = 'fixProfileSaveBtn';
-    saveBtn.className = 'btn btn--p btn--sm';
-    saveBtn.style.cssText = 'margin-bottom:16px;display:none;opacity:0.4;';
-    saveBtn.textContent = '저장하기';
-    saveBtn.disabled  = true;
-    saveBtn.addEventListener('click', function() {
-      if (!dirty) return;
-      // TODO: DB - profiles 테이블 UPDATE
-      snapshot();
-      dirty = false;
-      setEdit(false);
-      if (typeof showToast === 'function') showToast('저장되었습니다.', 'success');
-    });
-
-    /* mp-sec-title 바로 앞에 삽입 */
-    var secTitle = panel.querySelector('.mp-sec-title');
-    if (secTitle) {
-      panel.insertBefore(saveBtn, secTitle);
-      panel.insertBefore(editBtn, secTitle);
-    } else {
-      panel.prepend(saveBtn);
-      panel.prepend(editBtn);
-    }
-
-    /* ── 초기화 ── */
-    snapshot();
-    setEdit(false);
-
-    /* ── 변경 감지 ── */
     fields.forEach(function(el) {
-      el.addEventListener('input',  checkDirty);
-      el.addEventListener('change', checkDirty);
+      el.addEventListener('input',  updateBtn);
+      el.addEventListener('change', updateBtn);
     });
 
-    /* ── 브라우저 닫기/새로고침 경고 ── */
+    saveBtn.addEventListener('click', function() {
+      if (!isDirty()) return;
+      saveBtn.textContent = '저장 중...';
+      saveBtn.disabled = true;
+      setTimeout(function() {
+        fields.forEach(function(el, i) { origVals[i] = el.value; });
+        saveBtn.textContent   = '저장하기';
+        saveBtn.disabled      = true;
+        saveBtn.style.opacity = '0.5';
+        if (typeof showToast === 'function') showToast('설정이 저장되었습니다.', 'success');
+      }, 700);
+    });
+
     window.addEventListener('beforeunload', function(e) {
-      if (dirty && editing) {
+      if (isDirty()) {
         e.preventDefault();
         e.returnValue = '저장하지 않은 변경사항이 있습니다.';
       }
     });
 
-    /* ── SPA 탭 이탈 경고 ── */
-    document.querySelectorAll('[data-mp-tab]').forEach(function(link) {
-      link.addEventListener('click', function(e) {
-        if (!dirty || !editing) return;
-        if (!confirm('저장하지 않은 변경사항이 있습니다. 나가시겠습니까?')) {
-          e.stopImmediatePropagation();
-        } else {
-          dirty = false;
-          setEdit(false);
-        }
-      }, true);
-    });
+  })(); /* end setupSettingsPanel */
 
-    document.querySelectorAll('[data-goto]').forEach(function(link) {
-      link.addEventListener('click', function(e) {
-        if (!dirty || !editing) return;
-        if (!confirm('저장하지 않은 변경사항이 있습니다. 나가시겠습니까?')) {
-          e.stopImmediatePropagation();
-          e.preventDefault();
-        } else {
-          dirty = false;
-          setEdit(false);
-        }
-      }, true);
-    });
+} /* end _fixesInit */
 
-  })(); /* end setupProfileEdit */
-
-}); /* end DOMContentLoaded */
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', _fixesInit);
+} else {
+  _fixesInit();
+}

@@ -41,7 +41,7 @@
   .hero__kpi{grid-template-columns:repeat(2,1fr)}
   .trade-bar{gap:var(--s3)}
   .sec-hd{flex-direction:column;align-items:flex-start}
-  .chat-panel{width:100%;right:0!important;left:0!important;top:auto!important;bottom:0!important;border-radius:var(--radius-lg) var(--radius-lg) 0 0}
+  .chat-panel:not(.is-dragging){width:100%;right:0;left:0;top:auto;bottom:0;border-radius:var(--radius-lg) var(--radius-lg) 0 0}
   .modal{border-radius:var(--radius-lg)}
   .modal__body{padding:var(--s4)}
   .site-foot{flex-direction:column;text-align:center}
